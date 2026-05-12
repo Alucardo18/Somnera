@@ -28,7 +28,6 @@ final class AudioSessionManager {
     func switchToPlayback() throws {
         let session = AVAudioSession.sharedInstance()
         try session.setCategory(.playback, mode: .default, options: [])
-        try session.overrideOutputAudioPort(.speaker) // Forza la salida por el altavoz principal
         try session.setActive(true)
     }
 
