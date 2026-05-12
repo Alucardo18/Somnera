@@ -120,19 +120,24 @@ final class RecordingViewModel: ObservableObject {
             try AudioSessionManager.shared.configure()
             try audioFileService.ensureDirectoryExists()
             
-            // Setup AVAudioFile for recording
-            let audioURL = audioFileService.audioURL(for: id)
-            audioFile = try AVAudioFile(forWriting: audioURL, settings: audioFileService.recorderSettings)
-            
+            // Start engine FIRST so we know the output format
             try audioCapture.start()
             try snoreDetector.setup(format: audioCapture.outputFormat)
             motionDetector.start()
+            
+            // Create AVAudioFile using the SAME PCM format the engine delivers
+            let audioURL = audioFileService.audioURL(for: id)
+            audioFile = try AVAudioFile(
+                forWriting: audioURL,
+                settings: audioCapture.outputFormat.settings
+            )
+            print("[Somnera] 🎙️ Recording to: \(audioURL.lastPathComponent) | Format: \(audioCapture.outputFormat)")
             
             wireCallbacks()
             
             audioCapture.onBuffer = { [weak self] buffer, time in
                 self?.processBuffer(buffer, time: time)
-                // Write buffer to file
+                // Write PCM buffer directly — formats now match
                 try? self?.audioFile?.write(from: buffer)
             }
             
