@@ -35,24 +35,27 @@ final class DashboardViewModel: ObservableObject {
 
     var weeklyChartData: [ChartData] {
         let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
+        var calendarWithSundayStart = calendar
+        calendarWithSundayStart.firstWeekday = 1 // 1 = Domingo
         
-        // Generate last 7 days (including today)
-        let last7Days = (0..<7).map { dayOffset -> Date in
-            calendar.date(byAdding: .day, value: -dayOffset, to: today)!
-        }.reversed()
+        let today = calendarWithSundayStart.startOfDay(for: Date())
+        
+        // Encontrar el inicio de la semana (Domingo)
+        let components = calendarWithSundayStart.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)
+        guard let startOfWeek = calendarWithSundayStart.date(from: components) else { return [] }
         
         let dayFormatter = DateFormatter()
         dayFormatter.locale = Locale(identifier: "es_ES")
-        dayFormatter.dateFormat = "EEEEE" // One letter (L, M, X...)
+        dayFormatter.dateFormat = "EEEEE" // Una letra (D, L, M, X...)
         
-        return last7Days.map { day in
-            // Find all sessions on this specific day
+        return (0..<7).map { dayOffset in
+            let day = calendarWithSundayStart.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
+            
+            // Buscar sesiones en este día específico
             let sessionsOnDay = sessions.filter {
-                calendar.isDate($0.startDate, inSameDayAs: day)
+                calendarWithSundayStart.isDate($0.startDate, inSameDayAs: day)
             }
             
-            // If multiple sessions, take the average score (or max for safety)
             let score = sessionsOnDay.isEmpty ? 0 : 
                 sessionsOnDay.map { $0.snoreScore }.reduce(0, +) / sessionsOnDay.count
             
