@@ -61,6 +61,29 @@ struct SleepSession: Identifiable, Codable {
             .sorted { $0.offsetSeconds < $1.offsetSeconds } // Sort back by time
     }
 
+    /// Generates a human-readable summary of the night
+    var insightSummary: String {
+        if apneaEvents.isEmpty && snoreScore < 20 {
+            return "¡Noche perfecta! Tu respiración fue constante y silenciosa. Tu calidad de descanso es óptima."
+        }
+        
+        let hasCriticalApnea = apneaEvents.contains { $0.durationSeconds > 30 }
+        
+        if hasCriticalApnea {
+            return "Detectamos pausas respiratorias prolongadas (>30s). Esto reduce severamente tu oxígeno. Es importante que consultes con un especialista y consideres dormir de lado."
+        }
+        
+        if apneaEventCount > 0 {
+            return "Tu noche fue movida. Detectamos \(apneaEventCount) pausas respiratorias breves. Tus ronquidos ocuparon el \(Int(snorePercentage))% de la noche. Intenta evitar cenas pesadas."
+        }
+        
+        if snoreScore > 50 {
+            return "Ronquidos intensos detectados durante gran parte de la noche. Aunque no hubo apneas, tu nivel de esfuerzo respiratorio fue alto (\(Int(peakDecibels)) dB máximo)."
+        }
+        
+        return "Noche estable con algunos ronquidos aislados. No detectamos riesgos respiratorios importantes."
+    }
+
     // MARK: - Init
 
     init(

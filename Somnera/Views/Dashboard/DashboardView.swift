@@ -31,10 +31,10 @@ struct DashboardView: View {
                     VStack(spacing: 32) {
                         headerSection
                         
-                        startButton
-                            .padding(.horizontal)
-
                         if let session = viewModel.lastSession {
+                            InsightCardView(session: session)
+                                .padding(.horizontal)
+                            
                             ScoreCardView(session: session)
                                 .padding(.horizontal)
                             
@@ -48,6 +48,9 @@ struct DashboardView: View {
                         } else {
                             emptyStateCard
                         }
+
+                        startButton
+                            .padding(.horizontal)
 
                         if !viewModel.weeklyChartData.isEmpty {
                             WeeklyChartView(data: viewModel.weeklyChartData)
