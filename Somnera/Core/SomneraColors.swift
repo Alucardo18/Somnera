@@ -11,6 +11,7 @@ extension Color {
     static let somApnea        = Color(hex: "#FF4D4D")   // rojo vibrante
     static let somSafe         = Color(hex: "#00F5FF")   // cian neón
     static let somWarning      = Color(hex: "#FFD166")   // amarillo oro
+    static let somInfo         = Color(hex: "#20A4F3")   // azul información
 
     // MARK: - Text
     static let somTextPrimary  = Color(hex: "#F0F4FF")
