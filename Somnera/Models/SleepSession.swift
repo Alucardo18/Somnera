@@ -60,6 +60,8 @@ struct SleepSession: Identifiable, Codable, Hashable {
             .sorted { ($0.confidence * Double($0.peakDecibels)) > ($1.confidence * Double($1.peakDecibels)) }
             .prefix(5)
             .sorted { $0.offsetSeconds < $1.offsetSeconds } // Sort back by time
+    }
+
     /// Generates a human-readable summary of the night with high variation (50+ options)
     var insightSummary: String {
         let seed = abs(id.hashValue)
