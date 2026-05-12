@@ -56,7 +56,7 @@
 		3B2CDFF3AAE5762CBD959BED /* RecordingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingViewModel.swift; sourceTree = "<group>"; };
 		3B5CDDD6F190D10700AF53E1 /* AudioSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionManager.swift; sourceTree = "<group>"; };
 		44757D08C8733C3E1E37DE1E /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		4613D56AF3EA5A97B4F56D7F /* Somnera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Somnera.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4613D56AF3EA5A97B4F56D7F /* Somnera.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Somnera.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5394E29B5A0C2BAB2CE84C3D /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		560F26113D7731C71EA988F1 /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
 		57EE0EB93E7FFF684806E21B /* Somnera.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Somnera.entitlements; sourceTree = "<group>"; };
@@ -291,6 +291,7 @@
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					AFF2858196054339741A69BE = {
+						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -504,7 +505,7 @@
 				CODE_SIGN_ENTITLEMENTS = Somnera/Somnera.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = S5UW46GFUH;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Somnera/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -523,7 +524,7 @@
 				CODE_SIGN_ENTITLEMENTS = Somnera/Somnera.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = S5UW46GFUH;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Somnera/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

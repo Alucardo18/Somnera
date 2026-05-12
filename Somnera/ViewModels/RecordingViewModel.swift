@@ -21,6 +21,8 @@ final class RecordingViewModel: ObservableObject {
     @Published var isCharging: Bool = false
     @Published var currentMotionIntensity: Double = 0
     @Published var session: SleepSession? = nil // Nueva propiedad para exponer la sesión terminada
+    @Published var currentSurface: MotionDetectionService.SurfaceType = .unknown
+    @Published var currentDistance: Double = 0.5
     
     // MARK: - Services
     private let audioCapture = AudioCaptureService.shared
@@ -287,7 +289,19 @@ final class RecordingViewModel: ObservableObject {
             }
         }
         
-        snoreDetector.onSnoreDetected = { [weak self] confidence, offset in
+        motionDetector.onSurfaceDetected = { [weak self] surface in
+            Task { @MainActor in
+                self?.currentSurface = surface
+            }
+        }
+        
+        snoreDetector.onDistanceEstimated = { [weak self] distance in
+            Task { @MainActor in
+                self?.currentDistance = distance
+            }
+        }
+        
+        snoreDetector.onSnoreDetected = { [weak self] confidence, offset, distance in
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 let event = SnoreEvent(

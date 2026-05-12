@@ -9,11 +9,13 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
     static let shared = SnoreDetectionService()
 
     // MARK: - Callbacks
-    var onSnoreDetected: ((_ confidence: Double, _ offsetFromStart: TimeInterval) -> Void)?
+    var onSnoreDetected: ((_ confidence: Double, _ offsetFromStart: TimeInterval, _ distance: Double) -> Void)?
+    var onDistanceEstimated: ((_ meters: Double) -> Void)?
 
     // MARK: - Private
     private var streamAnalyzer: SNAudioStreamAnalyzer?
     private var sessionStart: Date?
+    private var lastDistance: Double = 0.5
     private let analysisQueue = DispatchQueue(label: "com.somnera.soundAnalysis", qos: .userInitiated)
 
     // MARK: - Setup
@@ -54,6 +56,33 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
 
     /// Feed each audio buffer from AudioCaptureService into the analyzer.
     func analyze(_ buffer: AVAudioPCMBuffer, at time: AVAudioTime) {
+        // Echo-Location Analysis
+        if let samples = buffer.floatChannelData?[0] {
+            let frameCount = Int(buffer.frameLength)
+            var sum: Float = 0
+            var maxVal: Float = 0
+            
+            for i in 0..<frameCount {
+                let s = abs(samples[i])
+                sum += s
+                maxVal = max(maxVal, s)
+            }
+            
+            let avg = sum / Float(frameCount)
+            // Crest Factor: ratio of peak to average
+            let crest = maxVal / (avg + 0.00001)
+            
+            // Heuristic: Crest > 8 is very close (0.2m - 0.5m), Crest < 4 is far (>1.5m)
+            let estimatedMeters = Double(max(0.3, min(2.5, 12.0 / Double(crest))))
+            
+            // Smoothing
+            lastDistance = (estimatedMeters * 0.1) + (lastDistance * 0.9)
+            
+            DispatchQueue.main.async { [weak self] in
+                self?.onDistanceEstimated?(self?.lastDistance ?? 0.5)
+            }
+        }
+
         analysisQueue.async { [weak self] in
             self?.streamAnalyzer?.analyze(buffer, atAudioFramePosition: time.sampleTime)
         }
@@ -77,7 +106,8 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
 
         let offset = sessionStart.map { Date().timeIntervalSince($0) } ?? 0
         DispatchQueue.main.async { [weak self] in
-            self?.onSnoreDetected?(snoreClass.confidence, offset)
+            guard let self = self else { return }
+            self.onSnoreDetected?(snoreClass.confidence, offset, self.lastDistance)
         }
     }
 

@@ -187,10 +187,32 @@ struct RecordingView: View {
         ZStack {
             Color.somBackground.opacity(0.9)
             VStack(spacing: 20) {
-                Text("Panel Técnico").font(.headline)
+                Text("Panel Técnico").font(.headline).foregroundColor(.white)
+                
+                HStack(spacing: 20) {
+                    VStack {
+                        Text("SUPERFICIE").font(.caption2).foregroundColor(.somTextSecondary)
+                        Text(vm.currentSurface.rawValue.uppercased())
+                            .font(.system(.body, design: .monospaced, weight: .bold))
+                            .foregroundColor(vm.currentSurface == .bed ? .somSafe : .somWarning)
+                    }
+                    
+                    VStack {
+                        Text("DISTANCIA").font(.caption2).foregroundColor(.somTextSecondary)
+                        Text(String(format: "%.1f m", vm.currentDistance))
+                            .font(.system(.body, design: .monospaced, weight: .bold))
+                            .foregroundColor(.somAccent)
+                    }
+                }
+                .padding()
+                .background(Color.white.opacity(0.05))
+                .cornerRadius(15)
+
                 WaveformView(samples: vm.latestWaveform, isApnea: vm.isApneaActive)
                     .frame(height: 80)
-                Text("\(Int(vm.currentDecibels)) dB").font(.title.bold())
+                
+                Text("\(Int(vm.currentDecibels)) dB").font(.title.bold()).foregroundColor(.white)
+                
                 Button("Cerrar") { showDebugInfo = false }
                     .foregroundColor(.somAccent)
             }
