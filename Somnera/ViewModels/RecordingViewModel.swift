@@ -33,7 +33,6 @@ final class RecordingViewModel: ObservableObject {
     // MARK: - Session State
     private var sessionID: UUID?
     private var sessionStart: Date?
-    private var audioRecorder: AVAudioRecorder?
     private var timerTask: Task<Void, Never>?
 
     // Event accumulators
@@ -94,6 +93,8 @@ final class RecordingViewModel: ObservableObject {
 
     // MARK: - Start/Stop Session
 
+    private var audioFile: AVAudioFile?
+
     func startSession() async {
         guard !isRecording else { return }
 
@@ -102,7 +103,7 @@ final class RecordingViewModel: ObservableObject {
         sessionID = id
         sessionStart = now
 
-        // Reset state
+        // ... (reset state)
         currentSnoreEvents = []
         currentApneaEvents = []
         decibelTimeline = []
@@ -119,18 +120,20 @@ final class RecordingViewModel: ObservableObject {
             try AudioSessionManager.shared.configure()
             try audioFileService.ensureDirectoryExists()
             
+            // Setup AVAudioFile for recording
+            let audioURL = audioFileService.audioURL(for: id)
+            audioFile = try AVAudioFile(forWriting: audioURL, settings: audioFileService.recorderSettings)
+            
             try audioCapture.start()
             try snoreDetector.setup(format: audioCapture.outputFormat)
             motionDetector.start()
-            
-            let audioURL = audioFileService.audioURL(for: id)
-            audioRecorder = try AVAudioRecorder(url: audioURL, settings: audioFileService.recorderSettings)
-            audioRecorder?.record()
             
             wireCallbacks()
             
             audioCapture.onBuffer = { [weak self] buffer, time in
                 self?.processBuffer(buffer, time: time)
+                // Write buffer to file
+                try? self?.audioFile?.write(from: buffer)
             }
             
             startTimer()
@@ -163,7 +166,7 @@ final class RecordingViewModel: ObservableObject {
         snoreDetector.stopSession()
         apneaDetector.stopSession()
         motionDetector.stop()
-        audioRecorder?.stop()
+        audioFile = nil // This closes the file properly
         AudioSessionManager.shared.deactivate()
 
         // Final Save
