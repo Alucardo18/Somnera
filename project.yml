@@ -35,6 +35,7 @@ targets:
         NSMicrophoneUsageDescription: "Somnera usa el micrófono para detectar y grabar ronquidos y pausas respiratorias durante tu sueño. Todo el procesamiento ocurre en tu dispositivo."
         NSHealthShareUsageDescription: "Somnera lee tu historial de sueño para mostrar tendencias y comparar con tus sesiones."
         NSHealthUpdateUsageDescription: "Somnera guarda tus sesiones de sueño en Apple Health para que puedas verlas junto con otros datos de salud."
+        NSMotionUsageDescription: "Somnera usa los sensores de movimiento para validar las pausas respiratorias y asegurar que los diagnósticos sean precisos."
         # Background audio (critical for overnight recording)
         UIBackgroundModes:
           - audio
