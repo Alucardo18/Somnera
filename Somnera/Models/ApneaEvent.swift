@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 /// A detected apnea event: sustained silence ≥ 10 seconds.
-struct ApneaEvent: Identifiable, Codable {
+struct ApneaEvent: Identifiable, Codable, Hashable {
     let id: UUID
     var offsetSeconds: Double       // Seconds from session start when apnea began
     var durationSeconds: Double     // Total silence duration

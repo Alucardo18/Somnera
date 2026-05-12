@@ -1,7 +1,7 @@
 import Foundation
 
 /// In-memory model representing a completed sleep session.
-struct SleepSession: Identifiable, Codable {
+struct SleepSession: Identifiable, Codable, Hashable {
     let id: UUID
     var startDate: Date
     var endDate: Date

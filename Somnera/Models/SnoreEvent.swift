@@ -1,7 +1,7 @@
 import Foundation
 
 /// A single detected snoring event within a sleep session.
-struct SnoreEvent: Identifiable, Codable {
+struct SnoreEvent: Identifiable, Codable, Hashable {
     let id: UUID
     var offsetSeconds: Double       // Seconds from session start
     var durationSeconds: Double
