@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		07B694CE61F98F18097DB73D /* DenoisingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618DC0E8EF4EDDE152C375F3 /* DenoisingService.swift */; };
 		13A7C8EF2FDBE2396F2FE9F6 /* SleepTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C0809D82B808ADD30C22C5 /* SleepTimelineView.swift */; };
 		15E6D930875917501B047F15 /* AudioFileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40492B7EDE7265E4C21C0AD /* AudioFileService.swift */; };
 		16BB5ED902AACC2371AC9BC0 /* ApneaDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134D5724A2BD322053DD0E27 /* ApneaDetectionService.swift */; };
@@ -57,12 +56,11 @@
 		3B2CDFF3AAE5762CBD959BED /* RecordingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingViewModel.swift; sourceTree = "<group>"; };
 		3B5CDDD6F190D10700AF53E1 /* AudioSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionManager.swift; sourceTree = "<group>"; };
 		44757D08C8733C3E1E37DE1E /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		4613D56AF3EA5A97B4F56D7F /* Somnera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Somnera.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4613D56AF3EA5A97B4F56D7F /* Somnera.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Somnera.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5394E29B5A0C2BAB2CE84C3D /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		560F26113D7731C71EA988F1 /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
 		57EE0EB93E7FFF684806E21B /* Somnera.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Somnera.entitlements; sourceTree = "<group>"; };
 		5B369953ECB83A7DB4D461F5 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
-		618DC0E8EF4EDDE152C375F3 /* DenoisingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DenoisingService.swift; sourceTree = "<group>"; };
 		76B9C440F7BFC784E1C8C4D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7CB6235F0F8E154DB382BCCA /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		7EDCA8B8718033F1E9CB041C /* SnoreDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoreDetectionService.swift; sourceTree = "<group>"; };
@@ -100,7 +98,6 @@
 				0DC885CED0AF5616524143DA /* AudioCaptureService.swift */,
 				0FB8ACA65890D15EDBD28EC8 /* AudioPlaybackService.swift */,
 				3B5CDDD6F190D10700AF53E1 /* AudioSessionManager.swift */,
-				618DC0E8EF4EDDE152C375F3 /* DenoisingService.swift */,
 			);
 			path = AudioEngine;
 			sourceTree = "<group>";
@@ -294,6 +291,7 @@
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					AFF2858196054339741A69BE = {
+						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -345,7 +343,6 @@
 				9C3CFA597C1D9B344F71D606 /* DSPFilter.swift in Sources */,
 				5114794DA9C8CCD290FAA12B /* DashboardView.swift in Sources */,
 				587A4FE7723EA8BAB43BE9FA /* DashboardViewModel.swift in Sources */,
-				07B694CE61F98F18097DB73D /* DenoisingService.swift in Sources */,
 				75B60EE4D6DA102CA711957E /* HealthKitService.swift in Sources */,
 				8EC0E3DFEC5EA1D981D309DD /* HighlightsView.swift in Sources */,
 				CB5CBD8EBA8EBAE2E2940F36 /* MotionDetectionService.swift in Sources */,
@@ -508,7 +505,7 @@
 				CODE_SIGN_ENTITLEMENTS = Somnera/Somnera.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = S5UW46GFUH;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Somnera/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -527,7 +524,7 @@
 				CODE_SIGN_ENTITLEMENTS = Somnera/Somnera.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = S5UW46GFUH;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Somnera/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -30,6 +30,10 @@ final class AudioCaptureService {
 
     func start() throws {
         let inputNode   = engine.inputNode
+        
+        // 🚀 Activar el procesamiento de voz nativo de Apple (Denoising Profesional)
+        try? inputNode.setVoiceProcessingEnabled(true)
+        
         // ⚠️ MUST use the hardware's native format for the tap
         let nativeFormat = inputNode.outputFormat(forBus: 0)
 
