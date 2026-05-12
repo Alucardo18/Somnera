@@ -26,12 +26,23 @@ struct SleepSession: Identifiable, Codable {
         return min(100, (snoreDurationSeconds / duration) * 100)
     }
 
-    /// 0–100 score: weighted average of % time snoring + intensity
+    /// 0–100 score: weighted average of % time snoring + intensity + apnea severity
     var snoreScore: Int {
         let percentWeight = snorePercentage * 0.5                    // Máximo 50 pts por duración
         let dbWeight = Double(peakDecibels / 90.0) * 20              // Máximo 20 pts por volumen
-        let apneaWeight = Double(apneaEvents.count) * 10             // 10 pts por cada apnea detectada
-        return min(100, Int(percentWeight + dbWeight + apneaWeight))
+        
+        // Cálculo de Severidad de Apnea
+        let apneaRiskPoints = apneaEvents.reduce(0.0) { total, event in
+            if event.durationSeconds < 15 {
+                return total + 2.0  // Leve
+            } else if event.durationSeconds < 30 {
+                return total + 5.0  // Moderada
+            } else {
+                return total + 12.0 // Crítica
+            }
+        }
+        
+        return min(100, Int(percentWeight + dbWeight + apneaRiskPoints))
     }
 
     var apneaEventCount: Int { apneaEvents.count }

@@ -354,7 +354,7 @@ struct ScoreExplanationView: View {
                         explanationRow(
                             icon: "lungs.fill",
                             title: "Eventos Respiratorios",
-                            description: "Cada apnea detectada añade una penalización de 10 puntos debido al riesgo que representan."
+                            description: "Analizamos la duración de cada pausa. Las apneas de más de 30 segundos tienen una penalización mayor por su riesgo cardiaco."
                         )
                         
                         explanationRow(
