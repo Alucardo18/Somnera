@@ -8,17 +8,23 @@ final class DenoisingService {
     static let shared = DenoisingService()
     
     private var noiseFloor: [Float]?
-    private let alpha: Float = 0.98 // Smoothing factor for noise estimation
-    private let suppressionFactor: Float = 2.0 // How aggressive the filter is
+    private let alpha: Float = 0.995 // Much slower adaptation to avoid eating signal
+    private let suppressionFactor: Float = 1.2 // Gentler suppression
     
     // FFT Setup
     private let fftSize: Int = 1024
     private let log2n: vDSP_Length
     private let fftSetup: FFTSetup
+    private let window: [Float]
     
     private init() {
         self.log2n = vDSP_Length(log2(Double(fftSize)))
         self.fftSetup = vDSP_create_fftsetup(log2n, FFTRadix(kFFTRadix2))!
+        
+        // Create Hann window
+        var window = [Float](repeating: 0, count: fftSize)
+        vDSP_hann_window(&window, vDSP_Length(fftSize), Int32(vDSP_HANN_NORM))
+        self.window = window
     }
     
     deinit {
@@ -55,12 +61,15 @@ final class DenoisingService {
     }
     
     private func processChunk(input: UnsafePointer<Float>, output: UnsafeMutablePointer<Float>) {
+        var windowedInput = [Float](repeating: 0, count: fftSize)
+        vDSP_vmul(input, 1, window, 1, &windowedInput, 1, vDSP_Length(fftSize))
+        
         var real = [Float](repeating: 0, count: fftSize / 2)
         var imag = [Float](repeating: 0, count: fftSize / 2)
         
         // 1. Convert to Split Complex
         var splitComplex = DSPSplitComplex(realp: &real, imagp: &imag)
-        input.withMemoryRebound(to: DSPComplex.self, capacity: fftSize / 2) { 
+        windowedInput.withMemoryRebound(to: DSPComplex.self, capacity: fftSize / 2) { 
             vDSP_ctoz($0, 2, &splitComplex, 1, vDSP_Length(fftSize / 2))
         }
         
