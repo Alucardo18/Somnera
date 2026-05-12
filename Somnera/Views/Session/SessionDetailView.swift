@@ -16,13 +16,29 @@ struct SessionDetailView: View {
 
     var body: some View {
         ZStack {
+            // MARK: - Premium Mesh Background
             Color.somBackground.ignoresSafeArea()
-
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Header stats
+            
+            ZStack {
+                Circle()
+                    .fill(Color.somMesh3.opacity(0.3))
+                    .frame(width: 400, height: 400)
+                    .blur(radius: 80)
+                    .offset(x: -150, y: -200)
+                
+                Circle()
+                    .fill(Color.somAccent.opacity(0.12))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 60)
+                    .offset(x: 150, y: 100)
+            }
+            .ignoresSafeArea()
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 28) {
+                    // Main Score & Quick Stats
                     headerStats
-
+                    
                     // Snore events summary
                     if !session.snoreEvents.isEmpty {
                         eventsSection(
@@ -31,11 +47,8 @@ struct SessionDetailView: View {
                             color: .somAccent
                         ) {
                             VStack(spacing: 16) {
-                                // AI Insight for Snores
                                 aiInsightBox(text: aiReport.snoreInsight, color: .somAccent)
-                                
-                                integratedSnoreLegend
-                                    .padding(.bottom, 8)
+                                integratedSnoreLegend.padding(.bottom, 8)
                                 
                                 let grouped = groupSnoreEventsByHour(session.snoreEvents)
                                 ForEach(grouped.keys.sorted(), id: \.self) { hourKey in
@@ -54,11 +67,8 @@ struct SessionDetailView: View {
                             color: worstApneaColor
                         ) {
                             VStack(spacing: 16) {
-                                // AI Insight for Apneas
                                 aiInsightBox(text: aiReport.apneaInsight, color: worstApneaColor)
-                                
-                                integratedApneaLegend
-                                    .padding(.bottom, 8)
+                                integratedApneaLegend.padding(.bottom, 8)
                                 
                                 let grouped = groupApneaEventsByHour(session.apneaEvents)
                                 ForEach(grouped.keys.sorted(), id: \.self) { hourKey in
@@ -74,9 +84,7 @@ struct SessionDetailView: View {
                         audioPlayerSection
                     }
 
-                    // Medical disclaimer
-                    disclaimerView
-                        .padding(.bottom, 32)
+                    disclaimerView.padding(.bottom, 32)
                 }
                 .padding()
             }
@@ -91,42 +99,29 @@ struct SessionDetailView: View {
     // MARK: - AI Components
 
     private func aiInsightBox(text: String, color: Color) -> some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: 14) {
             Image(systemName: "sparkles")
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: 18, weight: .bold))
                 .foregroundColor(color)
-                .padding(8)
-                .background(color.opacity(0.15))
+                .padding(10)
+                .background(color.opacity(0.12))
                 .clipShape(Circle())
-                .shadow(color: color.opacity(0.3), radius: 5)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text("ANÁLISIS IA")
                     .font(.system(size: 10, weight: .black))
                     .foregroundColor(color)
-                    .tracking(1)
+                    .tracking(1.5)
                 
                 Text(text)
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundColor(.somTextPrimary)
-                    .lineSpacing(2)
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .foregroundColor(.white)
+                    .lineSpacing(4)
             }
         }
-        .padding(14)
+        .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            ZStack {
-                Color.somSurfaceHigh.opacity(0.3)
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(
-                        LinearGradient(colors: [color.opacity(0.5), color.opacity(0.1)], 
-                                       startPoint: .topLeading, 
-                                       endPoint: .bottomTrailing), 
-                        lineWidth: 1
-                    )
-            }
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .somGlassStyle(cornerRadius: 18)
     }
 
     // MARK: - Computed Colors
@@ -152,32 +147,73 @@ struct SessionDetailView: View {
     // MARK: - Header Stats
 
     private var headerStats: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            statTile(label: "Score", value: "\(session.snoreScore)", unit: "/100", color: scoreColor)
-            statTile(label: "Duración", value: session.formattedDuration, unit: "", color: .somTextPrimary)
-            statTile(label: "Roncando", value: String(format: "%.0f", session.snorePercentage), unit: "%", color: .somAccent)
-            statTile(label: "Pico", value: String(format: "%.0f", session.peakDecibels), unit: "dB", color: .somWarning)
+        VStack(spacing: 32) {
+            // Neon Score Gauge
+            ZStack {
+                // Outer Glow
+                Circle()
+                    .stroke(scoreColor.opacity(0.3), lineWidth: 18)
+                    .blur(radius: 15)
+                    .frame(width: 170, height: 170)
+                
+                Circle()
+                    .stroke(Color.somSurfaceHigh.opacity(0.4), lineWidth: 14)
+                    .frame(width: 170, height: 170)
+                
+                Circle()
+                    .trim(from: 0, to: CGFloat(session.snoreScore) / 100)
+                    .stroke(
+                        AngularGradient(
+                            colors: [scoreColor.opacity(0.6), scoreColor],
+                            center: .center,
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(270)
+                        ),
+                        style: StrokeStyle(lineWidth: 14, lineCap: .round)
+                    )
+                    .frame(width: 170, height: 170)
+                    .rotationEffect(.degrees(-90))
+                
+                VStack(spacing: -2) {
+                    Text("\(session.snoreScore)")
+                        .font(.system(size: 56, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    Text("Puntos")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.somTextSecondary)
+                }
+            }
+            .padding(.top, 10)
+            
+            // Stats Grid
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                statTile(label: "Duración", value: session.formattedDuration, unit: "", color: .somSafe)
+                statTile(label: "Roncando", value: String(format: "%.0f", session.snorePercentage), unit: "%", color: .somAccent)
+                statTile(label: "Pico", value: String(format: "%.0f", session.peakDecibels), unit: "dB", color: .somWarning)
+                statTile(label: "Apneas", value: "\(session.apneaEvents.count)", unit: "ev", color: .somApnea)
+            }
         }
     }
 
     private func statTile(label: String, value: String, unit: String, color: Color) -> some View {
         VStack(spacing: 4) {
             Text(label)
-                .font(.caption)
+                .font(.system(size: 11, weight: .black))
                 .foregroundColor(.somTextSecondary)
+                .tracking(1)
+            
             HStack(alignment: .lastTextBaseline, spacing: 2) {
                 Text(value)
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
                     .foregroundColor(color)
                 if !unit.isEmpty {
-                    Text(unit).font(.caption).foregroundColor(.somTextSecondary)
+                    Text(unit).font(.caption2).foregroundColor(.somTextSecondary)
                 }
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(16)
-        .background(Color.somSurface)
-        .clipShape(RoundedRectangle(cornerRadius: SomneraConstants.Design.cornerRadius))
+        .padding(.vertical, 20)
+        .somGlassStyle(cornerRadius: 18)
     }
 
     // MARK: - Events Section
@@ -187,18 +223,18 @@ struct SessionDetailView: View {
         title: String, icon: String, color: Color,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             Label(title, systemImage: icon)
-                .font(.subheadline.bold())
+                .font(.system(size: 14, weight: .black))
                 .foregroundColor(color)
+                .tracking(1)
 
-            VStack(spacing: 8) {
+            VStack(spacing: 12) {
                 content()
             }
         }
-        .padding(SomneraConstants.Design.cardPadding)
-        .background(Color.somSurface)
-        .clipShape(RoundedRectangle(cornerRadius: SomneraConstants.Design.cornerRadius))
+        .padding(20)
+        .somGlassStyle(cornerRadius: 24)
     }
 
     // MARK: - Snore Rows

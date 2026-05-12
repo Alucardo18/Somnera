@@ -8,14 +8,28 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                // MARK: - Premium Mesh Background
                 Color.somBackground.ignoresSafeArea()
+                
+                ZStack {
+                    Circle()
+                        .fill(Color.somMesh3.opacity(0.3))
+                        .frame(width: 400, height: 400)
+                        .blur(radius: 80)
+                        .offset(x: -150, y: -200)
+                    
+                    Circle()
+                        .fill(Color.somAccent.opacity(0.12))
+                        .frame(width: 300, height: 300)
+                        .blur(radius: 60)
+                        .offset(x: 150, y: 100)
+                }
+                .ignoresSafeArea()
 
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Header
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 32) {
                         headerSection
 
-                        // Last night score
                         if let session = viewModel.lastSession {
                             ScoreCardView(session: session)
                                 .padding(.horizontal)
@@ -23,18 +37,16 @@ struct DashboardView: View {
                             emptyStateCard
                         }
 
-                        // Weekly chart
                         if viewModel.sessions.count > 1 {
                             WeeklyChartView(scores: viewModel.weeklyScores)
                                 .padding(.horizontal)
                         }
 
-                        // Start button
                         startButton
                             .padding(.horizontal)
                             .padding(.bottom, 32)
                     }
-                    .padding(.top, 8)
+                    .padding(.top, 16)
                 }
             }
             .navigationTitle("")
@@ -71,44 +83,45 @@ struct DashboardView: View {
     }
 
     private var emptyStateCard: some View {
-        RoundedRectangle(cornerRadius: SomneraConstants.Design.cornerRadius)
-            .fill(Color.somSurface)
-            .frame(height: 180)
-            .overlay(
-                VStack(spacing: 12) {
-                    Image(systemName: "moon.stars")
-                        .font(.system(size: 40))
-                        .foregroundColor(.somAccent.opacity(0.6))
-                    Text("Sin sesiones aún")
-                        .font(.headline)
-                        .foregroundColor(.somTextSecondary)
-                    Text("Inicia tu primera sesión esta noche")
-                        .font(.caption)
-                        .foregroundColor(.somTextSecondary.opacity(0.7))
-                }
-            )
-            .padding(.horizontal)
+        VStack(spacing: 16) {
+            Image(systemName: "moon.stars.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(Color.somAccent.gradient)
+            
+            VStack(spacing: 4) {
+                Text("Sin sesiones aún")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Text("Inicia tu primera sesión esta noche")
+                    .font(.caption)
+                    .foregroundColor(.somTextSecondary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 200)
+        .somGlassStyle(cornerRadius: 24)
+        .padding(.horizontal)
     }
 
     private var startButton: some View {
         Button {
             showRecording = true
         } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: 16) {
                 Image(systemName: "record.circle.fill")
                     .font(.title2)
                 Text("Iniciar Sesión Nocturna")
-                    .font(.system(.title3, design: .rounded, weight: .semibold))
+                    .font(.system(.title3, design: .rounded, weight: .bold))
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
+            .padding(.vertical, 22)
             .background(Color.somGradient)
             .foregroundColor(.white)
-            .clipShape(RoundedRectangle(cornerRadius: SomneraConstants.Design.cornerRadius))
-            .shadow(color: Color.somAccent.opacity(0.4), radius: 16, y: 6)
+            .clipShape(RoundedRectangle(cornerRadius: 22))
+            .shadow(color: Color.somAccent.opacity(0.5), radius: 20, y: 10)
         }
-        .scaleEffect(appState.isRecording ? 0.97 : 1.0)
-        .animation(.spring(response: 0.3), value: appState.isRecording)
+        .scaleEffect(appState.isRecording ? 0.95 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: appState.isRecording)
     }
 }
 
@@ -126,43 +139,45 @@ struct ScoreCardView: View {
     }
 
     var body: some View {
-        RoundedRectangle(cornerRadius: SomneraConstants.Design.cornerRadius)
-            .fill(Color.somSurface)
-            .overlay(
-                HStack(spacing: 24) {
-                    // Score circle
-                    ZStack {
-                        Circle()
-                            .stroke(scoreColor.opacity(0.2), lineWidth: 8)
-                        Circle()
-                            .trim(from: 0, to: CGFloat(session.snoreScore) / 100)
-                            .stroke(scoreColor, style: StrokeStyle(lineWidth: 8, lineCap: .round))
-                            .rotationEffect(.degrees(-90))
-                        VStack(spacing: 2) {
-                            Text("\(session.snoreScore)")
-                                .font(.system(size: 36, weight: .bold, design: .rounded))
-                                .foregroundColor(.somTextPrimary)
-                            Text("Score")
-                                .font(.caption2)
-                                .foregroundColor(.somTextSecondary)
-                        }
-                    }
-                    .frame(width: 110, height: 110)
-
-                    // Stats
-                    VStack(alignment: .leading, spacing: 10) {
-                        statRow(icon: "timer", label: "Duración", value: session.formattedDuration)
-                        statRow(icon: "waveform", label: "Roncando", value: String(format: "%.0f%%", session.snorePercentage))
-                        statRow(icon: "lungs.fill", label: "Apneas", value: "\(session.apneaEventCount)",
-                                color: session.apneaEventCount > 0 ? .somApnea : .somSafe)
-                        statRow(icon: "speaker.wave.3.fill", label: "Pico dB", value: String(format: "%.0f dB", session.peakDecibels))
-                    }
-
-                    Spacer()
+        HStack(spacing: 24) {
+            // Score circle with glow
+            ZStack {
+                Circle()
+                    .stroke(scoreColor.opacity(0.3), lineWidth: 8)
+                    .blur(radius: 8)
+                
+                Circle()
+                    .stroke(Color.somSurfaceHigh.opacity(0.5), lineWidth: 6)
+                
+                Circle()
+                    .trim(from: 0, to: CGFloat(session.snoreScore) / 100)
+                    .stroke(scoreColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                
+                VStack(spacing: 0) {
+                    Text("\(session.snoreScore)")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    Text("Puntos")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundColor(.somTextSecondary)
                 }
-                .padding(SomneraConstants.Design.cardPadding)
-            )
-            .frame(height: 160)
+            }
+            .frame(width: 100, height: 100)
+
+            // Stats
+            VStack(alignment: .leading, spacing: 10) {
+                statRow(icon: "timer", label: "Duración", value: session.formattedDuration)
+                statRow(icon: "waveform", label: "Roncando", value: String(format: "%.0f%%", session.snorePercentage))
+                statRow(icon: "lungs.fill", label: "Apneas", value: "\(session.apneaEventCount)",
+                        color: session.apneaEventCount > 0 ? .somApnea : .somSafe)
+            }
+
+            Spacer()
+        }
+        .padding(20)
+        .somGlassStyle(cornerRadius: 24)
+        .frame(height: 160)
     }
 
     private func statRow(icon: String, label: String, value: String, color: Color = .somTextPrimary) -> some View {
@@ -190,31 +205,36 @@ struct WeeklyChartView: View {
     private let dayLabels = ["L", "M", "X", "J", "V", "S", "D"]
 
     var body: some View {
-        RoundedRectangle(cornerRadius: SomneraConstants.Design.cornerRadius)
-            .fill(Color.somSurface)
-            .overlay(
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Últimas \(scores.count) noches")
-                        .font(.subheadline.bold())
-                        .foregroundColor(.somTextPrimary)
+        VStack(alignment: .leading, spacing: 20) {
+            Text("Tendencia Semanal")
+                .font(.system(size: 14, weight: .black))
+                .foregroundColor(.white)
+                .tracking(1)
 
-                    HStack(alignment: .bottom, spacing: 8) {
-                        ForEach(Array(scores.enumerated()), id: \.offset) { i, score in
-                            VStack(spacing: 6) {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(barColor(score: score))
-                                    .frame(width: 28, height: max(8, CGFloat(score) * 1.2))
-                                Text(dayLabels[i % 7])
-                                    .font(.system(size: 10))
-                                    .foregroundColor(.somTextSecondary)
-                            }
+            HStack(alignment: .bottom, spacing: 10) {
+                ForEach(Array(scores.enumerated()), id: \.offset) { i, score in
+                    VStack(spacing: 8) {
+                        ZStack(alignment: .bottom) {
+                            Capsule()
+                                .fill(Color.somSurfaceHigh.opacity(0.3))
+                                .frame(width: 24, height: 80)
+                            
+                            Capsule()
+                                .fill(barColor(score: score).gradient)
+                                .frame(width: 24, height: max(10, CGFloat(score) * 0.8))
                         }
+                        
+                        Text(dayLabels[i % 7])
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(.somTextSecondary)
                     }
-                    .frame(maxWidth: .infinity)
                 }
-                .padding(SomneraConstants.Design.cardPadding)
-            )
-            .frame(height: 160)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(20)
+        .somGlassStyle(cornerRadius: 24)
+        .frame(height: 180)
     }
 
     private func barColor(score: Int) -> Color {

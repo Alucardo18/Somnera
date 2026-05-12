@@ -9,24 +9,39 @@ struct RecordingView: View {
     
     var body: some View {
         ZStack {
+            // MARK: - Premium Mesh Background
             Color.somBackground.ignoresSafeArea()
             
+            ZStack {
+                Circle()
+                    .fill(Color.somMesh3.opacity(0.2))
+                    .frame(width: 400, height: 400)
+                    .blur(radius: 80)
+                    .offset(x: -150, y: -200)
+                
+                Circle()
+                    .fill(Color.somAccent.opacity(0.1))
+                    .frame(width: 300, height: 300)
+                    .blur(radius: 60)
+                    .offset(x: 150, y: 100)
+            }
+            .ignoresSafeArea()
+            
             if !vm.isCharging {
-                // Phase 1: Charger Warning
                 chargerWarningView
             } else {
-                // Phase 2: Night Mode
                 nightModeView
             }
             
-            // Debug Toggle (Hidden button in top corner)
+            // Debug Toggle
             VStack {
                 HStack {
                     Spacer()
                     Button { showDebugInfo.toggle() } label: {
                         Image(systemName: "chart.bar.xaxis")
-                            .font(.caption)
+                            .font(.title3)
                             .foregroundColor(.somSurfaceHigh)
+                            .padding(8)
                     }
                 }
                 Spacer()
@@ -59,26 +74,31 @@ struct RecordingView: View {
             
             ZStack {
                 Circle()
-                    .stroke(Color.somWarning.opacity(0.2), lineWidth: 2)
+                    .stroke(Color.somWarning.opacity(0.3), lineWidth: 4)
                     .frame(width: 160, height: 160)
+                    .blur(radius: 8)
                 
                 Image(systemName: "battery.100.bolt")
                     .font(.system(size: 80))
                     .foregroundColor(.somWarning)
+                    .shadow(color: .somWarning.opacity(0.5), radius: 15)
                     .symbolEffect(.pulse, options: .repeating)
             }
             
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 Text("¡Conecta el cargador!")
-                    .font(.system(.title, design: .rounded, weight: .bold))
-                    .foregroundColor(.somTextPrimary)
+                    .font(.system(size: 28, weight: .black, design: .rounded))
+                    .foregroundColor(.white)
                 
                 Text("Para asegurar que Somnera pueda monitorizar toda tu noche sin interrupciones, conecta tu iPhone a la corriente.")
-                    .font(.body)
-                    .foregroundColor(.somTextSecondary)
+                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .foregroundColor(Color.somTextSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 40)
             }
+            .padding(30)
+            .somGlassStyle(cornerRadius: 30)
+            .padding(.horizontal, 20)
             
             Spacer()
             
@@ -86,7 +106,7 @@ struct RecordingView: View {
                 .padding(.horizontal, 40)
                 .padding(.bottom, 48)
         }
-        .transition(.asymmetric(insertion: .opacity, removal: .move(edge: .top)))
+        .transition(.opacity)
     }
     
     private var nightModeView: some View {
@@ -96,10 +116,12 @@ struct RecordingView: View {
                 Circle()
                     .fill(Color.somAccent)
                     .frame(width: 8, height: 8)
+                    .shadow(color: .somAccent, radius: 4)
                     .opacity(vm.elapsedSeconds % 2 == 0 ? 1 : 0.3)
                 Text("MONITORIZANDO SUEÑO")
-                    .font(.system(.caption, design: .monospaced, weight: .bold))
-                    .foregroundColor(.somTextSecondary)
+                    .font(.system(size: 12, weight: .black, design: .monospaced))
+                    .foregroundColor(Color.somTextSecondary)
+                    .tracking(2)
             }
             .padding(.top, 60)
             
@@ -107,26 +129,30 @@ struct RecordingView: View {
             
             // Big Clock
             Text(vm.formattedElapsed)
-                .font(.system(size: 80, weight: .bold, design: .rounded))
-                .foregroundColor(.somTextPrimary)
+                .font(.system(size: 90, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
                 .padding(.bottom, 40)
             
             // Instructions
-            VStack(spacing: 24) {
+            VStack(spacing: 32) {
                 Image(systemName: "iphone.gen3")
-                    .font(.system(size: 80))
+                    .font(.system(size: 70))
                     .foregroundColor(.somAccent)
+                    .shadow(color: .somAccent.opacity(0.5), radius: 20)
                     .symbolEffect(.pulse, options: .repeating)
                 
-                VStack(spacing: 8) {
+                VStack(spacing: 12) {
                     Text("Coloca el iPhone boca abajo")
-                        .font(.title3.bold())
-                        .foregroundColor(.somTextPrimary)
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
                     Text("Cerca de tu almohada para una mejor detección.")
-                        .font(.subheadline)
-                        .foregroundColor(.somTextSecondary)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(Color.somTextSecondary)
                 }
             }
+            .padding(30)
+            .somGlassStyle(cornerRadius: 30)
+            .padding(.horizontal, 30)
             
             Spacer()
             
@@ -158,15 +184,20 @@ struct RecordingView: View {
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: "stop.circle.fill")
+                    .font(.title3)
                 Text("Terminar Sesión")
+                    .font(.system(.body, design: .rounded, weight: .bold))
             }
-            .font(.headline)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
-            .background(Color.somSurface)
+            .padding(.vertical, 20)
+            .background(.ultraThinMaterial)
             .foregroundColor(.somApnea)
             .clipShape(Capsule())
-            .overlay(Capsule().stroke(Color.somApnea.opacity(0.3), lineWidth: 1))
+            .overlay(
+                Capsule()
+                    .stroke(Color.somApnea.opacity(0.5), lineWidth: 1)
+            )
+            .shadow(color: .somApnea.opacity(0.3), radius: 15)
         }
     }
 }
