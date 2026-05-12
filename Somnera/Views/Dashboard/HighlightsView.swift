@@ -17,6 +17,27 @@ struct HighlightsView: View {
                     .font(.caption)
                     .foregroundColor(.somTextSecondary)
             } else {
+                // Tip de Entrenamiento
+                HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: "lightbulb.fill")
+                        .foregroundColor(.somWarning)
+                        .font(.system(size: 14))
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Mejora tu IA")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.white)
+                        
+                        Text("Mantén presionado un clip para confirmarlo o rechazarlo. Esto entrena al modelo para ignorar ruidos de tu habitación.")
+                            .font(.system(size: 10))
+                            .foregroundColor(.somTextSecondary)
+                            .lineLimit(2)
+                    }
+                }
+                .padding(12)
+                .background(Color.somSurfaceHigh.opacity(0.2))
+                .cornerRadius(12)
+                
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(session.highlights) { event in
