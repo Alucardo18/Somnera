@@ -34,19 +34,15 @@ struct DashboardView: View {
                         startButton
                             .padding(.horizontal)
 
-                        // Acceso rápido a Historial
-                        NavigationLink(destination: SessionListView(viewModel: viewModel)) {
-                            HStack {
-                                Label("Ver Mis Sesiones", systemImage: "clock.arrow.circlepath")
-                                    .font(.headline)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.caption.bold())
+                        if let session = viewModel.lastSession {
+                            NightHeatmapView(session: session)
+                                .padding(.horizontal)
+                            
+                            HighlightsView(session: session) { session, event, feedback in
+                                viewModel.updateFeedback(for: session, event: event, feedback: feedback)
                             }
-                            .padding(20)
-                            .somGlassStyle(cornerRadius: 20)
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
 
                         if !viewModel.weeklyChartData.isEmpty {
                             WeeklyChartView(data: viewModel.weeklyChartData)
