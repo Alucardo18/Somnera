@@ -20,6 +20,7 @@ final class RecordingViewModel: ObservableObject {
     @Published var peakDecibels: Float = -100
     @Published var isCharging: Bool = false
     @Published var currentMotionIntensity: Double = 0
+    @Published var session: SleepSession? = nil // Nueva propiedad para exponer la sesión terminada
     
     // MARK: - Services
     private let audioCapture = AudioCaptureService.shared
@@ -244,6 +245,7 @@ final class RecordingViewModel: ObservableObject {
             decibelTimeline: decibelTimeline
         )
         sessionStorage.save(session)
+        self.session = session
     }
 
     private func updateWaveform(rms: Float) {

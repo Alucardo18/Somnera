@@ -59,7 +59,9 @@ struct RecordingView: View {
             Button("Terminar", role: .destructive) {
                 Task {
                     await vm.stopSession()
-                    dashboardVM.sessionToNavigate = vm.session
+                    if let finishedSession = vm.session {
+                        dashboardVM.sessionToNavigate = finishedSession
+                    }
                     dismiss()
                 }
             }
