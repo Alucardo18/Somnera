@@ -11,6 +11,7 @@
 		15E6D930875917501B047F15 /* AudioFileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40492B7EDE7265E4C21C0AD /* AudioFileService.swift */; };
 		16BB5ED902AACC2371AC9BC0 /* ApneaDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134D5724A2BD322053DD0E27 /* ApneaDetectionService.swift */; };
 		1AF06821B7A87503FC9896D9 /* SnoreDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDCA8B8718033F1E9CB041C /* SnoreDetectionService.swift */; };
+		1E17734C1692790F8335D82D /* TechInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73BD85843E37370605B41E3 /* TechInsightsView.swift */; };
 		2E64EA16A40C97996C5677FD /* AudioPlaybackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB8ACA65890D15EDBD28EC8 /* AudioPlaybackService.swift */; };
 		3F6A009825950E4930DA9D04 /* SessionStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7CEC54DEF50257FB2E9DDF9 /* SessionStorageService.swift */; };
 		44F2265B0C725580928F10DA /* SomneraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F8753C37E0A8EBA772DD30 /* SomneraApp.swift */; };
@@ -73,6 +74,7 @@
 		B8AF2C8A77D5FDB530C1EF7D /* ApneaEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApneaEvent.swift; sourceTree = "<group>"; };
 		C3E86F3D5316977DDE2DD56B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C40492B7EDE7265E4C21C0AD /* AudioFileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioFileService.swift; sourceTree = "<group>"; };
+		C73BD85843E37370605B41E3 /* TechInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechInsightsView.swift; sourceTree = "<group>"; };
 		CF34BDB21AF082805AA4A0F6 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
 		D39388BDC829D47D6A3DDFCD /* SnoreEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoreEvent.swift; sourceTree = "<group>"; };
 		DD8E31AD6D8C6997476CDB33 /* SomneraColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SomneraColors.swift; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				18D276AE55AD993017F0F0BE /* SettingsView.swift */,
+				C73BD85843E37370605B41E3 /* TechInsightsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -362,6 +365,7 @@
 				577718D06B7BFF9F34897C46 /* SnoreEvent.swift in Sources */,
 				44F2265B0C725580928F10DA /* SomneraApp.swift in Sources */,
 				D29EF7E10DE9B2D727384D5B /* SomneraColors.swift in Sources */,
+				1E17734C1692790F8335D82D /* TechInsightsView.swift in Sources */,
 				A18A94C8EF02870E5A43B6E9 /* WaveformView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

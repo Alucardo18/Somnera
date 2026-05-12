@@ -7,6 +7,7 @@ struct SettingsView: View {
 
     @State private var showHealthKitSheet = false
     @State private var showDeleteAlert = false
+    @State private var showTechSheet = false
     @ObservedObject var viewModel: DashboardViewModel
 
     var body: some View {
@@ -91,14 +92,19 @@ struct SettingsView: View {
 
                     // About
                     Section {
-                        HStack {
-                            Label("Versión", systemImage: "info.circle.fill")
-                                .foregroundColor(.somTextPrimary)
-                            Spacer()
-                            Text("1.0.0")
-                                .font(.caption)
-                                .foregroundColor(.somTextSecondary)
+                        Button {
+                            showTechSheet = true
+                        } label: {
+                            HStack {
+                                Label("Versión", systemImage: "info.circle.fill")
+                                    .foregroundColor(.somTextPrimary)
+                                Spacer()
+                                Text("2.0.0")
+                                    .font(.caption)
+                                    .foregroundColor(.somAccent)
+                            }
                         }
+                        
                         Link(destination: URL(string: "https://somnera.app/privacy")!) {
                             Label("Política de privacidad", systemImage: "lock.shield.fill")
                                 .foregroundColor(.somAccent)
@@ -112,6 +118,9 @@ struct SettingsView: View {
             }
             .navigationTitle("Ajustes")
             .navigationBarTitleDisplayMode(.large)
+            .sheet(isPresented: $showTechSheet) {
+                TechInsightsView()
+            }
             .toolbarBackground(Color.somBackground, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .alert("¿Borrar todas las sesiones?", isPresented: $showDeleteAlert) {
