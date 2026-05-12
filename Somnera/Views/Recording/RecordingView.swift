@@ -102,9 +102,14 @@ struct RecordingView: View {
             
             Spacer()
             
-            stopButton
-                .padding(.horizontal, 40)
-                .padding(.bottom, 48)
+            VStack(spacing: 8) {
+                stopButton
+                Text("Puedes minimizar la app deslizando hacia abajo.")
+                    .font(.system(size: 10))
+                    .foregroundColor(.somTextSecondary.opacity(0.8))
+            }
+            .padding(.horizontal, 40)
+            .padding(.bottom, 48)
         }
         .transition(.opacity)
     }
@@ -112,18 +117,24 @@ struct RecordingView: View {
     private var nightModeView: some View {
         VStack(spacing: 0) {
             // Live indicator
-            HStack(spacing: 8) {
-                Circle()
-                    .fill(Color.somAccent)
-                    .frame(width: 8, height: 8)
-                    .shadow(color: .somAccent, radius: 4)
-                    .opacity(vm.elapsedSeconds % 2 == 0 ? 1 : 0.3)
-                Text("MONITORIZANDO SUEÑO")
-                    .font(.system(size: 12, weight: .black, design: .monospaced))
-                    .foregroundColor(Color.somTextSecondary)
-                    .tracking(2)
+            VStack(spacing: 8) {
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(Color.somAccent)
+                        .frame(width: 8, height: 8)
+                        .shadow(color: .somAccent, radius: 4)
+                        .opacity(vm.elapsedSeconds % 2 == 0 ? 1 : 0.3)
+                    Text("MONITORIZANDO SUEÑO")
+                        .font(.system(size: 12, weight: .black, design: .monospaced))
+                        .foregroundColor(Color.somTextSecondary)
+                        .tracking(2)
+                }
+                
+                Text("Desliza hacia abajo para volver al Dashboard")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(Color.somAccent.opacity(0.6))
             }
-            .padding(.top, 60)
+            .padding(.top, 40)
             
             Spacer()
             
@@ -156,9 +167,14 @@ struct RecordingView: View {
             
             Spacer()
             
-            stopButton
-                .padding(.horizontal, 40)
-                .padding(.bottom, 48)
+            VStack(spacing: 8) {
+                stopButton
+                Text("La sesión continuará activa aunque minimices la vista.")
+                    .font(.system(size: 10))
+                    .foregroundColor(.somTextSecondary.opacity(0.8))
+            }
+            .padding(.horizontal, 40)
+            .padding(.bottom, 48)
         }
         .transition(.opacity)
     }
