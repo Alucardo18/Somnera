@@ -97,8 +97,8 @@ final class DenoisingService {
         
         // 7. Normalization and output
         var scale: Float = 1.0 / Float(fftSize * 2)
-        vDSP_vsmul(real, 1, &scale, real, 1, vDSP_Length(fftSize / 2))
-        vDSP_vsmul(imag, 1, &scale, imag, 1, vDSP_Length(fftSize / 2))
+        vDSP_vsmul(real, 1, &scale, &real, 1, vDSP_Length(fftSize / 2))
+        vDSP_vsmul(imag, 1, &scale, &imag, 1, vDSP_Length(fftSize / 2))
         
         output.withMemoryRebound(to: DSPComplex.self, capacity: fftSize / 2) {
             vDSP_ztoc(&splitComplex, 1, $0, 2, vDSP_Length(fftSize / 2))
