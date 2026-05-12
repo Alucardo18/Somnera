@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Updated RecordingView with guidance and "Night Mode" focus.
 struct RecordingView: View {
+    @ObservedObject var dashboardVM: DashboardViewModel
     @StateObject private var vm = RecordingViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var showStopAlert = false
@@ -58,6 +59,7 @@ struct RecordingView: View {
             Button("Terminar", role: .destructive) {
                 Task {
                     await vm.stopSession()
+                    dashboardVM.sessionToNavigate = vm.session
                     dismiss()
                 }
             }

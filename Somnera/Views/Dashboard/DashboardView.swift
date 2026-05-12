@@ -59,13 +59,16 @@ struct DashboardView: View {
             .navigationTitle("")
             .navigationBarHidden(true)
             .fullScreenCover(isPresented: $showRecording) {
-                RecordingView()
+                RecordingView(dashboardVM: viewModel)
                     .onDisappear { viewModel.load() }
             }
             .sheet(isPresented: $showCreatorMessage) {
                 CreatorMessageView()
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
+            }
+            .navigationDestination(item: $viewModel.sessionToNavigate) { session in
+                SessionDetailView(session: session)
             }
         }
     }

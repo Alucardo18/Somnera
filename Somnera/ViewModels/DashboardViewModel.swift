@@ -6,6 +6,7 @@ final class DashboardViewModel: ObservableObject {
 
     @Published var sessions: [SleepSession] = []
     @Published var isLoading: Bool = false
+    @Published var sessionToNavigate: SleepSession? = nil // Nueva propiedad para auto-navegación
 
     private let storageService = SessionStorageService()
     private let healthKitService = HealthKitService()
