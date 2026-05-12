@@ -69,8 +69,11 @@ final class DenoisingService {
         
         // 1. Convert to Split Complex
         var splitComplex = DSPSplitComplex(realp: &real, imagp: &imag)
-        windowedInput.withMemoryRebound(to: DSPComplex.self, capacity: fftSize / 2) { 
-            vDSP_ctoz($0, 2, &splitComplex, 1, vDSP_Length(fftSize / 2))
+        windowedInput.withUnsafeBufferPointer { bufferPtr in
+            guard let baseAddress = bufferPtr.baseAddress else { return }
+            baseAddress.withMemoryRebound(to: DSPComplex.self, capacity: fftSize / 2) { 
+                vDSP_ctoz($0, 2, &splitComplex, 1, vDSP_Length(fftSize / 2))
+            }
         }
         
         // 2. Perform Forward FFT
