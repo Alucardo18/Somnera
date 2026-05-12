@@ -61,27 +61,58 @@ struct SleepSession: Identifiable, Codable {
             .sorted { $0.offsetSeconds < $1.offsetSeconds } // Sort back by time
     }
 
-    /// Generates a human-readable summary of the night
+    /// Generates a human-readable summary of the night with high variation
     var insightSummary: String {
-        if apneaEvents.isEmpty && snoreScore < 20 {
-            return "¡Noche perfecta! Tu respiración fue constante y silenciosa. Tu calidad de descanso es óptima."
+        // Deterministic seed based on session ID to keep it consistent for the same night
+        let seed = abs(id.hashValue)
+        
+        func pick(_ options: [String]) -> String {
+            options[seed % options.count]
+        }
+
+        // Case 1: Perfect Night
+        if apneaEvents.isEmpty && snoreScore < 15 {
+            return pick([
+                "¡Noche perfecta! Tu respiración fue constante y silenciosa. Tu calidad de descanso es óptima.",
+                "Silencio total. No detectamos ronquidos ni interrupciones. Estás recuperando energías al máximo.",
+                "Increíble calidad de sueño. Tu sistema respiratorio funcionó sin ningún esfuerzo esta noche."
+            ])
         }
         
+        // Case 2: Critical Apnea
         let hasCriticalApnea = apneaEvents.contains { $0.durationSeconds > 30 }
-        
         if hasCriticalApnea {
-            return "Detectamos pausas respiratorias prolongadas (>30s). Esto reduce severamente tu oxígeno. Es importante que consultes con un especialista y consideres dormir de lado."
+            return pick([
+                "Detectamos pausas respiratorias prolongadas (>30s). Esto reduce severamente tu oxígeno. Es importante que consultes con un especialista.",
+                "Alerta de apnea crítica. Tuviste interrupciones de respiración muy largas. Considera usar una almohada más alta o dormir de lado.",
+                "Tu descanso fue interrumpido por pausas de oxígeno peligrosas. No ignores estas señales; tu corazón se esfuerza de más."
+            ])
         }
         
+        // Case 3: Moderate Apnea / High Activity
         if apneaEventCount > 0 {
-            return "Tu noche fue movida. Detectamos \(apneaEventCount) pausas respiratorias breves. Tus ronquidos ocuparon el \(Int(snorePercentage))% de la noche. Intenta evitar cenas pesadas."
+            return pick([
+                "Tu noche fue movida. Detectamos \(apneaEventCount) pausas respiratorias breves. Tus ronquidos ocuparon el \(Int(snorePercentage))% de la noche.",
+                "Notamos \(apneaEventCount) episodios de apnea leve. Aunque son breves, fragmentan tu sueño. Intenta evitar dormir boca arriba.",
+                "Respiración irregular detectada. Hubo \(apneaEventCount) momentos donde tu flujo de aire se detuvo. Un humidificador podría ayudarte."
+            ])
         }
         
+        // Case 4: High Snoring Intensity
         if snoreScore > 50 {
-            return "Ronquidos intensos detectados durante gran parte de la noche. Aunque no hubo apneas, tu nivel de esfuerzo respiratorio fue alto (\(Int(peakDecibels)) dB máximo)."
+            return pick([
+                "Ronquidos intensos detectados durante gran parte de la noche. Tu nivel de esfuerzo respiratorio fue alto (\(Int(peakDecibels)) dB).",
+                "Noche ruidosa. Tus ronquidos alcanzaron picos de \(Int(peakDecibels)) dB. Esto puede indicar una obstrucción nasal o cansancio extremo.",
+                "Mucho esfuerzo en tu respiración. Roncaste el \(Int(snorePercentage))% de la noche con alta intensidad. Revisa si tienes congestión."
+            ])
         }
         
-        return "Noche estable con algunos ronquidos aislados. No detectamos riesgos respiratorios importantes."
+        // Case 5: Normal/Stable
+        return pick([
+            "Noche estable con algunos ronquidos aislados. No detectamos riesgos respiratorios importantes.",
+            "Descanso balanceado. Hubo algo de ruido, pero tu respiración se mantuvo rítmica la mayor parte del tiempo.",
+            "Ronquidos leves detectados. En general, una noche segura y con buen flujo de aire."
+        ])
     }
 
     // MARK: - Init
