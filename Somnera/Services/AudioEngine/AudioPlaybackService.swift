@@ -10,6 +10,7 @@ final class AudioPlaybackService: NSObject, ObservableObject {
     
     @Published var isPlaying = false
     @Published var currentOffset: TimeInterval = 0
+    @Published var playingEventID: UUID?
     
     private override init() {
         super.init()
@@ -17,10 +18,9 @@ final class AudioPlaybackService: NSObject, ObservableObject {
         audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
     }
     
-    func playSegment(from url: URL, offset: TimeInterval, duration: TimeInterval) {
-        print("[Somnera] 🔊 Intentando reproducir highlight: \(url.lastPathComponent) @ \(offset)s")
+    func playSegment(from url: URL, offset: TimeInterval, duration: TimeInterval, eventID: UUID) {
+        print("[Somnera] 🔊 Reproduciendo clip: \(eventID.uuidString)")
         
-        // Ensure audio goes to speakers and not the earpiece
         try? AudioSessionManager.shared.switchToPlayback()
         
         stop()
@@ -35,7 +35,6 @@ final class AudioPlaybackService: NSObject, ObservableObject {
             let startFrame = AVAudioFramePosition(offset * sampleRate)
             let frameCount = AVAudioFrameCount(duration * sampleRate)
             
-            // Ensure we don't go out of bounds
             guard startFrame < file.length else { return }
             let safeFrameCount = min(frameCount, AVAudioFrameCount(file.length - startFrame))
             
@@ -48,13 +47,17 @@ final class AudioPlaybackService: NSObject, ObservableObject {
                                      frameCount: safeFrameCount, 
                                      at: nil) { [weak self] in
                 DispatchQueue.main.async {
-                    self?.isPlaying = false
+                    if self?.playingEventID == eventID {
+                        self?.isPlaying = false
+                        self?.playingEventID = nil
+                    }
                 }
             }
             
             playerNode.play()
             isPlaying = true
             currentOffset = offset
+            playingEventID = eventID
             
         } catch {
             print("[Somnera] Playback error: \(error.localizedDescription)")
@@ -65,5 +68,6 @@ final class AudioPlaybackService: NSObject, ObservableObject {
         playerNode.stop()
         audioEngine.stop()
         isPlaying = false
+        playingEventID = nil
     }
 }

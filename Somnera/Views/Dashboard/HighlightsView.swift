@@ -41,15 +41,16 @@ struct HighlightCard: View {
     @StateObject private var playback = AudioPlaybackService.shared
     
     private var isCurrentlyPlaying: Bool {
-        playback.isPlaying && playback.currentOffset == event.offsetSeconds
+        playback.isPlaying && playback.playingEventID == event.id
     }
     
     var body: some View {
         Button {
-            if let url = audioURL {
-                // Empezamos 2 segundos antes para dar contexto (sin bajar de 0)
+            if isCurrentlyPlaying {
+                playback.stop()
+            } else if let url = audioURL {
                 let startOffset = max(0, event.offsetSeconds - 2.0)
-                playback.playSegment(from: url, offset: startOffset, duration: 8.0)
+                playback.playSegment(from: url, offset: startOffset, duration: 8.0, eventID: event.id)
             }
         } label: {
             VStack(alignment: .leading, spacing: 8) {
