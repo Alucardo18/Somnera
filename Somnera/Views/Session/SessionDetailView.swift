@@ -36,6 +36,9 @@ struct SessionDetailView: View {
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 28) {
+                    // Smart Summary
+                    InsightCardView(session: session)
+                    
                     // Main Score & Quick Stats
                     headerStats
                     
@@ -557,4 +560,61 @@ struct SessionDetailView: View {
     }
     private func stopPlayback() { player?.stop(); playbackTimer?.invalidate() }
     private func formatTime(_ t: TimeInterval) -> String { let m = Int(t) / 60; let s = Int(t) % 60; return String(format: "%d:%02d", m, s) }
+}
+
+// MARK: - Insight Card
+
+struct InsightCardView: View {
+    let session: SleepSession
+    @State private var animate = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Label("RESUMEN DE LA NOCHE", systemImage: "sparkles")
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundColor(.somAccent)
+                    .tracking(1)
+                Spacer()
+                Text(session.startDate.formatted(.dateTime.hour().minute()))
+                    .font(.caption2)
+                    .foregroundColor(.somTextSecondary)
+            }
+            
+            Text(session.insightSummary)
+                .font(.system(size: 16, weight: .medium, design: .rounded))
+                .foregroundColor(.white)
+                .lineSpacing(4)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(24)
+        .background(
+            ZStack {
+                Color.white.opacity(0.03)
+                LinearGradient(
+                    colors: [.somAccent.opacity(0.1), .clear],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(
+                    LinearGradient(
+                        colors: [.somAccent.opacity(0.5), .clear, .white.opacity(0.1)],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: .somAccent.opacity(0.1), radius: 20, x: 0, y: 10)
+        .scaleEffect(animate ? 1.0 : 0.98)
+        .opacity(animate ? 1.0 : 0.0)
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.2)) {
+                animate = true
+            }
+        }
+    }
 }
