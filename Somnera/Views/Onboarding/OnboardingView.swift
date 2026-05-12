@@ -7,7 +7,7 @@ struct OnboardingView: View {
     private let pages: [(icon: String, title: String, body: String, color: Color)] = [
         ("brain.head.profile",
          "IA que Aprende de Ti",
-         "Nuestra red neuronal se personaliza con tu voz. Dale feedback a tus grabaciones y Somnera será cada vez más precisa.",
+         "Nuestra red neuronal se personaliza con tus patrones de ronquido. Dale feedback a tus grabaciones y Somnera será cada vez más precisa.",
          .somAccent),
         ("shield.checkerboard",
          "Privacidad Blindada",
