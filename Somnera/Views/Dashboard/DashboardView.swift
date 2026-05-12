@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardView: View {
     @ObservedObject var viewModel: DashboardViewModel
     @State private var showRecording = false
+    @State private var showCreatorMessage = false
     @EnvironmentObject var appState: AppState
 
     var body: some View {
@@ -64,6 +65,11 @@ struct DashboardView: View {
                 RecordingView()
                     .onDisappear { viewModel.load() }
             }
+            .sheet(isPresented: $showCreatorMessage) {
+                CreatorMessageView()
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+            }
         }
     }
 
@@ -83,9 +89,15 @@ struct DashboardView: View {
                     .foregroundColor(.somTextSecondary)
             }
             Spacer()
-            Image(systemName: "moon.zzz.fill")
-                .font(.system(size: 28))
-                .foregroundStyle(Color.somAccent.gradient)
+            
+            Button {
+                showCreatorMessage = true
+            } label: {
+                Image(systemName: "moon.zzz.fill")
+                    .font(.system(size: 28))
+                    .foregroundStyle(Color.somAccent.gradient)
+                    .shadow(color: Color.somAccent.opacity(0.4), radius: 10)
+            }
         }
         .padding(.horizontal)
         .padding(.top, 16)
@@ -131,6 +143,97 @@ struct DashboardView: View {
         }
         .scaleEffect(appState.isRecording ? 0.95 : 1.0)
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: appState.isRecording)
+    }
+}
+
+// MARK: - Creator Message (Easter Egg)
+
+struct CreatorMessageView: View {
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        ZStack {
+            Color.somBackground.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 30) {
+                    // Header con foto o avatar
+                    ZStack {
+                        Circle()
+                            .fill(Color.somAccent.opacity(0.2))
+                            .frame(width: 120, height: 120)
+                            .blur(radius: 20)
+                        
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
+                            .frame(width: 100, height: 100)
+                            .foregroundStyle(Color.somAccent.gradient)
+                    }
+                    .padding(.top, 40)
+                    
+                    VStack(spacing: 12) {
+                        Text("Hola, soy Emmanuel González")
+                            .font(.system(size: 24, weight: .black, design: .rounded))
+                            .foregroundColor(.white)
+                        
+                        Text("Creador de Somnera")
+                            .font(.subheadline.bold())
+                            .foregroundColor(.somAccent)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 20) {
+                        messageParagraph("Como muchas personas más, padecí apnea del sueño y sé lo terrible que se siente. La falta de energía, el riesgo constante y la incertidumbre de no saber qué pasa mientras duermes.")
+                        
+                        messageParagraph("Probé muchas apps y algunas eran buenas, pero extremadamente caras y carecían de un análisis profundo usando nuevas tecnologías como Machine Learning o IA, y muchas comprometían tu privacidad enviando audio a la nube.")
+                        
+                        messageParagraph("Es por eso que esta app es gratuita y procesa todo 100% localmente. Espero que te ayude a identificar tus patrones de sueño y ronquido para que puedas tomar acción sobre tu salud.")
+                        
+                        messageParagraph("Si gustas contribuir donando, me ayudarías a seguir dándole soporte y poder pagar la licencia anual de Apple que no es nada barata.")
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    // Botón de Donación (Placeholder)
+                    Button {
+                        // Acción de donación futura
+                    } label: {
+                        HStack {
+                            Image(systemName: "heart.fill")
+                                .foregroundColor(.red)
+                            Text("Apoyar el Proyecto")
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 18)
+                        .background(Color.white.opacity(0.05))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.somAccent.opacity(0.5), lineWidth: 1)
+                        )
+                        .foregroundColor(.white)
+                        .cornerRadius(16)
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    Button("Cerrar") {
+                        dismiss()
+                    }
+                    .font(.caption)
+                    .foregroundColor(.somTextSecondary)
+                    .padding(.bottom, 40)
+                }
+            }
+        }
+    }
+    
+    private func messageParagraph(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 15))
+            .foregroundColor(.white.opacity(0.85))
+            .lineSpacing(6)
+            .multilineTextAlignment(.leading)
+            .padding(16)
+            .background(Color.white.opacity(0.03))
+            .cornerRadius(12)
     }
 }
 
