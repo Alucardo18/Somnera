@@ -29,24 +29,31 @@ struct DashboardView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 32) {
                         headerSection
+                        
+                        startButton
+                            .padding(.horizontal)
 
                         if let session = viewModel.lastSession {
                             ScoreCardView(session: session)
+                                .padding(.horizontal)
+                            
+                            NightHeatmapView(session: session)
+                                .padding(.horizontal)
+                            
+                            HighlightsView(session: session)
                                 .padding(.horizontal)
                         } else {
                             emptyStateCard
                         }
 
-                        if viewModel.sessions.count > 1 {
-                            WeeklyChartView(scores: viewModel.weeklyScores)
+                        if !viewModel.weeklyChartData.isEmpty {
+                            WeeklyChartView(data: viewModel.weeklyChartData)
                                 .padding(.horizontal)
                         }
 
-                        startButton
-                            .padding(.horizontal)
-                            .padding(.bottom, 32)
                     }
                     .padding(.top, 16)
+                    .padding(.bottom, 32)
                 }
             }
             .navigationTitle("")
@@ -200,9 +207,7 @@ struct ScoreCardView: View {
 // MARK: - Weekly Chart
 
 struct WeeklyChartView: View {
-    let scores: [Int]
-
-    private let dayLabels = ["L", "M", "X", "J", "V", "S", "D"]
+    let data: [DashboardViewModel.ChartData]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -212,7 +217,7 @@ struct WeeklyChartView: View {
                 .tracking(1)
 
             HStack(alignment: .bottom, spacing: 10) {
-                ForEach(Array(scores.enumerated()), id: \.offset) { i, score in
+                ForEach(data) { point in
                     VStack(spacing: 8) {
                         ZStack(alignment: .bottom) {
                             Capsule()
@@ -220,11 +225,11 @@ struct WeeklyChartView: View {
                                 .frame(width: 24, height: 80)
                             
                             Capsule()
-                                .fill(barColor(score: score).gradient)
-                                .frame(width: 24, height: max(10, CGFloat(score) * 0.8))
+                                .fill(barColor(score: point.score).gradient)
+                                .frame(width: 24, height: max(10, CGFloat(point.score) * 0.8))
                         }
                         
-                        Text(dayLabels[i % 7])
+                        Text(point.label)
                             .font(.system(size: 10, weight: .bold))
                             .foregroundColor(.somTextSecondary)
                     }
@@ -244,4 +249,12 @@ struct WeeklyChartView: View {
         default:      return .somApnea
         }
     }
+}
+#Preview {
+    DashboardView(viewModel: {
+        let vm = DashboardViewModel()
+        vm.sessions = [.mock]
+        return vm
+    }())
+    .environmentObject(AppState())
 }

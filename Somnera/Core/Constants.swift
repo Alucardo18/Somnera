@@ -16,7 +16,7 @@ enum SomneraConstants {
     enum DSP {
         static let bandpassLowHz: Float  = 80.0
         static let bandpassHighHz: Float = 2_500.0
-        static let vadRMSThreshold: Float = 0.004   // ~38 dB floor
+        static let vadRMSThreshold: Float = 0.001   // Más sensible para el heatmap (~30 dB)
     }
 
     // MARK: - Snore Detection
@@ -40,7 +40,7 @@ enum SomneraConstants {
     enum Storage {
         static let maxSessions: Int         = 7
         static let sessionsFolderName       = "SomneraSessions"
-        static let audioExtension           = "caf"
+        static let audioExtension           = "m4a"
     }
 
     // MARK: - UI / Design

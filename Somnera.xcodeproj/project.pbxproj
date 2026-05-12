@@ -11,6 +11,7 @@
 		15E6D930875917501B047F15 /* AudioFileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40492B7EDE7265E4C21C0AD /* AudioFileService.swift */; };
 		16BB5ED902AACC2371AC9BC0 /* ApneaDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134D5724A2BD322053DD0E27 /* ApneaDetectionService.swift */; };
 		1AF06821B7A87503FC9896D9 /* SnoreDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDCA8B8718033F1E9CB041C /* SnoreDetectionService.swift */; };
+		2E64EA16A40C97996C5677FD /* AudioPlaybackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB8ACA65890D15EDBD28EC8 /* AudioPlaybackService.swift */; };
 		3F6A009825950E4930DA9D04 /* SessionStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7CEC54DEF50257FB2E9DDF9 /* SessionStorageService.swift */; };
 		44F2265B0C725580928F10DA /* SomneraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F8753C37E0A8EBA772DD30 /* SomneraApp.swift */; };
 		46BD6EA641EF95CED3164413 /* ApneaEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AF2C8A77D5FDB530C1EF7D /* ApneaEvent.swift */; };
@@ -18,12 +19,14 @@
 		5114794DA9C8CCD290FAA12B /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B369953ECB83A7DB4D461F5 /* DashboardView.swift */; };
 		577718D06B7BFF9F34897C46 /* SnoreEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D39388BDC829D47D6A3DDFCD /* SnoreEvent.swift */; };
 		587A4FE7723EA8BAB43BE9FA /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F509AD2979EB2C017BED8411 /* DashboardViewModel.swift */; };
+		5B29DEA5CECE97E747D7B2CD /* NightHeatmapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6DCB5A701234D74777DD6F /* NightHeatmapView.swift */; };
 		5E12475F2C22D449CD2EBC55 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328498EC4943C45D0733EE7B /* ContentView.swift */; };
 		619472A35195A2486D180F3F /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF801BF7ADF691DDB5C9B089 /* RecordingView.swift */; };
 		61ABA7E1DABBE3BB41A7839F /* SessionAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14193D691360C3AF9E20123B /* SessionAnalyticsService.swift */; };
 		67F1CF301A9ED62C0B602B6F /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB6235F0F8E154DB382BCCA /* AppState.swift */; };
 		75B60EE4D6DA102CA711957E /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5394E29B5A0C2BAB2CE84C3D /* HealthKitService.swift */; };
 		7DB6162BE85B4D229CD1451E /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F26113D7731C71EA988F1 /* SessionListView.swift */; };
+		8EC0E3DFEC5EA1D981D309DD /* HighlightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E07F10F08F4F429A8839E280 /* HighlightsView.swift */; };
 		9B1EDD71F2E7830C3AA06398 /* RecordingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2CDFF3AAE5762CBD959BED /* RecordingViewModel.swift */; };
 		9C3CFA597C1D9B344F71D606 /* DSPFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FEDBB312C5EB7200C5F4171 /* DSPFilter.swift */; };
 		A18A94C8EF02870E5A43B6E9 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF34BDB21AF082805AA4A0F6 /* WaveformView.swift */; };
@@ -41,17 +44,19 @@
 
 /* Begin PBXFileReference section */
 		0DC885CED0AF5616524143DA /* AudioCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCaptureService.swift; sourceTree = "<group>"; };
+		0FB8ACA65890D15EDBD28EC8 /* AudioPlaybackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlaybackService.swift; sourceTree = "<group>"; };
 		134D5724A2BD322053DD0E27 /* ApneaDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApneaDetectionService.swift; sourceTree = "<group>"; };
 		14193D691360C3AF9E20123B /* SessionAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionAnalyticsService.swift; sourceTree = "<group>"; };
 		18D276AE55AD993017F0F0BE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		18F8753C37E0A8EBA772DD30 /* SomneraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SomneraApp.swift; sourceTree = "<group>"; };
+		1F6DCB5A701234D74777DD6F /* NightHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightHeatmapView.swift; sourceTree = "<group>"; };
 		1FEDBB312C5EB7200C5F4171 /* DSPFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSPFilter.swift; sourceTree = "<group>"; };
 		2548508BAEEBC059223A96B9 /* MotionDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionDetectionService.swift; sourceTree = "<group>"; };
 		328498EC4943C45D0733EE7B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3B2CDFF3AAE5762CBD959BED /* RecordingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingViewModel.swift; sourceTree = "<group>"; };
 		3B5CDDD6F190D10700AF53E1 /* AudioSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionManager.swift; sourceTree = "<group>"; };
 		44757D08C8733C3E1E37DE1E /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		4613D56AF3EA5A97B4F56D7F /* Somnera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Somnera.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4613D56AF3EA5A97B4F56D7F /* Somnera.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Somnera.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5394E29B5A0C2BAB2CE84C3D /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		560F26113D7731C71EA988F1 /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
 		57EE0EB93E7FFF684806E21B /* Somnera.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Somnera.entitlements; sourceTree = "<group>"; };
@@ -71,6 +76,7 @@
 		CF34BDB21AF082805AA4A0F6 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
 		D39388BDC829D47D6A3DDFCD /* SnoreEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoreEvent.swift; sourceTree = "<group>"; };
 		DD8E31AD6D8C6997476CDB33 /* SomneraColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SomneraColors.swift; sourceTree = "<group>"; };
+		E07F10F08F4F429A8839E280 /* HighlightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightsView.swift; sourceTree = "<group>"; };
 		EF801BF7ADF691DDB5C9B089 /* RecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingView.swift; sourceTree = "<group>"; };
 		F509AD2979EB2C017BED8411 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -90,6 +96,7 @@
 			isa = PBXGroup;
 			children = (
 				0DC885CED0AF5616524143DA /* AudioCaptureService.swift */,
+				0FB8ACA65890D15EDBD28EC8 /* AudioPlaybackService.swift */,
 				3B5CDDD6F190D10700AF53E1 /* AudioSessionManager.swift */,
 			);
 			path = AudioEngine;
@@ -171,6 +178,8 @@
 			isa = PBXGroup;
 			children = (
 				5B369953ECB83A7DB4D461F5 /* DashboardView.swift */,
+				E07F10F08F4F429A8839E280 /* HighlightsView.swift */,
+				1F6DCB5A701234D74777DD6F /* NightHeatmapView.swift */,
 			);
 			path = Dashboard;
 			sourceTree = "<group>";
@@ -282,6 +291,7 @@
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					AFF2858196054339741A69BE = {
+						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -326,6 +336,7 @@
 				67F1CF301A9ED62C0B602B6F /* AppState.swift in Sources */,
 				B9840BF17856CF1BFF969990 /* AudioCaptureService.swift in Sources */,
 				15E6D930875917501B047F15 /* AudioFileService.swift in Sources */,
+				2E64EA16A40C97996C5677FD /* AudioPlaybackService.swift in Sources */,
 				A7AFEC80C93E768A02E6D110 /* AudioSessionManager.swift in Sources */,
 				E3A4D275F4A7697755B399F0 /* Constants.swift in Sources */,
 				5E12475F2C22D449CD2EBC55 /* ContentView.swift in Sources */,
@@ -333,7 +344,9 @@
 				5114794DA9C8CCD290FAA12B /* DashboardView.swift in Sources */,
 				587A4FE7723EA8BAB43BE9FA /* DashboardViewModel.swift in Sources */,
 				75B60EE4D6DA102CA711957E /* HealthKitService.swift in Sources */,
+				8EC0E3DFEC5EA1D981D309DD /* HighlightsView.swift in Sources */,
 				CB5CBD8EBA8EBAE2E2940F36 /* MotionDetectionService.swift in Sources */,
+				5B29DEA5CECE97E747D7B2CD /* NightHeatmapView.swift in Sources */,
 				BA216FBA2213ADE00997C59B /* OnboardingView.swift in Sources */,
 				AE98272A8AFBFD9C7B420715 /* RecordingActiveView.swift in Sources */,
 				619472A35195A2486D180F3F /* RecordingView.swift in Sources */,
@@ -492,7 +505,7 @@
 				CODE_SIGN_ENTITLEMENTS = Somnera/Somnera.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = S5UW46GFUH;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Somnera/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -511,7 +524,7 @@
 				CODE_SIGN_ENTITLEMENTS = Somnera/Somnera.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = S5UW46GFUH;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Somnera/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

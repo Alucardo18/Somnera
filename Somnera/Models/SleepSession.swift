@@ -41,6 +41,14 @@ struct SleepSession: Identifiable, Codable {
         return h > 0 ? "\(h)h \(m)m" : "\(m)m"
     }
 
+    /// Returns the top snoring events (highest confidence * intensity)
+    var highlights: [SnoreEvent] {
+        snoreEvents
+            .sorted { ($0.confidence * Double($0.peakDecibels)) > ($1.confidence * Double($1.peakDecibels)) }
+            .prefix(5)
+            .sorted { $0.offsetSeconds < $1.offsetSeconds } // Sort back by time
+    }
+
     // MARK: - Init
 
     init(
@@ -61,5 +69,26 @@ struct SleepSession: Identifiable, Codable {
         self.audioFilePath = audioFilePath
         self.peakDecibels = peakDecibels
         self.decibelTimeline = decibelTimeline
+    }
+
+    // MARK: - Mock Data for Previews
+    static var mock: SleepSession {
+        let start = Date().addingTimeInterval(-28800)
+        return SleepSession(
+            id: UUID(),
+            startDate: start,
+            endDate: Date(),
+            snoreEvents: [
+                SnoreEvent(offsetSeconds: 3600, confidence: 0.9, peakDecibels: 65),
+                SnoreEvent(offsetSeconds: 7200, confidence: 0.85, peakDecibels: 72),
+                SnoreEvent(offsetSeconds: 15000, confidence: 0.95, peakDecibels: 55)
+            ],
+            apneaEvents: [
+                ApneaEvent(offsetSeconds: 7210, durationSeconds: 15)
+            ],
+            audioFilePath: nil,
+            peakDecibels: 72,
+            decibelTimeline: (0..<500).map { _ in Float.random(in: 10...75) }
+        )
     }
 }

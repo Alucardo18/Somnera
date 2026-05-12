@@ -7,9 +7,12 @@ final class AudioFileService {
 
     // MARK: - Paths
 
+    var documentsDirectory: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    }
+
     private var sessionsDirectory: URL {
-        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        return docs.appendingPathComponent(SomneraConstants.Storage.sessionsFolderName)
+        documentsDirectory.appendingPathComponent(SomneraConstants.Storage.sessionsFolderName)
     }
 
     func ensureDirectoryExists() throws {
@@ -32,7 +35,7 @@ final class AudioFileService {
             AVFormatIDKey:              Int(kAudioFormatMPEG4AAC),
             AVSampleRateKey:            SomneraConstants.Audio.sampleRate,
             AVNumberOfChannelsKey:      SomneraConstants.Audio.channels,
-            AVEncoderAudioQualityKey:   AVAudioQuality.medium.rawValue,
+            AVEncoderAudioQualityKey:   AVAudioQuality.high.rawValue,
             AVEncoderBitRateKey:        SomneraConstants.Audio.encoderBitRate
         ]
     }

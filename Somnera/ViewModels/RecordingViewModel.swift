@@ -125,11 +125,14 @@ final class RecordingViewModel: ObservableObject {
             try snoreDetector.setup(format: audioCapture.outputFormat)
             motionDetector.start()
             
-            // Create AVAudioFile using the SAME PCM format the engine delivers
+            // Create AVAudioFile with AAC settings
+            // We specify pcmFormatFloat32 as the commonFormat so we can write PCM buffers directly
             let audioURL = audioFileService.audioURL(for: id)
             audioFile = try AVAudioFile(
                 forWriting: audioURL,
-                settings: audioCapture.outputFormat.settings
+                settings: audioFileService.recorderSettings,
+                commonFormat: .pcmFormatFloat32,
+                interleaved: false
             )
             print("[Somnera] 🎙️ Recording to: \(audioURL.lastPathComponent) | Format: \(audioCapture.outputFormat)")
             
@@ -223,6 +226,8 @@ final class RecordingViewModel: ObservableObject {
 
     private func saveCurrentSessionState(isFinal: Bool) {
         guard let id = sessionID, let start = sessionStart else { return }
+        print("[Somnera] 💾 Guardando sesión: \(id.uuidString)")
+        print("[Somnera] 📈 Puntos del Heatmap: \(decibelTimeline.count)")
         
         let session = SleepSession(
             id: id,
@@ -230,7 +235,7 @@ final class RecordingViewModel: ObservableObject {
             endDate: Date(),
             snoreEvents: currentSnoreEvents,
             apneaEvents: currentApneaEvents,
-            audioFilePath: audioFileService.audioURL(for: id).relativePath,
+            audioFilePath: id.uuidString,
             peakDecibels: peakDecibels,
             decibelTimeline: decibelTimeline
         )
@@ -250,7 +255,7 @@ final class RecordingViewModel: ObservableObject {
               let channelData = buffer.floatChannelData else { return }
         
         let frameCount = Int(buffer.frameLength)
-        let gain: Float = 8.0 // Boost factor for human listening
+        let gain: Float = 15.0 // Boost factor for human listening
         
         // Create an amplified copy
         guard let amplified = AVAudioPCMBuffer(

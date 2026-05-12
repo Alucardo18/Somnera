@@ -26,9 +26,41 @@ final class DashboardViewModel: ObservableObject {
 
     var lastSession: SleepSession? { sessions.first }
 
-    var weeklyScores: [Int] {
-        // Last 7 sessions scores (oldest → newest)
-        sessions.prefix(7).reversed().map { $0.snoreScore }
+    /// Data point for the weekly chart
+    struct ChartData: Identifiable {
+        let id = UUID()
+        let label: String
+        let score: Int
+    }
+
+    var weeklyChartData: [ChartData] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        
+        // Generate last 7 days (including today)
+        let last7Days = (0..<7).map { dayOffset -> Date in
+            calendar.date(byAdding: .day, value: -dayOffset, to: today)!
+        }.reversed()
+        
+        let dayFormatter = DateFormatter()
+        dayFormatter.locale = Locale(identifier: "es_ES")
+        dayFormatter.dateFormat = "EEEEE" // One letter (L, M, X...)
+        
+        return last7Days.map { day in
+            // Find all sessions on this specific day
+            let sessionsOnDay = sessions.filter {
+                calendar.isDate($0.startDate, inSameDayAs: day)
+            }
+            
+            // If multiple sessions, take the average score (or max for safety)
+            let score = sessionsOnDay.isEmpty ? 0 : 
+                sessionsOnDay.map { $0.snoreScore }.reduce(0, +) / sessionsOnDay.count
+            
+            return ChartData(
+                label: dayFormatter.string(from: day).uppercased(),
+                score: score
+            )
+        }
     }
 
     var averageScore: Int {
