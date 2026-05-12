@@ -349,6 +349,12 @@ struct ScoreExplanationView: View {
                         title: "Intensidad (30%)",
                         description: "Tomamos los picos de decibelios más altos detectados durante tus ronquidos."
                     )
+                    
+                    explanationRow(
+                        icon: "brain.head.profile",
+                        title: "Filtro por IA",
+                        description: "Nuestro modelo de Machine Learning valida cada sonido para ignorar ruidos externos como ventiladores o tráfico."
+                    )
                 }
                 .padding(.horizontal, 24)
                 
