@@ -283,7 +283,7 @@ struct ScoreCardView: View {
             .frame(width: 100, height: 100)
             .sheet(isPresented: $showExplanation) {
                 ScoreExplanationView()
-                    .presentationDetents([.medium])
+                    .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
             }
 
@@ -326,47 +326,48 @@ struct ScoreExplanationView: View {
         ZStack {
             Color.somBackground.ignoresSafeArea()
             
-            VStack(spacing: 30) {
-                VStack(spacing: 12) {
-                    Text("Puntuación de Ronquido")
-                        .font(.system(size: 24, weight: .black, design: .rounded))
-                        .foregroundColor(.white)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 30) {
+                    VStack(spacing: 12) {
+                        Text("Puntuación de Ronquido")
+                            .font(.system(size: 24, weight: .black, design: .rounded))
+                            .foregroundColor(.white)
+                        
+                        Text("¿Cómo calculamos tu noche?")
+                            .font(.subheadline)
+                            .foregroundColor(.somTextSecondary)
+                    }
                     
-                    Text("¿Cómo calculamos tu noche?")
-                        .font(.subheadline)
+                    VStack(spacing: 20) {
+                        explanationRow(
+                            icon: "clock.fill",
+                            title: "Persistencia (70%)",
+                            description: "Calculamos el porcentaje de tiempo que estuviste roncando respecto al total de la sesión."
+                        )
+                        
+                        explanationRow(
+                            icon: "speaker.wave.3.fill",
+                            title: "Intensidad (30%)",
+                            description: "Tomamos los picos de decibelios más altos detectados durante tus ronquidos."
+                        )
+                        
+                        explanationRow(
+                            icon: "brain.head.profile",
+                            title: "Filtro por IA",
+                            description: "Nuestro modelo de Machine Learning valida cada sonido para ignorar ruidos externos como ventiladores o tráfico."
+                        )
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    Text("Una puntuación baja indica una noche tranquila, mientras que una alta sugiere ronquidos persistentes o muy ruidosos.")
+                        .font(.system(size: 13))
                         .foregroundColor(.somTextSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                        .padding(.bottom, 30)
                 }
-                
-                VStack(spacing: 20) {
-                    explanationRow(
-                        icon: "clock.fill",
-                        title: "Persistencia (70%)",
-                        description: "Calculamos el porcentaje de tiempo que estuviste roncando respecto al total de la sesión."
-                    )
-                    
-                    explanationRow(
-                        icon: "speaker.wave.3.fill",
-                        title: "Intensidad (30%)",
-                        description: "Tomamos los picos de decibelios más altos detectados durante tus ronquidos."
-                    )
-                    
-                    explanationRow(
-                        icon: "brain.head.profile",
-                        title: "Filtro por IA",
-                        description: "Nuestro modelo de Machine Learning valida cada sonido para ignorar ruidos externos como ventiladores o tráfico."
-                    )
-                }
-                .padding(.horizontal, 24)
-                
-                Text("Una puntuación baja indica una noche tranquila, mientras que una alta sugiere ronquidos persistentes o muy ruidosos.")
-                    .font(.system(size: 13))
-                    .foregroundColor(.somTextSecondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-                
-                Spacer()
+                .padding(.top, 40)
             }
-            .padding(.top, 40)
         }
     }
     
