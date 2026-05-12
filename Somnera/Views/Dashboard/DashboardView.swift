@@ -35,6 +35,9 @@ struct DashboardView: View {
                             .padding(.horizontal)
 
                         if let session = viewModel.lastSession {
+                            ScoreCardView(session: session)
+                                .padding(.horizontal)
+                            
                             NightHeatmapView(session: session)
                                 .padding(.horizontal)
                             
