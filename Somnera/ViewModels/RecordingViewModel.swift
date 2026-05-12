@@ -137,8 +137,8 @@ final class RecordingViewModel: ObservableObject {
             
             audioCapture.onBuffer = { [weak self] buffer, time in
                 self?.processBuffer(buffer, time: time)
-                // Write PCM buffer directly — formats now match
-                try? self?.audioFile?.write(from: buffer)
+                // Write amplified copy to file (IA gets original, file gets boosted)
+                self?.writeAmplifiedBuffer(buffer)
             }
             
             startTimer()
@@ -241,6 +241,32 @@ final class RecordingViewModel: ObservableObject {
         waveformBuffer.removeFirst()
         waveformBuffer.append(min(1.0, rms * 8))
         latestWaveform = waveformBuffer
+    }
+
+    /// Writes an amplified copy of the buffer to the audio file.
+    /// The original buffer is NOT modified — IA analysis is unaffected.
+    private func writeAmplifiedBuffer(_ buffer: AVAudioPCMBuffer) {
+        guard let audioFile = audioFile,
+              let channelData = buffer.floatChannelData else { return }
+        
+        let frameCount = Int(buffer.frameLength)
+        let gain: Float = 8.0 // Boost factor for human listening
+        
+        // Create an amplified copy
+        guard let amplified = AVAudioPCMBuffer(
+            pcmFormat: buffer.format,
+            frameCapacity: buffer.frameLength
+        ) else { return }
+        amplified.frameLength = buffer.frameLength
+        
+        guard let ampData = amplified.floatChannelData else { return }
+        
+        for i in 0..<frameCount {
+            let sample = channelData[0][i] * gain
+            ampData[0][i] = max(-1.0, min(1.0, sample)) // Clamp to avoid distortion
+        }
+        
+        try? audioFile.write(from: amplified)
     }
 
     private func wireCallbacks() {
