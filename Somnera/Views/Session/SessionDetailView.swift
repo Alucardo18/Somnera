@@ -480,9 +480,18 @@ struct SessionDetailView: View {
         
         let url = AudioFileService.shared.audioURL(for: session.id)
         
-        // 1. Verify file exists
-        if !FileManager.default.fileExists(atPath: url.path) {
-            print("[Somnera] ❌ Error: Audio file not found at: \(url.path)")
+        // 1. Verify file exists and check size
+        do {
+            let attr = try FileManager.default.attributesOfItem(atPath: url.path)
+            let fileSize = attr[FileAttributeKey.size] as? UInt64 ?? 0
+            print("[Somnera] 📁 File Info: Size \(fileSize) bytes | Path: \(url.path)")
+            
+            if fileSize == 0 {
+                print("[Somnera] ❌ Error: Audio file is empty (0 bytes)")
+                return
+            }
+        } catch {
+            print("[Somnera] ❌ Error: Could not check file attributes: \(error.localizedDescription)")
             return
         }
         
@@ -490,12 +499,19 @@ struct SessionDetailView: View {
             // 2. Configure session
             try AudioSessionManager.shared.switchToPlayback()
             
-            // 3. Init player
-            player = try AVAudioPlayer(contentsOf: url)
+            // 3. Init player with fallback
+            do {
+                player = try AVAudioPlayer(contentsOf: url)
+            } catch {
+                print("[Somnera] ⚠️ URL init failed (Error -50?), trying Data fallback...")
+                let data = try Data(contentsOf: url)
+                player = try AVAudioPlayer(data: data)
+            }
+            
             player?.prepareToPlay()
             print("[Somnera] ✅ Player ready. Duration: \(player?.duration ?? 0)s")
         } catch {
-            print("[Somnera] ❌ Failed to initialize player: \(error.localizedDescription)")
+            print("[Somnera] ❌ Final player failure: \(error.localizedDescription)")
         }
     }
 
