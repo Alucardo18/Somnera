@@ -140,8 +140,6 @@ final class RecordingViewModel: ObservableObject {
             
             audioCapture.onBuffer = { [weak self] buffer, time in
                 self?.processBuffer(buffer, time: time)
-                // Write amplified copy to file (IA gets original, file gets boosted)
-                self?.writeAmplifiedBuffer(buffer)
             }
             
             startTimer()
@@ -193,11 +191,19 @@ final class RecordingViewModel: ObservableObject {
     // MARK: - Processing
 
     private func processBuffer(_ buffer: AVAudioPCMBuffer, time: AVAudioTime) {
-        let rms = DSPFilter.rms(of: buffer) ?? 0.0001
+        // 1. Denoise the buffer for visual analysis and recording
+        let cleanBuffer = DenoisingService.shared.process(buffer)
+        
+        // 2. Metrics (use CLEAN buffer for heatmap)
+        let rms = DSPFilter.rms(of: cleanBuffer) ?? 0.0001
         let dB = DSPFilter.toDecibels(rms)
         let motion = motionDetector.lastIntensity
         
         apneaDetector.update(rms: rms, motionIntensity: motion, at: Date())
+        // 3. Save (use CLEAN and amplified buffer for the user)
+        self.writeAmplifiedBuffer(cleanBuffer)
+        
+        // 4. IA Analysis (use ORIGINAL buffer for better ML compatibility)
         snoreDetector.analyze(buffer, at: time)
 
         // Timeline Sampling (5s)
