@@ -28,6 +28,8 @@
 	<string>Somnera guarda tus sesiones de sueño en Apple Health para que puedas verlas junto con otros datos de salud.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Somnera usa el micrófono para detectar y grabar ronquidos y pausas respiratorias durante tu sueño. Todo el procesamiento ocurre en tu dispositivo.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Somnera usa los sensores de movimiento para validar las pausas respiratorias y asegurar que los diagnósticos sean precisos.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

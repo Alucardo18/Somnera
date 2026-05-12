@@ -475,9 +475,70 @@ struct SessionDetailView: View {
         }.padding(12).background(Color.somSurface.opacity(0.5)).clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
-    private func setupPlayer() { guard let path = session.audioFilePath else { return }; let url = URL(fileURLWithPath: path); try? AudioSessionManager.shared.switchToPlayback(); player = try? AVAudioPlayer(contentsOf: url); player?.prepareToPlay() }
-    private func togglePlayback() { guard let player else { return }; if isPlaying { player.pause(); playbackTimer?.invalidate() } else { player.play(); playbackTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in self.updateProgress() } }; isPlaying.toggle() }
-    private func updateProgress() { guard let p = player else { return }; self.playbackTime = p.currentTime; self.playbackProgress = p.currentTime / max(1, p.duration); if !p.isPlaying && isPlaying { self.isPlaying = false; self.playbackTimer?.invalidate() } }
+    private func setupPlayer() {
+        print("[Somnera] Setting up player for session: \(session.id)")
+        
+        let url = AudioFileService.shared.audioURL(for: session.id)
+        
+        // 1. Verify file exists
+        if !FileManager.default.fileExists(atPath: url.path) {
+            print("[Somnera] ❌ Error: Audio file not found at: \(url.path)")
+            return
+        }
+        
+        do {
+            // 2. Configure session
+            try AudioSessionManager.shared.switchToPlayback()
+            
+            // 3. Init player
+            player = try AVAudioPlayer(contentsOf: url)
+            player?.prepareToPlay()
+            print("[Somnera] ✅ Player ready. Duration: \(player?.duration ?? 0)s")
+        } catch {
+            print("[Somnera] ❌ Failed to initialize player: \(error.localizedDescription)")
+        }
+    }
+
+    private func togglePlayback() {
+        guard let player else {
+            print("[Somnera] ❌ Player not initialized")
+            setupPlayer() // Try to re-init if player is nil
+            return
+        }
+        
+        if isPlaying {
+            player.pause()
+            playbackTimer?.invalidate()
+            print("[Somnera] ⏸ Paused at \(player.currentTime)")
+        } else {
+            do {
+                try AudioSessionManager.shared.switchToPlayback()
+                if player.play() {
+                    playbackTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+                        self.updateProgress()
+                    }
+                    print("[Somnera] ▶️ Playing...")
+                } else {
+                    print("[Somnera] ❌ Player.play() returned false")
+                }
+            } catch {
+                print("[Somnera] ❌ Session switch failed: \(error)")
+            }
+        }
+        isPlaying.toggle()
+    }
+
+    private func updateProgress() {
+        guard let p = player else { return }
+        self.playbackTime = p.currentTime
+        self.playbackProgress = p.currentTime / max(1, p.duration)
+        
+        if !p.isPlaying && isPlaying {
+            self.isPlaying = false
+            self.playbackTimer?.invalidate()
+            print("[Somnera] ⏹ Playback finished")
+        }
+    }
     private func stopPlayback() { player?.stop(); playbackTimer?.invalidate() }
     private func formatTime(_ t: TimeInterval) -> String { let m = Int(t) / 60; let s = Int(t) % 60; return String(format: "%d:%02d", m, s) }
 }
