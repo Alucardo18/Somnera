@@ -341,20 +341,26 @@ struct ScoreExplanationView: View {
                     VStack(spacing: 20) {
                         explanationRow(
                             icon: "clock.fill",
-                            title: "Persistencia (70%)",
-                            description: "Calculamos el porcentaje de tiempo que estuviste roncando respecto al total de la sesión."
+                            title: "Persistencia (50%)",
+                            description: "Porcentaje de tiempo que estuviste roncando respecto al total de la noche."
                         )
                         
                         explanationRow(
                             icon: "speaker.wave.3.fill",
-                            title: "Intensidad (30%)",
-                            description: "Tomamos los picos de decibelios más altos detectados durante tus ronquidos."
+                            title: "Intensidad (20%)",
+                            description: "Nivel de volumen máximo alcanzado. Ronquidos más fuertes indican más esfuerzo respiratorio."
+                        )
+                        
+                        explanationRow(
+                            icon: "lungs.fill",
+                            title: "Eventos Respiratorios",
+                            description: "Cada apnea detectada añade una penalización de 10 puntos debido al riesgo que representan."
                         )
                         
                         explanationRow(
                             icon: "brain.head.profile",
-                            title: "Filtro por IA",
-                            description: "Nuestro modelo de Machine Learning valida cada sonido para ignorar ruidos externos como ventiladores o tráfico."
+                            title: "Validación por IA",
+                            description: "La red neuronal filtra ruidos externos para asegurar que solo los ronquidos reales cuenten."
                         )
                     }
                     .padding(.horizontal, 24)
