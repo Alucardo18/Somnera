@@ -27,7 +27,9 @@ final class AudioSessionManager {
     /// Switches the session to playback mode for listening to recordings.
     func switchToPlayback() throws {
         let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.playback, mode: .default, options: [.defaultToSpeaker])
+        // .defaultToSpeaker is only for .playAndRecord. 
+        // For .playback, the system defaults to speaker/headphones automatically.
+        try session.setCategory(.playback, mode: .default, options: [])
         try session.setActive(true)
     }
 
