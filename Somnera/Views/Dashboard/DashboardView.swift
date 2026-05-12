@@ -241,6 +241,7 @@ struct CreatorMessageView: View {
 
 struct ScoreCardView: View {
     let session: SleepSession
+    @State private var showExplanation = false
 
     var scoreColor: Color {
         switch session.snoreScore {
@@ -253,29 +254,38 @@ struct ScoreCardView: View {
     var body: some View {
         HStack(spacing: 24) {
             // Score circle with glow
-            ZStack {
-                Circle()
-                    .stroke(scoreColor.opacity(0.3), lineWidth: 8)
-                    .blur(radius: 8)
-                
-                Circle()
-                    .stroke(Color.somSurfaceHigh.opacity(0.5), lineWidth: 6)
-                
-                Circle()
-                    .trim(from: 0, to: CGFloat(session.snoreScore) / 100)
-                    .stroke(scoreColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                
-                VStack(spacing: 0) {
-                    Text("\(session.snoreScore)")
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                    Text("Puntos")
-                        .font(.system(size: 8, weight: .bold))
-                        .foregroundColor(.somTextSecondary)
+            Button {
+                showExplanation = true
+            } label: {
+                ZStack {
+                    Circle()
+                        .stroke(scoreColor.opacity(0.3), lineWidth: 8)
+                        .blur(radius: 8)
+                    
+                    Circle()
+                        .stroke(Color.somSurfaceHigh.opacity(0.5), lineWidth: 6)
+                    
+                    Circle()
+                        .trim(from: 0, to: CGFloat(session.snoreScore) / 100)
+                        .stroke(scoreColor, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                    
+                    VStack(spacing: 0) {
+                        Text("\(session.snoreScore)")
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                        Text("Puntos")
+                            .font(.system(size: 8, weight: .bold))
+                            .foregroundColor(.somTextSecondary)
+                    }
                 }
             }
             .frame(width: 100, height: 100)
+            .sheet(isPresented: $showExplanation) {
+                ScoreExplanationView()
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+            }
 
             // Stats
             VStack(alignment: .leading, spacing: 10) {
@@ -306,6 +316,74 @@ struct ScoreCardView: View {
                 .font(.caption.bold())
                 .foregroundColor(color)
         }
+    }
+}
+
+// MARK: - Score Explanation View
+
+struct ScoreExplanationView: View {
+    var body: some View {
+        ZStack {
+            Color.somBackground.ignoresSafeArea()
+            
+            VStack(spacing: 30) {
+                VStack(spacing: 12) {
+                    Text("Puntuación de Ronquido")
+                        .font(.system(size: 24, weight: .black, design: .rounded))
+                        .foregroundColor(.white)
+                    
+                    Text("¿Cómo calculamos tu noche?")
+                        .font(.subheadline)
+                        .foregroundColor(.somTextSecondary)
+                }
+                
+                VStack(spacing: 20) {
+                    explanationRow(
+                        icon: "clock.fill",
+                        title: "Persistencia (70%)",
+                        description: "Calculamos el porcentaje de tiempo que estuviste roncando respecto al total de la sesión."
+                    )
+                    
+                    explanationRow(
+                        icon: "speaker.wave.3.fill",
+                        title: "Intensidad (30%)",
+                        description: "Tomamos los picos de decibelios más altos detectados durante tus ronquidos."
+                    )
+                }
+                .padding(.horizontal, 24)
+                
+                Text("Una puntuación baja indica una noche tranquila, mientras que una alta sugiere ronquidos persistentes o muy ruidosos.")
+                    .font(.system(size: 13))
+                    .foregroundColor(.somTextSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+                
+                Spacer()
+            }
+            .padding(.top, 40)
+        }
+    }
+    
+    private func explanationRow(icon: String, title: String, description: String) -> some View {
+        HStack(alignment: .top, spacing: 16) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundColor(.somAccent)
+                .frame(width: 32)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Text(description)
+                    .font(.caption)
+                    .foregroundColor(.somTextSecondary)
+                    .lineSpacing(4)
+            }
+        }
+        .padding(16)
+        .background(Color.white.opacity(0.05))
+        .cornerRadius(16)
     }
 }
 
