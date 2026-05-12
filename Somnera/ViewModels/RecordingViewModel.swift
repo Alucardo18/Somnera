@@ -244,7 +244,8 @@ final class RecordingViewModel: ObservableObject {
             apneaEvents: currentApneaEvents,
             audioFilePath: id.uuidString,
             peakDecibels: peakDecibels,
-            decibelTimeline: decibelTimeline
+            decibelTimeline: decibelTimeline,
+            surfaceType: currentSurface.rawValue
         )
         sessionStorage.save(session)
         self.session = session

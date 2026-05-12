@@ -10,6 +10,7 @@ struct SleepSession: Identifiable, Codable, Hashable {
     var audioFilePath: String?        // Relative path inside Documents/
     var peakDecibels: Float
     var decibelTimeline: [Float]      // Average dB sampled every 5 seconds
+    var surfaceType: String?          // "bed" or "nightstand"
 
     // MARK: - Computed
 
@@ -59,16 +60,16 @@ struct SleepSession: Identifiable, Codable, Hashable {
             .sorted { ($0.confidence * Double($0.peakDecibels)) > ($1.confidence * Double($1.peakDecibels)) }
             .prefix(5)
             .sorted { $0.offsetSeconds < $1.offsetSeconds } // Sort back by time
-    }
-
     /// Generates a human-readable summary of the night with high variation (50+ options)
     var insightSummary: String {
         let seed = abs(id.hashValue)
         func pick(_ options: [String]) -> String { options[seed % options.count] }
 
-        // CASE 1: Perfect Night (10 options)
+        let baseMessage: String
+        
+        // Determine Base Message
         if apneaEvents.isEmpty && snoreScore < 15 {
-            return pick([
+            baseMessage = pick([
                 "¡Noche perfecta! Tu respiración fue constante y silenciosa. Tu calidad de descanso es óptima.",
                 "Silencio total. No detectamos ronquidos ni interrupciones. Estás recuperando energías al máximo.",
                 "Increíble calidad de sueño. Tu sistema respiratorio funcionó sin ningún esfuerzo esta noche.",
@@ -80,12 +81,8 @@ struct SleepSession: Identifiable, Codable, Hashable {
                 "Descanso de alta calidad. No hubo vibraciones en tus vías aéreas ni interrupciones de oxígeno.",
                 "Tu mejor noche hasta ahora. El análisis no muestra nada más que paz y aire fluyendo libremente."
             ])
-        }
-        
-        // CASE 2: Critical Apnea (10 options)
-        let hasCriticalApnea = apneaEvents.contains { $0.durationSeconds > 30 }
-        if hasCriticalApnea {
-            return pick([
+        } else if let hasCriticalApnea = Optional(apneaEvents.contains { $0.durationSeconds > 30 }), hasCriticalApnea {
+            baseMessage = pick([
                 "Detectamos pausas respiratorias prolongadas (>30s). Esto reduce severamente tu oxígeno. Es importante que consultes con un especialista.",
                 "Alerta de apnea crítica. Tuviste interrupciones de respiración muy largas. Considera usar una almohada más alta o dormir de lado.",
                 "Tu descanso fue interrumpido por pausas de oxígeno peligrosas. No ignores estas señales; tu corazón se esfuerza de más.",
@@ -97,11 +94,8 @@ struct SleepSession: Identifiable, Codable, Hashable {
                 "Episodios de apnea crítica registrados. Tu flujo de aire se detuvo por periodos alarmantes. No dejes pasar este dato.",
                 "Alerta de salud: tu respiración se detuvo significativamente. Los ronquidos previos fueron la señal de una obstrucción severa."
             ])
-        }
-        
-        // CASE 3: Moderate Apnea / High Activity (10 options)
-        if apneaEventCount > 0 {
-            return pick([
+        } else if apneaEventCount > 0 {
+            baseMessage = pick([
                 "Tu noche fue movida. Detectamos \(apneaEventCount) pausas respiratorias breves. Tus ronquidos ocuparon el \(Int(snorePercentage))% de la noche.",
                 "Notamos \(apneaEventCount) episodios de apnea leve. Aunque son breves, fragmentan tu sueño. Intenta evitar dormir boca arriba.",
                 "Respiración irregular detectada. Hubo \(apneaEventCount) momentos donde tu flujo de aire se detuvo. Un humidificador podría ayudarte.",
@@ -113,11 +107,8 @@ struct SleepSession: Identifiable, Codable, Hashable {
                 "Tu puntuación bajó debido a \(apneaEventCount) pausas de aire. Aun breves, estas pausas estresan tu sistema cardiovascular.",
                 "Patrón de ronquido con apneas leves. Es un buen momento para monitorizar tu peso o posición al dormir."
             ])
-        }
-        
-        // CASE 4: High Snoring Intensity (10 options)
-        if snoreScore > 50 {
-            return pick([
+        } else if snoreScore > 50 {
+            baseMessage = pick([
                 "Ronquidos intensos detectados durante gran parte de la noche. Tu nivel de esfuerzo respiratorio fue alto (\(Int(peakDecibels)) dB).",
                 "Noche ruidosa. Tus ronquidos alcanzaron picos de \(Int(peakDecibels)) dB. Esto puede indicar una obstrucción nasal o cansancio extremo.",
                 "Mucho esfuerzo en tu respiración. Roncaste el \(Int(snorePercentage))% de la noche con alta intensidad. Revisa si tienes congestión.",
@@ -129,21 +120,33 @@ struct SleepSession: Identifiable, Codable, Hashable {
                 "Vibración intensa en las vías respiratorias. Esto suele causar sequedad de garganta e inflamación al despertar.",
                 "Análisis sonoro: ronquidos de alto impacto. Tu cuerpo está haciendo un sobreesfuerzo para mantener el flujo de aire."
             ])
+        } else {
+            baseMessage = pick([
+                "Noche estable con algunos ronquidos aislados. No detectamos riesgos respiratorios importantes.",
+                "Descanso balanceado. Hubo algo de ruido, pero tu respiración se mantuvo rítmica la mayor parte del tiempo.",
+                "Ronquidos leves detectados. En general, una noche segura y con buen flujo de aire.",
+                "Patrón de sueño saludable. Unos pocos ronquidos no afectan tu oxigenación general.",
+                "Respiración mayormente tranquila. Los eventos de sonido fueron breves y no interrumpieron tu ritmo.",
+                "Buena noche. Tu flujo de aire es consistente. Sigue así, tu higiene de sueño parece estar funcionando.",
+                "Análisis positivo: respiración rítmica con ruidos mínimos. Tu descanso ha sido de buena calidad.",
+                "Noche tranquila. Solo detectamos pequeñas vibraciones ocasionales que no representan riesgo.",
+                "Tu garganta se mantuvo despejada casi toda la noche. Un nivel de ronquido muy aceptable.",
+                "Buen descanso. Tu respiración fue estable y eficiente durante las \(formattedDuration) de sesión."
+            ])
         }
         
-        // CASE 5: Normal/Stable (10 options)
-        return pick([
-            "Noche estable con algunos ronquidos aislados. No detectamos riesgos respiratorios importantes.",
-            "Descanso balanceado. Hubo algo de ruido, pero tu respiración se mantuvo rítmica la mayor parte del tiempo.",
-            "Ronquidos leves detectados. En general, una noche segura y con buen flujo de aire.",
-            "Patrón de sueño saludable. Unos pocos ronquidos no afectan tu oxigenación general.",
-            "Respiración mayormente tranquila. Los eventos de sonido fueron breves y no interrumpieron tu ritmo.",
-            "Buena noche. Tu flujo de aire es consistente. Sigue así, tu higiene de sueño parece estar funcionando.",
-            "Análisis positivo: respiración rítmica con ruidos mínimos. Tu descanso ha sido de buena calidad.",
-            "Noche tranquila. Solo detectamos pequeñas vibraciones ocasionales que no representan riesgo.",
-            "Tu garganta se mantuvo despejada casi toda la noche. Un nivel de ronquido muy aceptable.",
-            "Buen descanso. Tu respiración fue estable y eficiente durante las \(formattedDuration) de sesión."
-        ])
+        // Add Surface Note
+        var finalSummary = baseMessage
+        
+        if let surface = surfaceType {
+            if surface == "nightstand" {
+                finalSummary += "\n\n💡 Tip: Detectamos que tu iPhone estaba en una superficie rígida. Para una precisión clínica (Sentinel V2), intenta colocarlo sobre el colchón."
+            } else if surface == "bed" {
+                finalSummary += "\n\n✅ Sentinel V2 activado: Detección de máxima precisión mediante vibraciones de colchón."
+            }
+        }
+        
+        return finalSummary
     }
 
     // MARK: - Init
@@ -156,7 +159,8 @@ struct SleepSession: Identifiable, Codable, Hashable {
         apneaEvents: [ApneaEvent] = [],
         audioFilePath: String? = nil,
         peakDecibels: Float = 0,
-        decibelTimeline: [Float] = []
+        decibelTimeline: [Float] = [],
+        surfaceType: String? = nil
     ) {
         self.id = id
         self.startDate = startDate
@@ -166,6 +170,7 @@ struct SleepSession: Identifiable, Codable, Hashable {
         self.audioFilePath = audioFilePath
         self.peakDecibels = peakDecibels
         self.decibelTimeline = decibelTimeline
+        self.surfaceType = surfaceType
     }
 
     // MARK: - Mock Data for Previews
@@ -185,7 +190,8 @@ struct SleepSession: Identifiable, Codable, Hashable {
             ],
             audioFilePath: nil,
             peakDecibels: 72,
-            decibelTimeline: (0..<500).map { _ in Float.random(in: 10...75) }
+            decibelTimeline: (0..<500).map { _ in Float.random(in: 10...75) },
+            surfaceType: "bed"
         )
     }
 }
