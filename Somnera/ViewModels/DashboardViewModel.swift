@@ -74,6 +74,17 @@ final class DashboardViewModel: ObservableObject {
         storageService.delete(session)
         sessions = storageService.fetchAll()
     }
+    
+    func updateFeedback(for session: SleepSession, event: SnoreEvent, feedback: SnoreEvent.Feedback) {
+        var updatedSession = session
+        if let index = updatedSession.snoreEvents.firstIndex(where: { $0.id == event.id }) {
+            updatedSession.snoreEvents[index].userFeedback = feedback
+            storageService.save(updatedSession)
+            
+            // Reload to update UI
+            sessions = storageService.fetchAll()
+        }
+    }
 
     func deleteAllSessions() {
         storageService.deleteAll()

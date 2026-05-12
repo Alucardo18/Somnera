@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HighlightsView: View {
     let session: SleepSession
+    let onFeedback: (SleepSession, SnoreEvent, SnoreEvent.Feedback) -> Void
     @StateObject private var playback = AudioPlaybackService.shared
     
     var body: some View {
@@ -19,7 +20,9 @@ struct HighlightsView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         ForEach(session.highlights) { event in
-                            HighlightCard(event: event, audioURL: sessionAudioURL)
+                            HighlightCard(event: event, audioURL: sessionAudioURL) { feedback in
+                                onFeedback(session, event, feedback)
+                            }
                         }
                     }
                 }
@@ -38,6 +41,7 @@ struct HighlightsView: View {
 struct HighlightCard: View {
     let event: SnoreEvent
     let audioURL: URL?
+    let onFeedback: (SnoreEvent.Feedback) -> Void
     @StateObject private var playback = AudioPlaybackService.shared
     
     private var isCurrentlyPlaying: Bool {
@@ -86,12 +90,40 @@ struct HighlightCard: View {
                     .stroke(isCurrentlyPlaying ? Color.somAccent : Color.clear, lineWidth: 2)
             )
         }
+        .opacity(event.userFeedback == .rejected ? 0.3 : 1.0)
+        .overlay(
+            Group {
+                if event.userFeedback == .rejected {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.red)
+                        .padding(4)
+                } else if event.userFeedback == .confirmed {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                        .padding(4)
+                }
+            },
+            alignment: .topTrailing
+        )
+        .contextMenu {
+            Button {
+                onFeedback(.confirmed)
+            } label: {
+                Label("Confirmar Ronquido", systemImage: "checkmark.circle")
+            }
+            
+            Button(role: .destructive) {
+                onFeedback(.rejected)
+            } label: {
+                Label("No es un ronquido", systemImage: "xmark.circle")
+            }
+        }
     }
 }
 #Preview {
     ZStack {
         Color.somBackground.ignoresSafeArea()
-        HighlightsView(session: .mock)
+        HighlightsView(session: .mock) { _, _, _ in }
             .padding()
     }
 }

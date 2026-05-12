@@ -7,19 +7,27 @@ struct SnoreEvent: Identifiable, Codable {
     var durationSeconds: Double
     var confidence: Double          // ML confidence 0.75–1.0
     var peakDecibels: Float
+    var userFeedback: Feedback?
+
+    enum Feedback: String, Codable {
+        case confirmed
+        case rejected
+    }
 
     init(
         id: UUID = UUID(),
         offsetSeconds: Double,
         durationSeconds: Double = 1.0,
         confidence: Double,
-        peakDecibels: Float = 0
+        peakDecibels: Float = 0,
+        userFeedback: Feedback? = nil
     ) {
         self.id = id
         self.offsetSeconds = offsetSeconds
         self.durationSeconds = durationSeconds
         self.confidence = confidence
         self.peakDecibels = peakDecibels
+        self.userFeedback = userFeedback
     }
 
     var formattedOffset: String {

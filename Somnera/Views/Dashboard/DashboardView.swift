@@ -40,8 +40,10 @@ struct DashboardView: View {
                             NightHeatmapView(session: session)
                                 .padding(.horizontal)
                             
-                            HighlightsView(session: session)
-                                .padding(.horizontal)
+                            HighlightsView(session: session) { session, event, feedback in
+                                viewModel.updateFeedback(for: session, event: event, feedback: feedback)
+                            }
+                            .padding(.horizontal)
                         } else {
                             emptyStateCard
                         }
