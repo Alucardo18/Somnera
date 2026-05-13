@@ -16,6 +16,7 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
     private var streamAnalyzer: SNAudioStreamAnalyzer?
     private var sessionStart: Date?
     private var lastDistance: Double = 0.5
+    private(set) var isSnoring: Bool = false
     private let analysisQueue = DispatchQueue(label: "com.somnera.soundAnalysis", qos: .userInitiated)
 
     // MARK: - Setup
@@ -56,6 +57,8 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
 
     /// Feed each audio buffer from AudioCaptureService into the analyzer.
     func analyze(_ buffer: AVAudioPCMBuffer, at time: AVAudioTime) {
+        self.isSnoring = false // Reset before new analysis
+        
         // Echo-Location Analysis
         if let samples = buffer.floatChannelData?[0] {
             let frameCount = Int(buffer.frameLength)
@@ -111,6 +114,8 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
             }),
             snoreClass.confidence >= SomneraConstants.Snore.confidenceThreshold
         else { return }
+        
+        self.isSnoring = true
 
         let offset = sessionStart.map { Date().timeIntervalSince($0) } ?? 0
         DispatchQueue.main.async { [weak self] in

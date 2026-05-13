@@ -318,6 +318,7 @@ final class RecordingViewModel: ObservableObject {
         self.writeAmplifiedBuffer(buffer)
         
         // 3. IA Analysis
+        let now = Date()
         snoreDetector.analyze(buffer, at: time)
         
         // Link snore events to apnea detector for context
@@ -327,7 +328,6 @@ final class RecordingViewModel: ObservableObject {
 
         // Timeline Sampling (5s)
         sampleAccumulator.append(dB)
-        let now = Date()
         if now.timeIntervalSince(lastTimelineSampleTime) >= 5.0 {
             let avgDB = sampleAccumulator.reduce(0, +) / Float(max(1, sampleAccumulator.count))
             decibelTimeline.append(avgDB)
