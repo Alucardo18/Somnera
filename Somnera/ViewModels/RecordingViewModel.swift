@@ -62,6 +62,7 @@ final class RecordingViewModel: ObservableObject {
     private var decibelTimeline: [Float] = []
     private var lastTimelineSampleTime = Date()
     private var lastAutoSaveTime = Date()
+    private var lastUIUpdateTime = Date()
     private var lastSpectralAnalysis: (nasal: Double, palatal: Double, lingual: Double) = (0, 0, 0)
     
     // Sentinel V2 Timelines
@@ -310,6 +311,7 @@ final class RecordingViewModel: ObservableObject {
     private var peakIntervals: [TimeInterval] = []
 
     private func processBuffer(_ buffer: AVAudioPCMBuffer, time: AVAudioTime) {
+        let now = Date()
         // 1. Metrics
         let rms = DSPFilter.rms(of: buffer) ?? 0.0001
         let dB = DSPFilter.toDecibels(rms)
@@ -322,7 +324,6 @@ final class RecordingViewModel: ObservableObject {
         // --- STABILITY (RHYTHM) CALCULATION ---
         // Basic peak detection for breathing rhythm
         if rms > noiseFloorRMS * 1.5 && rms > 0.001 {
-            let now = Date()
             let interval = now.timeIntervalSince(lastPeakTime)
             if interval > 1.0 && interval < 6.0 { // Range for human breathing (10-60 bpm)
                 peakIntervals.append(interval)
@@ -345,12 +346,22 @@ final class RecordingViewModel: ObservableObject {
             }
         }
 
-        // Visual updates even during waiting
-        Task { @MainActor in
-            self.currentRMS = rms
-            self.currentDecibels = dB
-            self.currentSNR = Double(snr)
-            self.updateWaveform(rms: rms)
+        // Visual updates throttled to 20Hz (every 0.05s) to avoid MainActor saturation
+        let shouldUpdateUI = now.timeIntervalSince(lastUIUpdateTime) >= 0.05
+        
+        if shouldUpdateUI {
+            let capturedSNR = snr
+            let capturedRMS = rms
+            let capturedDB = dB
+            
+            Task { @MainActor in
+                self.currentRMS = capturedRMS
+                self.currentDecibels = capturedDB
+                self.currentSNR = Double(capturedSNR)
+                self.peakDecibels = max(self.peakDecibels, capturedDB)
+                self.updateWaveform(rms: capturedRMS)
+            }
+            lastUIUpdateTime = now
         }
 
         // IF WAITING: We just return here but the engine keeps running!
@@ -364,7 +375,6 @@ final class RecordingViewModel: ObservableObject {
         self.writeAmplifiedBuffer(buffer)
         
         // 3. IA Analysis
-        let now = Date()
         snoreDetector.analyze(buffer, at: time)
         
         // Link snore events to apnea detector
@@ -378,10 +388,13 @@ final class RecordingViewModel: ObservableObject {
             let spectral = SpectralAnalysisService.shared.analyze(buffer: buffer)
             self.lastSpectralAnalysis = (spectral.nasal, spectral.palatal, spectral.lingual)
             
-            Task { @MainActor in
-                self.currentNasalIntensity = spectral.nasal
-                self.currentPalatalIntensity = spectral.palatal
-                self.currentLingualIntensity = spectral.lingual
+            if shouldUpdateUI {
+                let capturedSpectral = spectral
+                Task { @MainActor in
+                    self.currentNasalIntensity = capturedSpectral.nasal
+                    self.currentPalatalIntensity = capturedSpectral.palatal
+                    self.currentLingualIntensity = capturedSpectral.lingual
+                }
             }
             
             if (spectral.nasal + spectral.palatal + spectral.lingual) > 0 {
@@ -416,12 +429,7 @@ final class RecordingViewModel: ObservableObject {
             }
         }
 
-        Task { @MainActor in
-            self.currentRMS = rms
-            self.currentDecibels = dB
-            self.peakDecibels = max(self.peakDecibels, dB)
-            self.updateWaveform(rms: rms)
-        }
+        // Throttled UI updates handled at the beginning of the function
     }
 
     private func saveCurrentSessionState(isFinal: Bool) {
