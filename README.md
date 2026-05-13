@@ -1,6 +1,6 @@
 # 🎙️ Somnera — State-of-the-Art Sleep Diagnostics
 
-[![Version](https://img.shields.io/badge/Version-2.0.0-blue.svg)](https://github.com/Alucardo18/Somnera)
+[![Version](https://img.shields.io/badge/Version-2.1.0-blue.svg)](https://github.com/Alucardo18/Somnera)
 [![Platform](https://img.shields.io/badge/Platform-iOS%2017%2B-black.svg)](https://developer.apple.com/ios/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -20,8 +20,12 @@ A diferencia de las aplicaciones convencionales que dependen únicamente del aud
 
 ### 🔬 Procesamiento de Señal y AI Local
 - **Core ML & SoundAnalysis**: Implementación de un modelo de red neuronal convolucional (`SomneraClassifier`) optimizado para el Apple Neural Engine, capaz de identificar patrones de ronquidos en milisegundos.
-- **DSP Avanzado (vDSP)**: Uso intensivo del framework **Accelerate** para filtrado bandpass y análisis espectral con consumo energético mínimo.
+- **DSP Avanzado (vDSP)**: Uso intensivo del framework **Accelerate** para filtrado bandpass y análisis espectral de frecuencia (FFT).
+- **Digital Twin 3D**: Reconstrucción anatómica de la vía aérea en tiempo real. Mediante análisis espectral, Somnera identifica si la obstrucción es **Nasal, Palatal o Lingual**.
+- **PSG Medical Timeline**: Visualización de grado médico que muestra ondas de sonido y pausas respiratorias sincronizadas con el audio original.
 - **Audio Pipeline v2**: Grabación en formato **.caf (PCM Float32)** con amplificación dinámica x8 para una claridad diagnóstica superior durante la reproducción.
+
+![Somnera Recording Mode](Docs/Assets/recording_mockup.png)
 
 ### 💎 Diseño Premium & UX
 - **Glassmorphism Design System**: Una interfaz inmersiva basada en materiales ultra-delgados, gradientes dinámicos y micro-animaciones que reducen la fricción cognitiva durante el uso nocturno.
