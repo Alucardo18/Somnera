@@ -1,44 +1,45 @@
-# 🎙️ Somnera — Professional Sleep Diagnostics
+# 🎙️ Somnera — State-of-the-Art Sleep Diagnostics
 
 [![Version](https://img.shields.io/badge/Version-2.0.0-blue.svg)](https://github.com/Alucardo18/Somnera)
 [![Platform](https://img.shields.io/badge/Platform-iOS%2017%2B-black.svg)](https://developer.apple.com/ios/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Somnera es una plataforma de diagnóstico de sueño de alta precisión para iOS que transforma tu iPhone en un monitor de apnea y ronquidos de grado médico, priorizando la privacidad mediante el procesamiento 100% local.
+Somnera es la cumbre de la tecnología de monitoreo de sueño en iOS. Diseñada para transformar el iPhone en un laboratorio de diagnóstico clínico personal, Somnera utiliza **fusión sensorial avanzada** y **aprendizaje profundo** para detectar ronquidos y apnea del sueño con una precisión sin precedentes, manteniendo la privacidad absoluta mediante un procesamiento 100% local (Edge AI).
 
 ![Somnera Dashboard](Docs/Assets/dashboard.png)
 
-## 🧠 Inteligencia Artificial y Machine Learning
+## 🌌 Tecnología de Vanguardia
 
-Somnera no solo registra audio; lo interpreta. El núcleo de la aplicación utiliza una arquitectura de IA multinivel:
+Somnera integra un stack tecnológico de nivel industrial para ofrecer resultados precisos y confiables:
 
-### 1. Clasificación de Sonido en Tiempo Real (CoreML)
-Utilizamos el framework **SoundAnalysis** de Apple junto con un modelo **CoreML** personalizado (`SomneraClassifier`) entrenado para identificar patrones acústicos de ronquidos y jadeos de recuperación.
-- **Procesamiento**: El audio se convierte a 16kHz y se analiza en ventanas de 1 segundo para garantizar una latencia mínima.
-- **Local**: Todo el análisis ocurre en el Neural Engine del iPhone, sin enviar datos a la nube.
+### 🧠 Sentinel V2: El Motor de Fusión Sensorial
+A diferencia de las aplicaciones convencionales que dependen únicamente del audio, nuestro motor **Sentinel V2** utiliza una validación cruzada tripartita:
+- **Acoustic Energy Analysis**: Monitoreo en tiempo real de la energía RMS del audio para detectar caídas críticas.
+- **Actigrafía de Alta Frecuencia**: Integración con **CoreMotion** (10Hz) para validar la inmovilidad física durante episodios de apnea, eliminando falsos positivos.
+- **Recovery Gasp Detection**: Identificación inteligente de picos de energía post-apnea mediante modelos de clasificación acústica.
 
-### 2. Sentinel V2: Fusión Sensorial (Local AI)
-Nuestro algoritmo propietario **Sentinel V2** elimina los falsos positivos mediante la correlación cruzada de datos. A diferencia de otras apps que solo miden el silencio, Sentinel V2 valida una apnea solo si se cumplen tres condiciones:
-- 🔇 **Silencio Acústico**: Caída repentina de la energía RMS por debajo de los 38dB.
-- 🧘 **Inmovilidad Actigráfica**: Datos del acelerómetro (**CoreMotion**) confirmando la falta de movimiento físico durante el episodio.
-- ⚡ **Jadeo de Recuperación**: Detección de un pico de energía post-silencio validado por Machine Learning.
+### 🔬 Procesamiento de Señal y AI Local
+- **Core ML & SoundAnalysis**: Implementación de un modelo de red neuronal convolucional (`SomneraClassifier`) optimizado para el Apple Neural Engine, capaz de identificar patrones de ronquidos en milisegundos.
+- **DSP Avanzado (vDSP)**: Uso intensivo del framework **Accelerate** para filtrado bandpass y análisis espectral con consumo energético mínimo.
+- **Audio Pipeline v2**: Grabación en formato **.caf (PCM Float32)** con amplificación dinámica x8 para una claridad diagnóstica superior durante la reproducción.
 
-### 3. Diagnostic Insights (Local LLM Logic)
-Al finalizar cada sesión, nuestro motor de **SessionAnalytics** genera un reporte humano. No mostramos solo números; interpretamos la severidad (Leve, Moderada, Severa) y proporcionamos sugerencias accionables basadas en la tendencia de la noche.
+### 💎 Diseño Premium & UX
+- **Glassmorphism Design System**: Una interfaz inmersiva basada en materiales ultra-delgados, gradientes dinámicos y micro-animaciones que reducen la fricción cognitiva durante el uso nocturno.
+- **HealthKit Synergy**: Sincronización bidireccional con Apple Health, permitiendo una visión holística de la salud respiratoria del usuario.
 
 ![Sentinel V2 Analysis](Docs/Assets/sentinel.png)
 
 ## 🛠️ Stack Tecnológico
 
-- **UI**: SwiftUI (Arquitectura MVVM + Glassmorphism Design).
-- **Audio**: AVAudioEngine con procesamiento DSP avanzado (vDSP).
-- **Sensores**: CoreMotion para actigrafía de alta frecuencia (10Hz).
-- **Salud**: Integración total con **HealthKit** para sincronizar sesiones de sueño.
-- **Gestión**: XcodeGen para un control de proyecto reproducible y limpio.
+- **Core**: Swift 5.9 + SwiftUI (MVVM Architecture).
+- **IA**: Core ML, SoundAnalysis, Neural Engine optimization.
+- **Hardware**: CoreMotion (Accelerometer), AVFoundation (AVAudioEngine).
+- **Health**: HealthKit Integration.
+- **DevOps**: XcodeGen (Reproducible project management).
 
 ## 🚀 Instalación y Desarrollo
 
-Este proyecto utiliza **XcodeGen** para gestionar el archivo `.xcodeproj`.
+Este proyecto utiliza **XcodeGen** para una gestión de dependencias y configuración de proyecto limpia y determinista.
 
 ```bash
 # 1. Instalar XcodeGen
@@ -56,4 +57,4 @@ open Somnera.xcodeproj
 Este proyecto está bajo la **Licencia MIT**. Ver el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
-Desarrollado con ❤️ por **Emmanuel Gonzalez**
+Desarrollado con ❤️ y tecnología de punta por **Emmanuel Gonzalez**
