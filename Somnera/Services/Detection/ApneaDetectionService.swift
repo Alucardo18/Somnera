@@ -91,35 +91,46 @@ final class ApneaDetectionService {
         guard let start = silenceStart else { return }
         let duration = timestamp.timeIntervalSince(start)
         
-        // Safety: Ignore pauses longer than 120s (likely phone left alone or disconnected)
+        // Safety: Ignore pauses longer than 120s
         if duration > 120 { return }
 
-        // Bio-Context 1: Was there a snore recently? (Last 5 minutes)
+        // Bio-Context 1: Immediate Snore Context (Last 60 seconds)
+        // Apnea usually happens right after a snoring bout.
         let secondsSinceLastSnore = lastSnoreDate.map { timestamp.timeIntervalSince($0) } ?? 9999
-        let hadRecentSnoring = secondsSinceLastSnore < 300
+        let hadImmediateSnoring = secondsSinceLastSnore < 60
         
         // Bio-Context 2: Motion during silence
         let wasStill = maxMotionDuringSilence < 0.03
         
-        // Bio-Context 3: The "Recovery Gasp" (Audio & Motion spike)
-        let audioSpike = (recentRMS.last ?? 0) - (recentRMS.dropLast(5).first ?? 0) > 25.0
-        let motionSpike = recentMotionIntensity.last ?? 0 > 0.06
+        // Bio-Context 3: The "Recovery Gasp" (Critical Validation)
+        // We look for a sudden spike compared to the silence average
+        let currentRMS = recentRMS.last ?? 0
+        let previousRMS = recentRMS.dropLast(10).first ?? 0
+        let audioSpike = (currentRMS - previousRMS) > 20.0
+        let motionSpike = recentMotionIntensity.last ?? 0 > 0.07
         
         var confidenceScore: Double = 0.0
         
-        if hadRecentSnoring { confidenceScore += 0.4 } // High weight to snore context
+        if hadImmediateSnoring { confidenceScore += 0.5 } // Main trigger context
         if wasStill { confidenceScore += 0.2 }
         if audioSpike { confidenceScore += 0.2 }
         if motionSpike { confidenceScore += 0.2 }
         
-        // CRITICAL: If no recent snoring AND low confidence, it's a false positive (likely awake).
-        if !hadRecentSnoring && confidenceScore < 0.5 {
-            print("[Sentinel] 🛡️ Apnea rechazada: Falta contexto de ronquido/gasp. Score: \(confidenceScore)")
-            return 
+        // CRITICAL RULES:
+        // 1. If it was just silence without a Gasp AND duration < 20s, it's just normal sleep.
+        if !audioSpike && duration < 20 {
+            print("[Sentinel] 🛡️ Apnea rechazada: Retorno de audio suave (no es un gasp).")
+            return
+        }
+
+        // 2. If it's been more than 60s since the last snore, it's likely not obstructive apnea.
+        if !hadImmediateSnoring && confidenceScore < 0.6 {
+            print("[Sentinel] 🛡️ Apnea rechazada: Sin ronquido inmediato (Window: \(Int(secondsSinceLastSnore))s).")
+            return
         }
         
-        // Minimum score to actually report as a critical event
-        if confidenceScore >= 0.4 {
+        // Report if confidence is solid
+        if confidenceScore >= 0.5 || (duration > 25 && wasStill) {
             onApneaResolved?(duration, confidenceScore)
         }
     }
