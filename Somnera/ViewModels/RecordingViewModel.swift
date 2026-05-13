@@ -197,22 +197,19 @@ final class RecordingViewModel: ObservableObject {
     }
 
     func stopSession() async {
+        let wasRecording = isRecording
         countdownTask?.cancel()
-        guard (isRecording || isWaiting), let id = sessionID, let start = sessionStart else {
-            isRecording = false
-            isWaiting = false
-            return
-        }
-
+        
         isRecording = false
         isWaiting = false
+        isSetup = true
         timerTask?.cancel()
 
         // Stop services
         audioCapture.stop()
         
         // Final sample
-        if !sampleAccumulator.isEmpty {
+        if wasRecording && !sampleAccumulator.isEmpty {
             let avgDB = sampleAccumulator.reduce(0, +) / Float(sampleAccumulator.count)
             decibelTimeline.append(avgDB)
         }
@@ -224,16 +221,21 @@ final class RecordingViewModel: ObservableObject {
         audioFile = nil // This closes the file properly
         AudioSessionManager.shared.deactivate()
 
-        // Final Save
-        saveCurrentSessionState(isFinal: true)
+        // ONLY SAVE IF WE ACTUALLY STARTED RECORDING
+        if wasRecording {
+            saveCurrentSessionState(isFinal: true)
 
-        // Sync to HealthKit
-        if healthKitService.isAvailable {
-            try? await healthKitService.saveSleepSession(
-                start: start,
-                end: Date(),
-                apneaEventCount: currentApneaEvents.count
-            )
+            // Sync to HealthKit
+            if healthKitService.isAvailable, let start = sessionStart {
+                try? await healthKitService.saveSleepSession(
+                    start: start,
+                    end: Date(),
+                    apneaEventCount: currentApneaEvents.count
+                )
+            }
+        } else {
+            print("[Somnera] 🗑️ Sesión descartada (cancelada durante el retardo/setup)")
+            session = nil
         }
     }
 
