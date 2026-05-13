@@ -1,22 +1,37 @@
 import Foundation
+import SwiftData
 
 /// A single detected snoring event within a sleep session.
-struct SnoreEvent: Identifiable, Codable, Hashable {
-    let id: UUID
+@Model
+final class SnoreEvent: Identifiable {
+    @Attribute(.unique) var id: UUID
     var offsetSeconds: Double       // Seconds from session start
     var durationSeconds: Double
     var confidence: Double          // ML confidence 0.75–1.0
     var peakDecibels: Float
-    var userFeedback: Feedback?
+    var userFeedbackRaw: String?    // Stores Feedback enum as String for SwiftData
     
     // Spectral Intensities for Digital Twin
     var nasalIntensity: Double = 0.0
     var palatalIntensity: Double = 0.0
     var lingualIntensity: Double = 0.0
+    
+    // Relationship back to session
+    var session: SleepSession?
 
     enum Feedback: String, Codable {
         case confirmed
         case rejected
+    }
+    
+    var userFeedback: Feedback? {
+        get {
+            guard let raw = userFeedbackRaw else { return nil }
+            return Feedback(rawValue: raw)
+        }
+        set {
+            userFeedbackRaw = newValue?.rawValue
+        }
     }
 
     init(
@@ -35,7 +50,7 @@ struct SnoreEvent: Identifiable, Codable, Hashable {
         self.durationSeconds = durationSeconds
         self.confidence = confidence
         self.peakDecibels = peakDecibels
-        self.userFeedback = userFeedback
+        self.userFeedbackRaw = userFeedback?.rawValue
         self.nasalIntensity = nasalIntensity
         self.palatalIntensity = palatalIntensity
         self.lingualIntensity = lingualIntensity

@@ -1,12 +1,17 @@
 import Foundation
 import SwiftUI
+import SwiftData
 
 /// A detected apnea event: sustained silence ≥ 10 seconds.
-struct ApneaEvent: Identifiable, Codable, Hashable {
-    let id: UUID
+@Model
+final class ApneaEvent: Identifiable {
+    @Attribute(.unique) var id: UUID
     var offsetSeconds: Double       // Seconds from session start when apnea began
     var durationSeconds: Double     // Total silence duration
     var confidence: Double          // Confidence from sensor fusion (0.0 to 1.0)
+    
+    // Relationship back to session
+    var session: SleepSession?
 
     var severity: Severity {
         switch durationSeconds {

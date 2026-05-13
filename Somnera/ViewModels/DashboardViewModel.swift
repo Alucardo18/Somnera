@@ -8,7 +8,7 @@ final class DashboardViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var sessionToNavigate: SleepSession? = nil // Nueva propiedad para auto-navegación
 
-    private let storageService = SessionStorageService()
+    private let storageService = SessionStorageService.shared
     private let healthKitService = HealthKitService()
 
     // MARK: - Load
@@ -103,14 +103,11 @@ final class DashboardViewModel: ObservableObject {
     }
     
     func updateFeedback(for session: SleepSession, event: SnoreEvent, feedback: SnoreEvent.Feedback) {
-        var updatedSession = session
-        if let index = updatedSession.snoreEvents.firstIndex(where: { $0.id == event.id }) {
-            updatedSession.snoreEvents[index].userFeedback = feedback
-            storageService.save(updatedSession)
-            
-            // Reload to update UI
-            sessions = storageService.fetchAll()
-        }
+        event.userFeedback = feedback
+        storageService.save(session)
+        
+        // Reload to update UI
+        sessions = storageService.fetchAll()
     }
 
     func deleteAllSessions() {

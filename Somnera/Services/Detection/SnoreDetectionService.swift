@@ -57,8 +57,6 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
 
     /// Feed each audio buffer from AudioCaptureService into the analyzer.
     func analyze(_ buffer: AVAudioPCMBuffer, at time: AVAudioTime) {
-        self.isSnoring = false // Reset before new analysis
-        
         // Echo-Location Analysis
         if let samples = buffer.floatChannelData?[0] {
             let frameCount = Int(buffer.frameLength)
@@ -113,7 +111,10 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
                 $0.identifier.lowercased().contains(SomneraConstants.Snore.snoreLabel)
             }),
             snoreClass.confidence >= SomneraConstants.Snore.confidenceThreshold
-        else { return }
+        else {
+            self.isSnoring = false
+            return
+        }
         
         self.isSnoring = true
 

@@ -8,9 +8,9 @@ final class SpectralAnalysisService {
     static let shared = SpectralAnalysisService()
     
     // Frequency Band Definitions (Hz)
-    private let lowBandRange: ClosedRange<Float> = 200...800    // Lingual
-    private let midBandRange: ClosedRange<Float> = 800...1800   // Palatal
-    private let highBandRange: ClosedRange<Float> = 1800...4000 // Nasal
+    private let lowBandRange: ClosedRange<Float> = 200...799     // Lingual
+    private let midBandRange: ClosedRange<Float> = 800...1799    // Palatal
+    private let highBandRange: ClosedRange<Float> = 1800...4000  // Nasal
     
     // Cached resources
     private var fftSetup: FFTSetup?

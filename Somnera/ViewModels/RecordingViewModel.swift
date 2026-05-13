@@ -63,6 +63,7 @@ final class RecordingViewModel: ObservableObject {
     private var lastTimelineSampleTime = Date()
     private var lastAutoSaveTime = Date()
     private var lastUIUpdateTime = Date()
+    private var lastValidSpectralTime = Date()
     private var lastSpectralAnalysis: (nasal: Double, palatal: Double, lingual: Double) = (0, 0, 0)
     
     // Sentinel V2 Timelines
@@ -236,6 +237,16 @@ final class RecordingViewModel: ObservableObject {
             
             wireCallbacks()
             
+            // Initialize SwiftData session early
+            let newSession = SleepSession(
+                id: sessionID ?? UUID(),
+                startDate: now,
+                audioFilePath: sessionID?.uuidString,
+                surfaceType: currentSurface.rawValue
+            )
+            sessionStorage.save(newSession)
+            self.session = newSession
+            
             audioCapture.onBuffer = { [weak self] buffer, time in
                 self?.processBuffer(buffer, time: time)
             }
@@ -349,10 +360,16 @@ final class RecordingViewModel: ObservableObject {
         // Visual updates throttled to 20Hz (every 0.05s) to avoid MainActor saturation
         let shouldUpdateUI = now.timeIntervalSince(lastUIUpdateTime) >= 0.05
         
+        // 4. Digital Twin Spectral Analysis
+        let spectral = SpectralAnalysisService.shared.analyze(buffer: buffer)
+        self.lastSpectralAnalysis = (spectral.nasal, spectral.palatal, spectral.lingual)
+        
         if shouldUpdateUI {
             let capturedSNR = snr
             let capturedRMS = rms
             let capturedDB = dB
+            let capturedSpectral = spectral
+            let capturedIsSnoring = snoreDetector.isSnoring
             
             Task { @MainActor in
                 self.currentRMS = capturedRMS
@@ -360,6 +377,49 @@ final class RecordingViewModel: ObservableObject {
                 self.currentSNR = Double(capturedSNR)
                 self.peakDecibels = max(self.peakDecibels, capturedDB)
                 self.updateWaveform(rms: capturedRMS)
+                
+                // Digital Twin Live UI Update with Smoothing (EMA Filter)
+                if capturedDB > 35 {
+                    self.currentNasalIntensity = (self.currentNasalIntensity * 0.7) + (capturedSpectral.nasal * 0.3)
+                    self.currentPalatalIntensity = (self.currentPalatalIntensity * 0.7) + (capturedSpectral.palatal * 0.3)
+                    self.currentLingualIntensity = (self.currentLingualIntensity * 0.7) + (capturedSpectral.lingual * 0.3)
+                    self.lastValidSpectralTime = Date() // Reset hold timer
+                } else {
+                    // Start fading out ONLY after 1.5 seconds of silence
+                    if Date().timeIntervalSince(self.lastValidSpectralTime) > 1.5 {
+                        // Slower fade out for a more premium feel (Alpha 0.9)
+                        self.currentNasalIntensity *= 0.9
+                        self.currentPalatalIntensity *= 0.9
+                        self.currentLingualIntensity *= 0.9
+                        
+                        if self.currentNasalIntensity < 0.05 {
+                            self.currentNasalIntensity = 0
+                            self.currentPalatalIntensity = 0
+                            self.currentLingualIntensity = 0
+                        }
+                    }
+                }
+                
+                // Accumulation for final report (Gated by IA & Energy Stability)
+                // Threshold set to 35dB as per user preference to capture lighter snoring events.
+                if capturedIsSnoring && capturedDB > 35 {
+                    let frameCount = Int(buffer.frameLength)
+                    let crest: Float
+                    if let ptr = buffer.floatChannelData?[0], capturedRMS > 0 {
+                        let samples = UnsafeBufferPointer(start: ptr, count: frameCount)
+                        let peak = samples.reduce(0) { max($0, abs($1)) }
+                        crest = peak / capturedRMS
+                    } else {
+                        crest = 0
+                    }
+                    
+                    if crest > 3.0 && (capturedSpectral.nasal + capturedSpectral.palatal + capturedSpectral.lingual) > 0 {
+                        self.nasalSum += capturedSpectral.nasal
+                        self.palatalSum += capturedSpectral.palatal
+                        self.lingualSum += capturedSpectral.lingual
+                        self.spectralCount += 1
+                    }
+                }
             }
             lastUIUpdateTime = now
         }
@@ -380,31 +440,6 @@ final class RecordingViewModel: ObservableObject {
         // Link snore events to apnea detector
         if snoreDetector.isSnoring {
             apneaDetector.reportSnore(at: now)
-        }
-        
-        // 4. Digital Twin Spectral Analysis
-        // Only analyze during CONFIRMED snore events for accurate anatomical classification
-        if snoreDetector.isSnoring && dB > 30 {
-            let spectral = SpectralAnalysisService.shared.analyze(buffer: buffer)
-            self.lastSpectralAnalysis = (spectral.nasal, spectral.palatal, spectral.lingual)
-            
-            if shouldUpdateUI {
-                let capturedSpectral = spectral
-                Task { @MainActor in
-                    self.currentNasalIntensity = capturedSpectral.nasal
-                    self.currentPalatalIntensity = capturedSpectral.palatal
-                    self.currentLingualIntensity = capturedSpectral.lingual
-                }
-            }
-            
-            if (spectral.nasal + spectral.palatal + spectral.lingual) > 0 {
-                Task { @MainActor in
-                    self.nasalSum += spectral.nasal
-                    self.palatalSum += spectral.palatal
-                    self.lingualSum += spectral.lingual
-                    self.spectralCount += 1
-                }
-            }
         }
 
         // Timeline Sampling (5s)
@@ -433,32 +468,40 @@ final class RecordingViewModel: ObservableObject {
     }
 
     private func saveCurrentSessionState(isFinal: Bool) {
-        guard let id = sessionID, let start = sessionStart else { return }
-        print("[Somnera] 💾 Guardando sesión: \(id.uuidString)")
-        print("[Somnera] 📈 Puntos del Heatmap: \(decibelTimeline.count)")
-        print("[Somnera] 🎙️ Eventos de ronquido: \(currentSnoreEvents.count)")
-        print("[Somnera] 🫁 Intensidades: N:\(nasalSum/Double(max(1,spectralCount))) P:\(palatalSum/Double(max(1,spectralCount))) L:\(lingualSum/Double(max(1,spectralCount)))")
+        guard let session = self.session else { return }
+        print("[Somnera] 💾 Actualizando sesión: \(session.id.uuidString)")
         
-        let session = SleepSession(
-            id: id,
-            startDate: start,
-            endDate: Date(),
-            snoreEvents: currentSnoreEvents,
-            apneaEvents: currentApneaEvents,
-            audioFilePath: id.uuidString,
-            peakDecibels: peakDecibels,
-            decibelTimeline: decibelTimeline,
-            surfaceType: currentSurface.rawValue,
-            nasalIntensity: spectralCount > 0 ? (nasalSum / Double(spectralCount)) : 0.0,
-            palatalIntensity: spectralCount > 0 ? (palatalSum / Double(spectralCount)) : 0.0,
-            lingualIntensity: spectralCount > 0 ? (lingualSum / Double(spectralCount)) : 0.0,
-            snrTimeline: snrTimeline,
-            stabilityTimeline: stabilityTimeline,
-            tiltTimeline: tiltTimeline,
-            motionTimeline: motionTimeline
-        )
+        session.endDate = Date()
+        session.snoreEvents = currentSnoreEvents
+        session.apneaEvents = currentApneaEvents
+        session.peakDecibels = peakDecibels
+        session.decibelTimeline = decibelTimeline
+        session.surfaceType = currentSurface.rawValue
+        
+        // Anatomical Average: Based on validated SnoreEvents for maximum clinical accuracy.
+        // This avoids background noise contamination in the final report.
+        let eventsWithIntensity = currentSnoreEvents.filter { ($0.nasalIntensity + $0.palatalIntensity + $0.lingualIntensity) > 0 }
+        
+        if !eventsWithIntensity.isEmpty {
+            let count = Double(eventsWithIntensity.count)
+            session.nasalIntensity = eventsWithIntensity.map { $0.nasalIntensity }.reduce(0, +) / count
+            session.palatalIntensity = eventsWithIntensity.map { $0.palatalIntensity }.reduce(0, +) / count
+            session.lingualIntensity = eventsWithIntensity.map { $0.lingualIntensity }.reduce(0, +) / count
+        } else {
+            // Fallback to the accumulated sums if no snore events were captured (unlikely with IA gating)
+            session.nasalIntensity = spectralCount > 0 ? (nasalSum / Double(spectralCount)) : 0.0
+            session.palatalIntensity = spectralCount > 0 ? (palatalSum / Double(spectralCount)) : 0.0
+            session.lingualIntensity = spectralCount > 0 ? (lingualSum / Double(spectralCount)) : 0.0
+        }
+        
+        print("[Somnera] 📊 Persistiendo reporte anatómico - Nasal: \(Int(session.nasalIntensity * 100))%, Palatal: \(Int(session.palatalIntensity * 100))%, Lingual: \(Int(session.lingualIntensity * 100))% (Eventos: \(eventsWithIntensity.count))")
+        
+        session.snrTimeline = snrTimeline
+        session.stabilityTimeline = stabilityTimeline
+        session.tiltTimeline = tiltTimeline
+        session.motionTimeline = motionTimeline
+        
         sessionStorage.save(session)
-        self.session = session
     }
 
     private func updateWaveform(rms: Float) {
@@ -522,9 +565,9 @@ final class RecordingViewModel: ObservableObject {
                     durationSeconds: SomneraConstants.Snore.windowDurationSeconds,
                     confidence: confidence,
                     peakDecibels: self.peakDecibels,
-                    nasalIntensity: self.lastSpectralAnalysis.nasal,
-                    palatalIntensity: self.lastSpectralAnalysis.palatal,
-                    lingualIntensity: self.lastSpectralAnalysis.lingual
+                    nasalIntensity: self.currentNasalIntensity,
+                    palatalIntensity: self.currentPalatalIntensity,
+                    lingualIntensity: self.currentLingualIntensity
                 )
                 self.currentSnoreEvents.append(event)
                 self.snoreEventCount = self.currentSnoreEvents.count
@@ -546,17 +589,16 @@ final class RecordingViewModel: ObservableObject {
                 guard let self else { return }
                 
                 // Update the last event (the one created in onApneaDetected)
-                if var lastEvent = self.currentApneaEvents.last {
-                    self.currentApneaEvents.removeLast()
+                if let lastEvent = self.currentApneaEvents.last {
                     lastEvent.durationSeconds = duration
                     lastEvent.confidence = confidence
                     
                     // Only keep it if it satisfies Sentinel V2 clinical criteria
                     if confidence >= 0.4 {
-                        self.currentApneaEvents.append(lastEvent)
-                        
                         // Sync specific event to HealthKit as an interruption (asleep -> awake)
                         try? await self.healthKitService.saveApneaEvent(at: Date(), duration: duration)
+                    } else {
+                        self.currentApneaEvents.removeLast()
                     }
                 }
                 
