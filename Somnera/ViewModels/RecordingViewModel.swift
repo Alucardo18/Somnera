@@ -23,6 +23,8 @@ final class RecordingViewModel: ObservableObject {
     @Published var session: SleepSession? = nil // Nueva propiedad para exponer la sesión terminada
     @Published var currentSurface: MotionDetectionService.SurfaceType = .unknown
     @Published var currentDistance: Double = 0.5
+    @Published var currentSNR: Double = 0.0
+    @Published var breathingStability: Double = 1.0
     
     // Countdown State
     @Published var isSetup: Bool = true
@@ -258,15 +260,50 @@ final class RecordingViewModel: ObservableObject {
 
     // MARK: - Processing
 
+    // Advanced Telemetry State
+    private var noiseFloorRMS: Float = 0.001
+    private var lastPeakTime: Date = Date()
+    private var peakIntervals: [TimeInterval] = []
+
     private func processBuffer(_ buffer: AVAudioPCMBuffer, time: AVAudioTime) {
         // 1. Metrics
         let rms = DSPFilter.rms(of: buffer) ?? 0.0001
         let dB = DSPFilter.toDecibels(rms)
         
+        // --- SNR CALCULATION ---
+        // Slowly track the lowest RMS to find the noise floor
+        noiseFloorRMS = (rms < noiseFloorRMS) ? (rms * 0.05 + noiseFloorRMS * 0.95) : (noiseFloorRMS * 0.999 + rms * 0.001)
+        let snr = 20 * log10(max(1.1, rms / max(0.0001, noiseFloorRMS)))
+        
+        // --- STABILITY (RHYTHM) CALCULATION ---
+        // Basic peak detection for breathing rhythm
+        if rms > noiseFloorRMS * 1.5 && rms > 0.001 {
+            let now = Date()
+            let interval = now.timeIntervalSince(lastPeakTime)
+            if interval > 1.0 && interval < 6.0 { // Range for human breathing (10-60 bpm)
+                peakIntervals.append(interval)
+                if peakIntervals.count > 10 { peakIntervals.removeFirst() }
+                
+                // Stability = 1.0 - (StdDev / Mean)
+                if peakIntervals.count >= 3 {
+                    let mean = peakIntervals.reduce(0, +) / Double(peakIntervals.count)
+                    let variance = peakIntervals.map { pow($0 - mean, 2) }.reduce(0, +) / Double(peakIntervals.count)
+                    let stdDev = sqrt(variance)
+                    let stability = max(0.0, min(1.0, 1.0 - (stdDev / mean)))
+                    
+                    Task { @MainActor in
+                        self.breathingStability = stability
+                    }
+                }
+                lastPeakTime = now
+            }
+        }
+
         // Visual updates even during waiting
         Task { @MainActor in
             self.currentRMS = rms
             self.currentDecibels = dB
+            self.currentSNR = Double(snr)
             self.updateWaveform(rms: rms)
         }
 

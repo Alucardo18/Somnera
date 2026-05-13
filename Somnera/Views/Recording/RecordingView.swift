@@ -342,19 +342,37 @@ struct RecordingView: View {
             VStack(spacing: 20) {
                 Text("Panel Técnico").font(.headline).foregroundColor(.white)
                 
-                HStack(spacing: 20) {
-                    VStack {
-                        Text("SUPERFICIE").font(.caption2).foregroundColor(.somTextSecondary)
-                        Text(vm.currentSurface.rawValue.uppercased())
-                            .font(.system(.body, design: .monospaced, weight: .bold))
-                            .foregroundColor(vm.currentSurface == .bed ? .somSafe : .somWarning)
+                VStack(spacing: 12) {
+                    HStack(spacing: 30) {
+                        VStack(alignment: .leading) {
+                            Text("SUPERFICIE").font(.caption2).foregroundColor(.somTextSecondary)
+                            Text(vm.currentSurface.rawValue.uppercased())
+                                .font(.system(.body, design: .monospaced, weight: .bold))
+                                .foregroundColor(vm.currentSurface == .bed ? .somSafe : .somWarning)
+                        }
+                        
+                        VStack(alignment: .leading) {
+                            Text("DISTANCIA").font(.caption2).foregroundColor(.somTextSecondary)
+                            Text(String(format: "%.1f m", vm.currentDistance))
+                                .font(.system(.body, design: .monospaced, weight: .bold))
+                                .foregroundColor(.somAccent)
+                        }
                     }
                     
-                    VStack {
-                        Text("DISTANCIA").font(.caption2).foregroundColor(.somTextSecondary)
-                        Text(String(format: "%.1f m", vm.currentDistance))
-                            .font(.system(.body, design: .monospaced, weight: .bold))
-                            .foregroundColor(.somAccent)
+                    HStack(spacing: 30) {
+                        VStack(alignment: .leading) {
+                            Text("ESTABILIDAD").font(.caption2).foregroundColor(.somTextSecondary)
+                            Text(String(format: "%.0f%%", vm.breathingStability * 100))
+                                .font(.system(.body, design: .monospaced, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                        
+                        VStack(alignment: .leading) {
+                            Text("SNR").font(.caption2).foregroundColor(.somTextSecondary)
+                            Text(String(format: "%.1f dB", vm.currentSNR))
+                                .font(.system(.body, design: .monospaced, weight: .bold))
+                                .foregroundColor(.white)
+                        }
                     }
                 }
                 .padding()
