@@ -24,6 +24,11 @@ final class RecordingViewModel: ObservableObject {
     @Published var currentSurface: MotionDetectionService.SurfaceType = .unknown
     @Published var currentDistance: Double = 0.5
     
+    // Countdown State
+    @Published var isWaiting: Bool = false
+    @Published var countdownRemaining: Int = 0
+    @Published var selectedDelayMinutes: Int = 0
+    
     // MARK: - Services
     private let audioCapture = AudioCaptureService.shared
     private let snoreDetector = SnoreDetectionService.shared
@@ -97,14 +102,46 @@ final class RecordingViewModel: ObservableObject {
     // MARK: - Start/Stop Session
 
     private var audioFile: AVAudioFile?
+    private var countdownTask: Task<Void, Never>?
 
-    func startSession() async {
-        guard !isRecording else { return }
-
+    func startWithDelay(minutes: Int) {
         let id = UUID()
         let now = Date()
         sessionID = id
         sessionStart = now
+        
+        selectedDelayMinutes = minutes
+        if minutes == 0 {
+            Task { await startSession() }
+        } else {
+            isWaiting = true
+            countdownRemaining = minutes * 60
+            startCountdownTask()
+        }
+    }
+
+    private func startCountdownTask() {
+        countdownTask?.cancel()
+        countdownTask = Task {
+            while countdownRemaining > 0 {
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                await MainActor.run {
+                    self.countdownRemaining -= 1
+                }
+                if Task.isCancelled { return }
+            }
+            await MainActor.run {
+                self.isWaiting = false
+            }
+            await startSession()
+        }
+    }
+
+    func startSession() async {
+        isWaiting = false
+        guard !isRecording else { return }
+        
+        let now = Date()
 
         // ... (reset state)
         currentSnoreEvents = []
@@ -130,7 +167,7 @@ final class RecordingViewModel: ObservableObject {
             
             // Create AVAudioFile with AAC settings
             // We specify pcmFormatFloat32 as the commonFormat so we can write PCM buffers directly
-            let audioURL = audioFileService.audioURL(for: id)
+            let audioURL = audioFileService.audioURL(for: sessionID ?? UUID())
             audioFile = try AVAudioFile(
                 forWriting: audioURL,
                 settings: audioFileService.recorderSettings,
@@ -157,9 +194,15 @@ final class RecordingViewModel: ObservableObject {
     }
 
     func stopSession() async {
-        guard isRecording, let id = sessionID, let start = sessionStart else { return }
+        countdownTask?.cancel()
+        guard (isRecording || isWaiting), let id = sessionID, let start = sessionStart else {
+            isRecording = false
+            isWaiting = false
+            return
+        }
 
         isRecording = false
+        isWaiting = false
         timerTask?.cancel()
 
         // Stop services

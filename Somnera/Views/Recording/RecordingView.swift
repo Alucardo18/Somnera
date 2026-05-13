@@ -3,6 +3,7 @@ import SwiftUI
 /// Updated RecordingView with guidance and "Night Mode" focus.
 struct RecordingView: View {
     @ObservedObject var dashboardVM: DashboardViewModel
+    let initialDelay: Int
     @StateObject private var vm = RecordingViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var showStopAlert = false
@@ -28,7 +29,9 @@ struct RecordingView: View {
             }
             .ignoresSafeArea()
             
-            if !vm.isCharging {
+            if vm.isWaiting {
+                waitingView
+            } else if !vm.isCharging {
                 chargerWarningView
             } else {
                 nightModeView
@@ -116,6 +119,69 @@ struct RecordingView: View {
             .padding(.bottom, 48)
         }
         .transition(.opacity)
+    }
+    
+    private var waitingView: some View {
+        VStack(spacing: 30) {
+            Spacer()
+            
+            VStack(spacing: 12) {
+                Text("Tiempo de Calma")
+                    .font(.system(size: 12, weight: .black, design: .monospaced))
+                    .foregroundColor(.somAccent)
+                    .tracking(3)
+                
+                Text(formattedCountdown)
+                    .font(.system(size: 80, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+            }
+            
+            VStack(spacing: 32) {
+                Image(systemName: "timer")
+                    .font(.system(size: 60))
+                    .foregroundColor(.somAccent.opacity(0.8))
+                    .symbolEffect(.pulse, options: .repeating)
+                
+                VStack(spacing: 12) {
+                    Text("Prepárate para dormir")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Text("El monitoreo comenzará automáticamente cuando termine el contador.")
+                        .font(.subheadline)
+                        .foregroundColor(.somTextSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                }
+            }
+            .padding(30)
+            .somGlassStyle(cornerRadius: 30)
+            
+            Spacer()
+            
+            VStack(spacing: 16) {
+                Button {
+                    Task { await vm.startSession() }
+                } label: {
+                    Text("Iniciar ahora")
+                        .font(.headline)
+                        .foregroundColor(.somAccent)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 24)
+                        .background(Color.somAccent.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+                
+                stopButton
+            }
+            .padding(.horizontal, 40)
+            .padding(.bottom, 48)
+        }
+    }
+    
+    private var formattedCountdown: String {
+        let m = vm.countdownRemaining / 60
+        let s = vm.countdownRemaining % 60
+        return String(format: "%02d:%02d", m, s)
     }
     
     private var nightModeView: some View {
