@@ -112,10 +112,18 @@ final class RecordingViewModel: ObservableObject {
         sessionID = id
         sessionStart = now
         
+        // Disable screen dimming
+        UIApplication.shared.isIdleTimerDisabled = true
+        
         selectedDelayMinutes = minutes
-        if minutes == 0 {
-            Task { await startSession() }
-        } else {
+        
+        // CRITICAL: Start the audio engine IMMEDIATELY to prevent iOS from killing the process
+        // during the cooldown period.
+        Task {
+            await startSession(isWaitingPhase: minutes > 0)
+        }
+
+        if minutes > 0 {
             isWaiting = true
             countdownRemaining = minutes * 60
             startCountdownTask()
@@ -139,25 +147,31 @@ final class RecordingViewModel: ObservableObject {
         }
     }
 
-    func startSession() async {
+    func startSession(isWaitingPhase: Bool = false) async {
         isSetup = false
-        isWaiting = false
-        guard !isRecording else { return }
+        if !isWaitingPhase {
+            isWaiting = false
+        }
+        
+        // If already recording (from cooldown), just ensure state is right
+        if isRecording && !isWaitingPhase { return }
         
         let now = Date()
 
         // ... (reset state)
-        currentSnoreEvents = []
-        currentApneaEvents = []
-        decibelTimeline = []
-        sampleAccumulator = []
-        lastTimelineSampleTime = now
-        lastAutoSaveTime = now
-        peakDecibels = -100
-        elapsedSeconds = 0
-        snoreEventCount = 0
-        apneaEventCount = 0
-        isApneaActive = false
+        if !isWaitingPhase {
+            currentSnoreEvents = []
+            currentApneaEvents = []
+            decibelTimeline = []
+            sampleAccumulator = []
+            lastTimelineSampleTime = now
+            lastAutoSaveTime = now
+            peakDecibels = -100
+            elapsedSeconds = 0
+            snoreEventCount = 0
+            apneaEventCount = 0
+            isApneaActive = false
+        }
 
         do {
             try AudioSessionManager.shared.configure()
@@ -165,31 +179,31 @@ final class RecordingViewModel: ObservableObject {
             
             // Start engine FIRST so we know the output format
             try audioCapture.start()
-            try snoreDetector.setup(format: audioCapture.outputFormat)
-            motionDetector.start()
             
-            // Create AVAudioFile with AAC settings
-            // We specify pcmFormatFloat32 as the commonFormat so we can write PCM buffers directly
-            let audioURL = audioFileService.audioURL(for: sessionID ?? UUID())
-            audioFile = try AVAudioFile(
-                forWriting: audioURL,
-                settings: audioFileService.recorderSettings,
-                commonFormat: .pcmFormatFloat32,
-                interleaved: false
-            )
-            print("[Somnera] 🎙️ Recording to: \(audioURL.lastPathComponent) | Format: \(audioCapture.outputFormat)")
+            if !isWaitingPhase {
+                try snoreDetector.setup(format: audioCapture.outputFormat)
+                motionDetector.start()
+                
+                // Create AVAudioFile with AAC settings
+                let audioURL = audioFileService.audioURL(for: sessionID ?? UUID())
+                audioFile = try AVAudioFile(
+                    forWriting: audioURL,
+                    settings: audioFileService.recorderSettings,
+                    commonFormat: .pcmFormatFloat32,
+                    interleaved: false
+                )
+                
+                snoreDetector.startSession(at: now)
+                apneaDetector.startSession(at: now)
+                isRecording = true
+                startTimer()
+            }
             
             wireCallbacks()
             
             audioCapture.onBuffer = { [weak self] buffer, time in
                 self?.processBuffer(buffer, time: time)
             }
-            
-            startTimer()
-            isRecording = true
-            
-            snoreDetector.startSession(at: now)
-            apneaDetector.startSession(at: now)
             
         } catch {
             print("[Somnera] Failed to start session: \(error)")
@@ -199,6 +213,9 @@ final class RecordingViewModel: ObservableObject {
     func stopSession() async {
         let wasRecording = isRecording
         countdownTask?.cancel()
+        
+        // Re-enable screen dimming
+        UIApplication.shared.isIdleTimerDisabled = false
         
         isRecording = false
         isWaiting = false
@@ -242,11 +259,22 @@ final class RecordingViewModel: ObservableObject {
     // MARK: - Processing
 
     private func processBuffer(_ buffer: AVAudioPCMBuffer, time: AVAudioTime) {
-        // 1. Metrics (El buffer ya viene limpio por el hardware de Apple)
+        // 1. Metrics
         let rms = DSPFilter.rms(of: buffer) ?? 0.0001
         let dB = DSPFilter.toDecibels(rms)
-        let motion = motionDetector.lastIntensity
         
+        // Visual updates even during waiting
+        Task { @MainActor in
+            self.currentRMS = rms
+            self.currentDecibels = dB
+            self.updateWaveform(rms: rms)
+        }
+
+        // IF WAITING: We just return here but the engine keeps running!
+        // This is the trick to keep the app alive in background.
+        guard isRecording && !isWaiting else { return }
+
+        let motion = motionDetector.lastIntensity
         apneaDetector.update(rms: rms, motionIntensity: motion, at: Date())
         
         // 2. Save amplified copy
