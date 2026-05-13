@@ -28,6 +28,11 @@ final class RecordingViewModel: ObservableObject {
     @Published var currentTiltAngle: Double = 0.0
     @Published var currentMotionG: Double = 0.0
     
+    // Real-time Spectral Intensities
+    @Published var currentNasalIntensity: Double = 0.0
+    @Published var currentPalatalIntensity: Double = 0.0
+    @Published var currentLingualIntensity: Double = 0.0
+    
     // Countdown State
     @Published var isSetup: Bool = true
     @Published var isWaiting: Bool = false
@@ -372,6 +377,12 @@ final class RecordingViewModel: ObservableObject {
         if dB > 30 {
             let spectral = SpectralAnalysisService.shared.analyze(buffer: buffer)
             self.lastSpectralAnalysis = (spectral.nasal, spectral.palatal, spectral.lingual)
+            
+            Task { @MainActor in
+                self.currentNasalIntensity = spectral.nasal
+                self.currentPalatalIntensity = spectral.palatal
+                self.currentLingualIntensity = spectral.lingual
+            }
             
             if (spectral.nasal + spectral.palatal + spectral.lingual) > 0 {
                 Task { @MainActor in

@@ -395,6 +395,15 @@ struct RecordingView: View {
                 .background(Color.white.opacity(0.05))
                 .cornerRadius(15)
 
+                // Live Digital Twin Verification
+                AirwayDigitalTwinView(
+                    nasalIntensity: vm.currentNasalIntensity,
+                    palatalIntensity: vm.currentPalatalIntensity,
+                    lingualIntensity: vm.currentLingualIntensity
+                )
+                .scaleEffect(0.8)
+                .frame(height: 180)
+
                 WaveformView(samples: vm.latestWaveform, isApnea: vm.isApneaActive)
                     .frame(height: 80)
                 
