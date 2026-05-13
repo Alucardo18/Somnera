@@ -262,7 +262,7 @@ final class RecordingViewModel: ObservableObject {
             }
             
             if let session = self.session {
-                sessionStorage.saveSession(session)
+                sessionStorage.save(session)
             }
         } else {
             print("[Somnera] 🗑️ Sesión descartada (cancelada durante el retardo/setup)")
