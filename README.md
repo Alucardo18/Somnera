@@ -8,6 +8,8 @@ Somnera es la cumbre de la tecnología de monitoreo de sueño en iOS. Diseñada 
 
 ![Somnera Dashboard](Docs/Assets/dashboard_mockup.png)
 
+![Somnera Sessions](Docs/Assets/sessions_mockup.png)
+
 ## 🌌 Tecnología de Vanguardia
 
 Somnera integra un stack tecnológico de nivel industrial para ofrecer resultados precisos y confiables:
