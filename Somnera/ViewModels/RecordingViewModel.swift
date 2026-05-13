@@ -60,7 +60,7 @@ final class RecordingViewModel: ObservableObject {
     // Visualization & Timeline
     private var waveformBuffer: [Float] = Array(repeating: 0, count: 60)
     private var decibelTimeline: [Float] = []
-    private var lastTimelineSampleTime = Date()
+    private var lastTimelineSampleTime = Date(timeIntervalSince1970: 0)
     private var lastAutoSaveTime = Date()
     private var lastUIUpdateTime = Date()
     private var lastValidSpectralTime = Date()
@@ -452,9 +452,9 @@ final class RecordingViewModel: ObservableObject {
             apneaDetector.reportSnore(at: now)
         }
 
-        // Timeline Sampling (5s)
+        // Timeline Sampling (1s resolution for smoother hypnogram)
         sampleAccumulator.append(dB)
-        if now.timeIntervalSince(lastTimelineSampleTime) >= 5.0 {
+        if now.timeIntervalSince(lastTimelineSampleTime) >= 1.0 {
             let avgDB = sampleAccumulator.reduce(0, +) / Float(max(1, sampleAccumulator.count))
             decibelTimeline.append(avgDB)
             

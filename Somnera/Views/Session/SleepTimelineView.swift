@@ -183,11 +183,16 @@ struct SleepTimelineView: View {
     }
     
     private func normalizedHeight(_ db: Float) -> CGFloat {
-        // Updated to match 0-90dB positive scale
-        let minDB: Float = 30
-        let maxDB: Float = 80
-        let normalized = (db - minDB) / (maxDB - minDB)
-        return CGFloat(max(4, min(1.0, normalized)) * 60)
+        // Scale Agnostic Normalization: Supports both old (negative) and new (positive) dB scales
+        let normalized: Float
+        if db < 0 {
+            // Old Scale: -60 to -10
+            normalized = (db - (-60)) / 50
+        } else {
+            // New Scale: 30 to 80
+            normalized = (db - 30) / 50
+        }
+        return CGFloat(max(0.1, min(1.0, normalized)) * 60)
     }
     
     private func formatTime(_ t: TimeInterval) -> String {

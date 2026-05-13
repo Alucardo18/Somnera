@@ -78,9 +78,7 @@ struct PSGTimelineView: View {
                 
                 for (index, db) in session.decibelTimeline.enumerated() {
                     let x = CGFloat(index) * stepX
-                    // Normalize dB to height (30dB to 80dB)
-                    let normalizedDB = max(0, min(1, (db - 30) / 50))
-                    let y = geo.size.height - (CGFloat(normalizedDB) * geo.size.height * 0.8)
+                    let y = geo.size.height - normalizedHeight(db)
                     path.addLine(to: CGPoint(x: x, y: y))
                 }
                 
@@ -149,6 +147,19 @@ struct PSGTimelineView: View {
         .font(.system(size: 9, weight: .bold))
         .foregroundColor(.somTextSecondary)
         .padding(.horizontal, 2)
+    }
+    
+    private func normalizedHeight(_ db: Float) -> CGFloat {
+        // Scale Agnostic Normalization: Supports both old (negative) and new (positive) dB scales
+        let normalized: Float
+        if db < 0 {
+            // Old Scale: -60 to -10
+            normalized = (db - (-60)) / 50
+        } else {
+            // New Scale: 30 to 80
+            normalized = (db - 30) / 50
+        }
+        return CGFloat(max(0.05, min(1.0, normalized)) * 120 * 0.8) // Relative to canvas height
     }
     
     private func formatTime(_ t: TimeInterval) -> String {
