@@ -1,0 +1,25 @@
+[
+  {
+    "id": "A1B2C3D4-E5F6-47A8-9B0C-1D2E3F4G5H6I",
+    "startDate": "2026-05-13T02:15:00Z",
+    "endDate": "2026-05-13T08:30:00Z",
+    "snoreEvents": [
+      { "id": "B1B2C3D4-E5F6-47A8-9B0C-1D2E3F4G5H6I", "offsetSeconds": 3600, "durationSeconds": 1, "confidence": 0.95, "peakDecibels": 68, "nasalIntensity": 0.1, "palatalIntensity": 0.7, "lingualIntensity": 0.2 },
+      { "id": "C1B2C3D4-E5F6-47A8-9B0C-1D2E3F4G5H6I", "offsetSeconds": 7200, "durationSeconds": 1, "confidence": 0.88, "peakDecibels": 75, "nasalIntensity": 0.2, "palatalIntensity": 0.6, "lingualIntensity": 0.2 },
+      { "id": "D1B2C3D4-E5F6-47A8-9B0C-1D2E3F4G5H6I", "offsetSeconds": 10800, "durationSeconds": 1, "confidence": 0.92, "peakDecibels": 62, "nasalIntensity": 0.1, "palatalIntensity": 0.8, "lingualIntensity": 0.1 }
+    ],
+    "apneaEvents": [
+      { "offsetSeconds": 7210, "durationSeconds": 18, "confidence": 0.85 }
+    ],
+    "peakDecibels": 75,
+    "decibelTimeline": [45, 48, 52, 60, 75, 45, 40],
+    "surfaceType": "bed",
+    "nasalIntensity": 0.15,
+    "palatalIntensity": 0.65,
+    "lingualIntensity": 0.20,
+    "snrTimeline": [25, 26, 24],
+    "stabilityTimeline": [0.9, 0.85, 0.92],
+    "tiltTimeline": [5, 6, 5],
+    "motionTimeline": [0.01, 0.02, 0.01]
+  }
+]

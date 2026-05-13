@@ -256,518 +256,518 @@
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/AVFAudio.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/AVFAudio-1PM6MA3SUZ9FIOJWWPGIGFAWR.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/AVFAudio-6CTVUM9J9MBX0FATEHW42EPX7.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "AVFAudio"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/AVFoundation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/AVFoundation-34H2ZSIHMWCZVJRMRGNZK3RR3.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/AVFoundation-37SOYLRC8FLEVTCYY4T06WDKU.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "AVFoundation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/AVRouting.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/AVRouting-4J9VSNCOL8FQ0OYZLSGN87538.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/AVRouting-AB385I7I0WGQBRW1BSRZOEB52.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "AVRouting"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/Accelerate.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Accelerate-7PVS2ISQH9G6QZ8QWJ7KQBNHG.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Accelerate-9VBGRB3ELY8NBMPEONA95C8JO.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Accelerate"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/Accessibility.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Accessibility-CQXP4OIJ47BGPG4K5HOJWQAGW.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Accessibility-3Z5GX4HQ88KDFVUK0EWQCG4SB.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Accessibility"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/AudioToolbox.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/AudioToolbox-CGUK2VSTZW5VJWWF42PHTDZYN.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/AudioToolbox-AN3WFQJXV8XKMWFTU7JI9IBVZ.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "AudioToolbox"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CFNetwork.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CFNetwork-22E4R49A4UO7QQ5E0O50GMK4.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CFNetwork-AI7CUEIQXTJAHQ2QEAW8IDP25.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CFNetwork"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreAudio.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreAudio-629V645OVBK358J00GNDPPYMU.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreAudio-1L0C5LCSZWT00G3YUDFRW6O7Q.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreAudio"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreAudioTypes.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreAudioTypes-7FC4OKHNEFHNMFOCJ8RRP2WEO.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreAudioTypes-5TREG4QXB4SGC02G0JVTDXVK2.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreAudioTypes"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreData.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreData-YX5LLUJ4TDPI20KR4BBNLRSU.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreData-5ANLO8SKEH9YFAWAXFYWPM9CT.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreData"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreFoundation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreFoundation-1RRLFK12VAWBN9WXOGMX252LP.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreFoundation-5WOFC2NGXO7YC5YHJCWNSFNEE.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreFoundation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreGraphics.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreGraphics-3OAZ3V9JTP8RYZC33LLT6Q4FT.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreGraphics-9ABVYJMYUJR3GU0HO4EPL7CR2.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreGraphics"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreImage.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreImage-ASK3E2SYVJ5P4WTFAWMYQO40I.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreImage-BJ5RM2ESW1PIAZ5MVAGAMM623.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreImage"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreLocation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreLocation-S0Y5INXPRYXTRTY89YIE61XF.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreLocation-DKE2FCUJEQWJFD8NRBGASGWQ4.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreLocation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreMIDI.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreMIDI-3BUAPKXN4IU5K4EHFUZRYYNOL.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreMIDI-5P7FW6ETDZJ7F624S75MV5EVM.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreMIDI"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreML.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreML-EE4N7JUXTC84C0S40LALPZIX0.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreML-BHCT41I20NP11J3KIFAYJFBJ9.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreML"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreMedia.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreMedia-EXBMVYIPT8EHVOEE2851MVPLJ.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreMedia-D6J7Q8Y8P9A6FZG3Y0CSRY54J.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreMedia"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreMotion.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreMotion-5ETH94I9WXRDZPZSLJMGJQTGE.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreMotion-CTYG178M16DZ5PCY3M5T4S0LL.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreMotion"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreText.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreText-3S29QZXU343DTPKGZRC8I9Z1K.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreText-6HGO38YEJ6R5BFB6MZ6G0FCUB.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreText"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreTransferable.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreTransferable-BT7TVTDLGMYYMKLLNO4IOA7C6.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreTransferable-B2JHUYD2J3J6LXJPB7OPWSO2M.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreTransferable"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/CoreVideo.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreVideo-4HOH0095H6FD2H7ZUQ8S0GDR5.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/CoreVideo-7HIEGXQLYCS4O6DKLQ6XR3KKC.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreVideo"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/Darwin.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Darwin-6GN43HHIGN9PJQ0GZIZM8MVGL.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Darwin-58XN4PC6H058DHSDJBKJOPIME.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Darwin"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/DataDetection.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/DataDetection-64UMTPKC8UTIRTK2VBHK38WV9.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/DataDetection-2V0AGCPCZC0Z1RDG9JW42QCVR.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "DataDetection"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/DeveloperToolsSupport.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/DeveloperToolsSupport-32Z993GGEPB006D1OXCWFCDU7.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/DeveloperToolsSupport-2RL4CBLC7VGYI7LHYBJRB524I.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "DeveloperToolsSupport"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/dispatch.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Dispatch-7XSYKYDA40O0B023EHAKLHL7O.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Dispatch-AIPVATDS4R4FNX43IFD6IBSN4.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Dispatch"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/FileProvider.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/FileProvider-4ZSBSV3AG4VFT8WGI0JVZVIWE.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/FileProvider-19ZAWA484OQ8FDMGK7NB7JF80.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "FileProvider"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/Foundation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Foundation-5UV45U472LZ7VZCSNZKCT22YJ.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Foundation-51EJWSCD9Y5GLLASEMMYDN5S2.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Foundation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/HealthKit.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/HealthKit-DHE9676H8HYXEWXL2WODD6Z12.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/HealthKit-7X11JOMK1UCDUV1PP4PEQ4CQE.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "HealthKit"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/IOSurface.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/IOSurface-2BGR2NLQL5MPR4ILL19SUV0NS.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/IOSurface-8YSUTWPKATLZ4LOG29KQ4C52G.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "IOSurface"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/ImageIO.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/ImageIO-4M7MC7WKTMP9PFPB2IJ6QQKAE.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/ImageIO-CE1X1J495Z7NAYL9QKNU3Y457.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ImageIO"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/DarwinBasic.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/MachO-F42RYO89O4SDZOR7RDPPX6K5X.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/MachO-45R71H23CX57YWOSK0F31EO2T.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "MachO"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/MediaToolbox.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/MediaToolbox-5OL97W7NJC0MXWGRFOAC73K5B.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/MediaToolbox-2UF0TGYPWVXXA8T1N19A6CI9V.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "MediaToolbox"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/Metal.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Metal-419AJHHFQV5ICNWRB175MWUS8.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Metal-9OZ322IAPGBYKUB6RWI7AB2C6.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Metal"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/Network.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Network-B9NPGLH1NM82ZELN94YGX5F9F.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Network-8GKTBBSDO2Z52ZBAEKP88PYZ.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Network"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/OSLog.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/OSLog-BAJ5O49E7CEA2TC7HF3VJDKO2.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/OSLog-73Q2AXO3NMTCY8YJKYT7WSFBA.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "OSLog"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/ObjectiveC.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/ObjectiveC-24KY5AA83UJV4N6D6BXDC1GI0.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/ObjectiveC-D9NARGHOBLK37IBFSHCWWKQ11.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ObjectiveC"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/OpenGLES.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/OpenGLES-8HXF37RDRTR89NW92WAWDVAH6.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/OpenGLES-6Q172DFTHG3QFE6O8D5TLXVXH.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "OpenGLES"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/QuartzCore.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/QuartzCore-56TIODDY9FUTY15JLTPKNANKW.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/QuartzCore-8MBOCH3LV9BMBK1Q8VLGDIN0.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "QuartzCore"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/Security.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Security-2QKHS8IMGCH3937P82YOTSY7B.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Security-B4SI23O6UYYAU7QYWIYD7GJ0P.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Security"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/SoundAnalysis.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/SoundAnalysis-2Q3XZ5QIJAKCZW2I6O97TU5II.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/SoundAnalysis-3MNSLBU058XLJHV3YJDPJOALN.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "SoundAnalysis"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/Spatial\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Spatial-3OVQ0X70ER5FVFSHS163RBA1T.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Spatial-A1QUUH1E8TDCK73VMU6MRFSBN.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Spatial"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/lib\/swift\/shims\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/SwiftShims-4H7QKSU9MI7QXVBOBZAESHU9P.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/SwiftShims-21A89F3HMZGW79OP813KYZOWM.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "SwiftShims"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/SwiftUI.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/SwiftUI-70PLACGDJTV2BP9OXEHRGRRI7.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/SwiftUI-AMR4TK63K2BNSP3H82G9OXL2E.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "SwiftUI"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/SwiftUICore.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/SwiftUICore-C4X27CFO81QJHNNVN81JZAWAT.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/SwiftUICore-CJO3R0CT431DB0DNU17S9NQ1.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "SwiftUICore"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/Symbols.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Symbols-3B2OVIBMMBAUR2J0ZWCFOSSFZ.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/Symbols-B4CJKRGKF9WAVKCP2D1Y577FX.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Symbols"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/UIKit.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/UIKit-7NSK7IOUK0UB47I0ZA06Z2QS2.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/UIKit-76NZ9GRR0BA1TF3IGLJGPL44I.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UIKit"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/SubFrameworks\/UIUtilities.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/UIUtilities-CXIE1S2GBL3YVV2FGA6BOATBY.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/UIUtilities-442UMDKZXBEK79922NY0S4WGA.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UIUtilities"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/UniformTypeIdentifiers.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/UniformTypeIdentifiers-30EEIGJH7V5ZALHKQX7TZHVR.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/UniformTypeIdentifiers-79TG9NIOI055O08PK8S2CI9I2.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UniformTypeIdentifiers"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/UserNotifications.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/UserNotifications-5BKI1ZPJNBRXJIU3NV9DJ1N2K.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/UserNotifications-DG64FV2Z0FYHBUMYDG5KH442U.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UserNotifications"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/xpc.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/XPC-EZF3JZE2TMDXBZHB369E7VS69.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/XPC-14KMD55IR77U89XXB0B54C92A.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "XPC"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/DarwinFoundation1.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_AvailabilityInternal-BI8DB05FGIISMENP1D0EOVIT8.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_AvailabilityInternal-D58PHYGARQN0ZM6FG2PVCPH9F.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_AvailabilityInternal"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_float-9E2GM3YZIF1X5945VL57N51H3.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_float-A1XDG0D530TAJTCNPQ7BAS6WV.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_float"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_intrinsics-BVLD5FVHHBJYYPQZQL029GCJ2.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_intrinsics-3TLCKLXN64G7RTIQBJIRVV08G.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_intrinsics"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_inttypes-E2X7H4QS8A6AV6NJUYOOEUC5D.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_inttypes-DH8VF1XXNN7WYS3LOZJSRAYDN.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_inttypes"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_limits-EABC6PAQ91GLYILL6MP3FGV89.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_limits-7NGFFJG98FIS91Y3AAUI5GV71.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_limits"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_stdarg-1U62VYMOXK0WIB0Y4TBOATGSV.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_stdarg-905GDR9KJ7ZKVD950TTK87BBU.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdarg"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_stdatomic-4X048S65Z5703QRFQIKUBLRSX.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_stdatomic-3BYA2FVV0UABUHM9GH572GHAN.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdatomic"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_stdbool-872IGYFTQ1MWZ7K41SAYQ5NL8.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_stdbool-E6HHKOEHXMQYRGOZHE54GYAHI.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdbool"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_stddef-A8EE3FEGV7HK82D8HHUC2YF6M.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_stddef-B0MPRNDYLO76CQ8NT6B26ZBLN.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stddef"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_stdint-CVY330IJRM7D13731BULHRPGR.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_stdint-4R9THQHOXUUFM1GVT3G8KBDLX.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdint"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_tgmath-53DNXJJEM19B7UJVEDFN1U7EK.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_Builtin_tgmath-BIIL38MOM166KFNP4A6IBHLWB.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_tgmath"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/DarwinFoundation1.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_DarwinFoundation1-CA3WRETI2O4HUBFXXX7DJT9GR.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_DarwinFoundation1-B12XB1O2Q3K7AQVXFM0TSHISP.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_DarwinFoundation1"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/DarwinFoundation2.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_DarwinFoundation2-5O9JN19DNRUFLFWYKC0TEHBUJ.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_DarwinFoundation2-DP3TPXBYZ3TM042ET5PF25H9A.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_DarwinFoundation2"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/DarwinFoundation3.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_DarwinFoundation3-CMJPL7BBGLE5ZDDC866DNJQIT.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_DarwinFoundation3-E6WBITDU4L8H5HSPCUS11K3N.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_DarwinFoundation3"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/System\/Library\/Frameworks\/_LocationEssentials.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_LocationEssentials-F0S4484XN8ESQPY50FJ21IRY4.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_LocationEssentials-8Q9TJ4T9Y6E4LRWFZ7E7Y6WP3.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_LocationEssentials"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/lib\/swift\/shims\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_SwiftConcurrencyShims-CWUTMVM3QMKQY3ZP3YA2BGPOG.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/_SwiftConcurrencyShims-8GD5XP1J1J8GUJDWI8YO9AYKK.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_SwiftConcurrencyShims"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/dnssd.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/dnssd-EJYAQKWN79HYHW2KB8NYFOU42.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/dnssd-56K01M1OMSVNW5DXZFVS6DP0T.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "dnssd"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/os.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/os-3UA6GQ1CZKHO9JLE0X7HIOOA3.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/os-6NS3PBYQMNBFPHJWZRH7F7AWA.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "os"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/os.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/os_object-1MNXRQ997T5FDVAHU7O4MX9MA.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/os_object-AE88ER2HSEHID4KFSS5HPM8K1.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "os_object"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/os.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/os_workgroup-DXLIJAJLC0A1DVJB1Z5GY0E1H.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/os_workgroup-54OLTVAPE9YL6M6U4941AIK07.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "os_workgroup"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/ptrauth-88109E7QM4HT0VXLJ5PUSBVSC.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/ptrauth-5RUEE516EOZ603W01NXKXMLRT.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ptrauth"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/21\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/ptrcheck-F58680BL8A4WXGUOOQAX1X2XA.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/ptrcheck-4X5PP0NI6Z2QQJFL8XKDHTQNG.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ptrcheck"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/simd\/module.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/simd-3TW85NPRDCCVBIQ78IRGQIYWN.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/simd-5QOT4YDJCXKK4QY8SCGSIB04O.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "simd"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneSimulator.platform\/Developer\/SDKs\/iPhoneSimulator.sdk\/usr\/include\/DarwinFoundation2.modulemap",
-    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/sys_types-79ZBIJIVSOAOOFH45MHQ37E8H.pcm",
+    "clangModulePath" : "\/Users\/emmanuel\/Documents\/ANTIGRAVITY\/SNORE-APP\/build\/ModuleCache.noindex\/sys_types-54G8Y9GYFAQHZOR2WUMZA7NJR.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "sys_types"
