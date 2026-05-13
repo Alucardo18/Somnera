@@ -18,7 +18,8 @@ final class ApneaDetectionService {
     // Pattern Window (Sliding history)
     private var recentMotionIntensity: [Double] = []
     private var recentRMS: [Float] = []
-    private let windowSize = 30 // ~3 seconds at 10Hz
+    private let windowSize = 50 // ~5 seconds for better context
+    private var lastSnoreDate: Date?
 
     private let silenceThreshold = SomneraConstants.Apnea.silenceRMSThreshold
     private let apneaTriggerSeconds = SomneraConstants.Apnea.triggerSeconds
@@ -27,7 +28,7 @@ final class ApneaDetectionService {
     private var maxMotionDuringSilence: Double = 0.0
 
     // MARK: - Interface
-
+    
     func startSession(at date: Date) {
         sessionStart = date
         reset()
@@ -36,6 +37,10 @@ final class ApneaDetectionService {
     func stopSession() {
         reset()
         sessionStart = nil
+    }
+
+    func reportSnore(at date: Date) {
+        lastSnoreDate = date
     }
 
     func update(rms: Float, motionIntensity: Double, at timestamp: Date) {
@@ -54,15 +59,22 @@ final class ApneaDetectionService {
                 maxMotionDuringSilence = 0.0
             }
             
-            // Track movement during silence
-            maxMotionDuringSilence = max(maxMotionDuringSilence, motionIntensity)
+            // Track movement during silence. 
+            // If movement is too high (>0.05), we reset the silence timer 
+            // because someone moving is NOT having an obstructive apnea event.
+            if motionIntensity > 0.05 {
+                silenceStart = timestamp 
+                maxMotionDuringSilence = 0.0
+            } else {
+                maxMotionDuringSilence = max(maxMotionDuringSilence, motionIntensity)
+            }
             
             let currentSilenceDuration = timestamp.timeIntervalSince(silenceStart!)
             
-            if currentSilenceDuration >= apneaTriggerSeconds && !isApneaActive {
+            // Trigger local flag but DON'T NOTIFY UI YET. 
+            // We wait until resolution to be sure.
+            if currentSilenceDuration >= apneaTriggerSeconds {
                 isApneaActive = true
-                let offset = sessionStart.map { timestamp.timeIntervalSince($0) } ?? 0
-                onApneaDetected?(currentSilenceDuration, offset)
             }
         } else {
             // Audio detected - Analyze if it's a 'Recovery Gasp'
@@ -79,21 +91,37 @@ final class ApneaDetectionService {
         guard let start = silenceStart else { return }
         let duration = timestamp.timeIntervalSince(start)
         
-        let wasStill = maxMotionDuringSilence < 0.04 
-        let audioSpike = (recentRMS.last ?? 0) - (recentRMS.first ?? 0) > 15.0
-        let motionSpike = recentMotionIntensity.last ?? 0 > 0.08
+        // Safety: Ignore pauses longer than 120s (likely phone left alone or disconnected)
+        if duration > 120 { return }
+
+        // Bio-Context 1: Was there a snore recently? (Last 5 minutes)
+        let secondsSinceLastSnore = lastSnoreDate.map { timestamp.timeIntervalSince($0) } ?? 9999
+        let hadRecentSnoring = secondsSinceLastSnore < 300
         
-        var confidenceScore: Double = 0.1 
+        // Bio-Context 2: Motion during silence
+        let wasStill = maxMotionDuringSilence < 0.03
         
-        if wasStill { confidenceScore += 0.3 }
-        if audioSpike { confidenceScore += 0.3 }
-        if motionSpike { confidenceScore += 0.3 }
+        // Bio-Context 3: The "Recovery Gasp" (Audio & Motion spike)
+        let audioSpike = (recentRMS.last ?? 0) - (recentRMS.dropLast(5).first ?? 0) > 25.0
+        let motionSpike = recentMotionIntensity.last ?? 0 > 0.06
         
-        if confidenceScore < 0.4 && duration < 15 {
+        var confidenceScore: Double = 0.0
+        
+        if hadRecentSnoring { confidenceScore += 0.4 } // High weight to snore context
+        if wasStill { confidenceScore += 0.2 }
+        if audioSpike { confidenceScore += 0.2 }
+        if motionSpike { confidenceScore += 0.2 }
+        
+        // CRITICAL: If no recent snoring AND low confidence, it's a false positive (likely awake).
+        if !hadRecentSnoring && confidenceScore < 0.5 {
+            print("[Sentinel] 🛡️ Apnea rechazada: Falta contexto de ronquido/gasp. Score: \(confidenceScore)")
             return 
         }
         
-        onApneaResolved?(duration, confidenceScore)
+        // Minimum score to actually report as a critical event
+        if confidenceScore >= 0.4 {
+            onApneaResolved?(duration, confidenceScore)
+        }
     }
 
     private func resetSilence() {

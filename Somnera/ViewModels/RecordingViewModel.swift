@@ -282,6 +282,11 @@ final class RecordingViewModel: ObservableObject {
         
         // 3. IA Analysis
         snoreDetector.analyze(buffer, at: time)
+        
+        // Link snore events to apnea detector for context
+        if snoreDetector.isSnoring {
+            apneaDetector.reportSnore(at: now)
+        }
 
         // Timeline Sampling (5s)
         sampleAccumulator.append(dB)

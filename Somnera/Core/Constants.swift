@@ -31,8 +31,8 @@ enum SomneraConstants {
 
     // MARK: - Apnea Detection
     enum Apnea {
-        static let silenceRMSThreshold: Float   = 0.002  // ~32 dB
-        static let triggerSeconds: TimeInterval  = 10.0
+        static let silenceRMSThreshold: Float   = 0.0008  // ~25 dB (Cerca del ruido de fondo real)
+        static let triggerSeconds: TimeInterval  = 12.0    // 12s para más seguridad
         static let checkIntervalSeconds: Double  = 1.0
     }
 
