@@ -8,6 +8,7 @@ struct SessionDetailView: View {
     @State private var playbackProgress: Double = 0
     @State private var playbackTime: Double = 0
     @State private var playbackTimer: Timer?
+    @State private var showScoreInfo = false
     
     // AI Report Generation
     private var aiReport: SessionAnalyticsService.DiagnosticReport {
@@ -196,15 +197,31 @@ struct SessionDetailView: View {
                     .rotationEffect(.degrees(-90))
                 
                 VStack(spacing: -2) {
-                    Text("\(session.snoreScore)")
-                        .font(.system(size: 56, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
+                    HStack(spacing: 4) {
+                        Text("\(session.snoreScore)")
+                            .font(.system(size: 56, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                        
+                        Button {
+                            showScoreInfo = true
+                        } label: {
+                            Image(systemName: "info.circle")
+                                .font(.system(size: 14))
+                                .foregroundColor(.somTextSecondary)
+                        }
+                        .offset(y: -10)
+                    }
+                    
                     Text("Puntos")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.somTextSecondary)
                 }
             }
             .padding(.top, 10)
+            .sheet(isPresented: $showScoreInfo) {
+                ScoreInfoSheetView()
+                    .presentationDetents([.medium])
+            }
             
             // Stats Grid
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
@@ -635,5 +652,95 @@ struct InsightCardView: View {
                 animate = true
             }
         }
+    }
+}
+
+// MARK: - Score Info Sheet
+
+struct ScoreInfoSheetView: View {
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        ZStack {
+            Color.somBackground.ignoresSafeArea()
+            
+            VStack(alignment: .leading, spacing: 24) {
+                HStack {
+                    Image(systemName: "chart.bar.doc.horizontal.fill")
+                        .font(.title2)
+                        .foregroundColor(.somAccent)
+                    Text("Cálculo de Puntuación")
+                        .font(.system(.title3, design: .rounded).bold())
+                        .foregroundColor(.white)
+                    Spacer()
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title3)
+                            .foregroundColor(.somTextSecondary)
+                    }
+                }
+                
+                Text("Tu puntuación Somnera mide la severidad de la noche basándose en 4 pilares clínicos:")
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .foregroundColor(.somTextSecondary)
+                
+                ScrollView {
+                    VStack(spacing: 16) {
+                        scorePillar(
+                            title: "PERSISTENCIA (50%)",
+                            desc: "Calculado sobre el tiempo total roncando vs. tiempo en cama.",
+                            icon: "clock.fill",
+                            color: .somAccent
+                        )
+                        
+                        scorePillar(
+                            title: "INTENSIDAD (20%)",
+                            desc: "Basado en el pico máximo de decibelios (dB) alcanzado.",
+                            icon: "waveform",
+                            color: .somWarning
+                        )
+                        
+                        scorePillar(
+                            title: "RIESGO RESPIRATORIO",
+                            desc: "Puntos adicionales por cada pausa de aire (apnea) detectada.",
+                            icon: "lungs.fill",
+                            color: .somApnea
+                        )
+                        
+                        scorePillar(
+                            title: "FRECUENCIA",
+                            desc: "Bonificación por la densidad de eventos detectados por hora.",
+                            icon: "calendar.badge.clock",
+                            color: .somSafe
+                        )
+                    }
+                    .padding(.bottom, 20)
+                }
+            }
+            .padding(30)
+        }
+    }
+    
+    private func scorePillar(title: String, desc: String, icon: String, color: Color) -> some View {
+        HStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundColor(color)
+                .frame(width: 32)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundColor(color)
+                    .tracking(1)
+                Text(desc)
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundColor(.white.opacity(0.8))
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(Color.somSurface.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
