@@ -25,6 +25,8 @@ final class RecordingViewModel: ObservableObject {
     @Published var currentDistance: Double = 0.5
     @Published var currentSNR: Double = 0.0
     @Published var breathingStability: Double = 1.0
+    @Published var currentTiltAngle: Double = 0.0
+    @Published var currentMotionG: Double = 0.0
     
     // Countdown State
     @Published var isSetup: Bool = true
@@ -402,9 +404,11 @@ final class RecordingViewModel: ObservableObject {
     }
 
     private func wireCallbacks() {
-        motionDetector.onMotionUpdate = { [weak self] intensity in
+        motionDetector.onMotionUpdate = { [weak self] intensity, tilt, rawG in
             Task { @MainActor in
                 self?.currentMotionIntensity = intensity
+                self?.currentTiltAngle = tilt
+                self?.currentMotionG = rawG
             }
         }
         

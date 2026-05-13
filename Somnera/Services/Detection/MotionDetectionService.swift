@@ -15,7 +15,7 @@ final class MotionDetectionService {
     }
     
     // Callbacks
-    var onMotionUpdate: ((_ intensity: Double) -> Void)?
+    var onMotionUpdate: ((_ intensity: Double, _ tiltAngle: Double, _ rawG: Double) -> Void)?
     var onSurfaceDetected: ((_ surface: SurfaceType) -> Void)?
     
     // State
@@ -55,19 +55,18 @@ final class MotionDetectionService {
         let intensity = abs(magnitude - 1.0)
         
         // --- TILT DETECTION (Inclinación) ---
-        // If the phone is NOT flat (Z ~ 1.0 or -1.0), it's likely being held.
-        // We look for a Z-gravity of at least 0.85 to consider it "flat on a surface"
-        let isFlat = abs(z) > 0.85
+        // Angle relative to vertical (Z-axis)
+        let tiltAngle = acos(min(1.0, abs(z))) * (180.0 / .pi)
+        let isFlat = tiltAngle < 25.0 // More permissive flat detection (within 25 degrees)
         
         if !isFlat {
-            // Force handheld state immediately if tilted
             if currentSurface != .handheld {
                 currentSurface = .handheld
                 onSurfaceDetected?(.handheld)
-                varianceBuffer.removeAll() // Clear buffer to avoid stale data
+                varianceBuffer.removeAll()
             }
         } else {
-            // --- CONTINUOUS SURFACE MONITORING (Only when flat) ---
+            // --- CONTINUOUS SURFACE MONITORING ---
             varianceBuffer.append(intensity)
             if varianceBuffer.count > calibrationLimit {
                 varianceBuffer.removeFirst()
@@ -75,11 +74,11 @@ final class MotionDetectionService {
             }
         }
         
-        // Apply a simple low-pass filter to smooth out noise
         let smoothedIntensity = (intensity * 0.2) + (lastIntensity * 0.8)
         lastIntensity = smoothedIntensity
         
-        onMotionUpdate?(smoothedIntensity)
+        // Pass all telemetry to the callback
+        onMotionUpdate?(smoothedIntensity, tiltAngle, intensity)
     }
     
     private func updateSurfaceType() {

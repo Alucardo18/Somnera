@@ -373,6 +373,20 @@ struct RecordingView: View {
                                 .font(.system(.body, design: .monospaced, weight: .bold))
                                 .foregroundColor(.white)
                         }
+                    HStack(spacing: 30) {
+                        VStack(alignment: .leading) {
+                            Text("INCLINACIÓN").font(.caption2).foregroundColor(.somTextSecondary)
+                            Text(String(format: \"%.1f°\", vm.currentTiltAngle))
+                                .font(.system(.body, design: .monospaced, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                        
+                        VStack(alignment: .leading) {
+                            Text("VIBRACIÓN").font(.caption2).foregroundColor(.somTextSecondary)
+                            Text(String(format: \"%.4f G\", vm.currentMotionG))
+                                .font(.system(.body, design: .monospaced, weight: .bold))
+                                .foregroundColor(.white)
+                        }
                     }
                 }
                 .padding()
