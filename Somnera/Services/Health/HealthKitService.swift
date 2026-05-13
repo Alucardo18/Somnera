@@ -23,13 +23,14 @@ final class HealthKitService {
     // MARK: - Write Sleep Session
 
     /// Writes an inBed + asleepUnspecified sample for the session duration.
-    func saveSleepSession(start: Date, end: Date, apneaEventCount: Int) async throws {
+    func saveSleepSession(start: Date, end: Date, apneaEventCount: Int, avgStability: Double) async throws {
         guard isAvailable else { return }
 
         let tz = TimeZone.current.identifier
         let metadata: [String: Any] = [
             HKMetadataKeyTimeZone: tz,
-            "SomneraApneaCount": apneaEventCount
+            "SomneraApneaCount": apneaEventCount,
+            "SomneraAvgStability": String(format: "%.2f", avgStability)
         ]
 
         let inBed = HKCategorySample(
@@ -47,6 +48,21 @@ final class HealthKitService {
         )
 
         try await store.save([inBed, asleep])
+    }
+
+    /// Records a specific apnea event as a momentary sleep interruption.
+    func saveApneaEvent(at timestamp: Date, duration: TimeInterval) async throws {
+        guard isAvailable else { return }
+        
+        let sample = HKCategorySample(
+            type: sleepType,
+            value: HKCategoryValueSleepAnalysis.awake.rawValue,
+            start: timestamp,
+            end: timestamp.addingTimeInterval(duration),
+            metadata: [HKMetadataKeyDescription: "Somnera: Potential Apnea Detected"]
+        )
+        
+        try await store.save(sample)
     }
 
     // MARK: - Read Recent Sessions

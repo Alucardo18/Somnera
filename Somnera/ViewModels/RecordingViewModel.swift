@@ -58,6 +58,10 @@ final class RecordingViewModel: ObservableObject {
     private var lastTimelineSampleTime = Date()
     private var lastAutoSaveTime = Date()
     private var sampleAccumulator: [Float] = []
+    
+    // Stability Averages
+    private var stabilitySum: Double = 0.0
+    private var stabilityCount: Int = 0
 
     init() {
         setupInterruptionObservers()
@@ -246,13 +250,19 @@ final class RecordingViewModel: ObservableObject {
         if wasRecording {
             saveCurrentSessionState(isFinal: true)
 
-            // Sync to HealthKit
+            // Final Sync to HealthKit
+            let avgStability = stabilityCount > 0 ? (stabilitySum / Double(stabilityCount)) : 1.0
             if healthKitService.isAvailable, let start = sessionStart {
                 try? await healthKitService.saveSleepSession(
                     start: start,
                     end: Date(),
-                    apneaEventCount: currentApneaEvents.count
+                    apneaEventCount: currentApneaEvents.count,
+                    avgStability: avgStability
                 )
+            }
+            
+            if let session = self.session {
+                sessionStorage.saveSession(session)
             }
         } else {
             print("[Somnera] 🗑️ Sesión descartada (cancelada durante el retardo/setup)")
@@ -295,6 +305,8 @@ final class RecordingViewModel: ObservableObject {
                     
                     Task { @MainActor in
                         self.breathingStability = stability
+                        self.stabilitySum += stability
+                        self.stabilityCount += 1
                     }
                 }
                 lastPeakTime = now
@@ -450,22 +462,25 @@ final class RecordingViewModel: ObservableObject {
 
         apneaDetector.onApneaResolved = { [weak self] duration, confidence in
             Task { @MainActor [weak self] in
-                guard let self = self else { return }
-                self.isApneaActive = false
+                guard let self else { return }
                 
-                // Update the last event with final duration and confidence
+                // Update the last event (the one created in onApneaDetected)
                 if var lastEvent = self.currentApneaEvents.last {
                     self.currentApneaEvents.removeLast()
                     lastEvent.durationSeconds = duration
                     lastEvent.confidence = confidence
                     
-                    // Only keep it if it's a valid event (Sentinel V2 Filter)
+                    // Only keep it if it satisfies Sentinel V2 clinical criteria
                     if confidence >= 0.4 {
                         self.currentApneaEvents.append(lastEvent)
+                        
+                        // Sync specific event to HealthKit as an interruption (asleep -> awake)
+                        try? await self.healthKitService.saveApneaEvent(at: Date(), duration: duration)
                     }
-                    
-                    self.apneaEventCount = self.currentApneaEvents.count
                 }
+                
+                self.apneaEventCount = self.currentApneaEvents.count
+                self.isApneaActive = false
             }
         }
     }
