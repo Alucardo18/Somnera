@@ -48,21 +48,17 @@ final class MotionDetectionService {
     }
     
     private func processMotion(_ data: CMAccelerometerData) {
-        // Calculate G-force vector magnitude
         let x = data.acceleration.x
         let y = data.acceleration.y
         let z = data.acceleration.z
         let magnitude = sqrt(x*x + y*y + z*z)
-        
-        // Filter out gravity (approx 1.0G) to get pure movement intensity
         let intensity = abs(magnitude - 1.0)
         
-        // Surface Detection Calibration
-        if currentSurface == .unknown {
-            varianceBuffer.append(intensity)
-            if varianceBuffer.count >= calibrationLimit {
-                calibrateSurface()
-            }
+        // --- CONTINUOUS SURFACE MONITORING ---
+        varianceBuffer.append(intensity)
+        if varianceBuffer.count > calibrationLimit {
+            varianceBuffer.removeFirst()
+            updateSurfaceType()
         }
         
         // Apply a simple low-pass filter to smooth out noise
@@ -72,20 +68,28 @@ final class MotionDetectionService {
         onMotionUpdate?(smoothedIntensity)
     }
     
-    private func calibrateSurface() {
+    private func updateSurfaceType() {
         guard !varianceBuffer.isEmpty else { return }
         let avg = varianceBuffer.reduce(0, +) / Double(varianceBuffer.count)
         
-        // If average micro-movement is extremely low, it's a rigid surface (nightstand)
-        // Colchón suele tener un ruido base > 0.002 incluso en reposo por la elasticidad
-        if avg < 0.0015 {
-            currentSurface = .nightstand
+        // Thresholds calibrated for Sentinel V2
+        // - < 0.0012: Nightstand (Superficie rígida, ruido de micro-acelerómetro puro)
+        // - 0.0012 to 0.04: Bed (Vibraciones elásticas de colchón/respiración)
+        // - > 0.08: Handheld / Moving (El usuario tiene el móvil en la mano)
+        
+        let newSurface: SurfaceType
+        if avg > 0.08 {
+            newSurface = .unknown // Representa "En movimiento/Mano"
+        } else if avg < 0.0014 {
+            newSurface = .nightstand
         } else {
-            currentSurface = .bed
+            newSurface = .bed
         }
         
-        print("[Somnera] 🔍 Surface Detected: \(currentSurface.rawValue) (Avg: \(avg))")
-        onSurfaceDetected?(currentSurface)
-        varianceBuffer.removeAll()
+        if newSurface != currentSurface {
+            currentSurface = newSurface
+            print("[Somnera] 🔍 Surface Changed: \(currentSurface.rawValue) (Avg: \(avg))")
+            onSurfaceDetected?(currentSurface)
+        }
     }
 }
