@@ -6,7 +6,7 @@
 
 Somnera es la cumbre de la tecnología de monitoreo de sueño en iOS. Diseñada para transformar el iPhone en un laboratorio de diagnóstico clínico personal, Somnera utiliza **fusión sensorial avanzada** y **aprendizaje profundo** para detectar ronquidos y apnea del sueño con una precisión sin precedentes, manteniendo la privacidad absoluta mediante un procesamiento 100% local (Edge AI).
 
-![Somnera Dashboard](Docs/Assets/dashboard_v2.png)
+![Somnera Dashboard](Docs/Assets/dashboard_mockup.png)
 
 ## 🌌 Tecnología de Vanguardia
 
@@ -27,7 +27,7 @@ A diferencia de las aplicaciones convencionales que dependen únicamente del aud
 - **Glassmorphism Design System**: Una interfaz inmersiva basada en materiales ultra-delgados, gradientes dinámicos y micro-animaciones que reducen la fricción cognitiva durante el uso nocturno.
 - **HealthKit Synergy**: Sincronización bidireccional con Apple Health, permitiendo una visión holística de la salud respiratoria del usuario.
 
-![Sentinel V2 Analysis](Docs/Assets/sentinel_v2.png)
+![Sentinel V2 Analysis](Docs/Assets/sentinel_mockup.png)
 
 ## 🛠️ Stack Tecnológico
 
