@@ -6,46 +6,44 @@
 
 Somnera es la cumbre de la tecnología de monitoreo de sueño en iOS. Diseñada para transformar el iPhone en un laboratorio de diagnóstico clínico personal, Somnera utiliza **fusión sensorial avanzada** y **aprendizaje profundo** para detectar ronquidos y apnea del sueño con una precisión sin precedentes, manteniendo la privacidad absoluta mediante un procesamiento 100% local (Edge AI).
 
-![Somnera Dashboard](Docs/Assets/dashboard_mockup.png)
+![Somnera Clinical Dashboard](Docs/Assets/dashboard_mockup.png)
 
-![Somnera Sessions](Docs/Assets/sessions_mockup.png)
+![Somnera Analytics & Trends](Docs/Assets/sessions_mockup.png)
 
 ## 🌌 Tecnología de Vanguardia
 
 Somnera integra un stack tecnológico de nivel industrial para ofrecer resultados precisos y confiables:
 
 ### 🧠 Sentinel V2: El Motor de Fusión Sensorial
-A diferencia de las aplicaciones convencionales que dependen únicamente del audio, nuestro motor **Sentinel V2** utiliza una validación cruzada tripartita:
-- **Acoustic Energy Analysis**: Monitoreo en tiempo real de la energía RMS del audio para detectar caídas críticas.
-- **Actigrafía de Alta Frecuencia**: Integración con **CoreMotion** (10Hz) para validar la inmovilidad física durante episodios de apnea, eliminando falsos positivos.
-- **Recovery Gasp Detection**: Identificación inteligente de picos de energía post-apnea mediante modelos de clasificación acústica.
+A diferencia de las aplicaciones convencionales que dependen únicamente del audio, nuestro motor **Sentinel V2** utiliza una validación cruzada avanzada:
+- **Acoustic Energy Analysis**: Monitoreo en tiempo real de la energía RMS y filtrado de ruidos constantes (Fans/AC) mediante **Crest Factor Analysis**.
+- **Actigrafía de Alta Frecuencia**: Integración con **CoreMotion** (10Hz) para validar la inmovilidad física durante episodios de apnea.
+- **Recovery Gasp Detection**: Identificación de picos de energía post-apnea mediante modelos neuronales.
 
 ### 🔬 Procesamiento de Señal y AI Local
-- **Core ML & SoundAnalysis**: Implementación de un modelo de red neuronal convolucional (`SomneraClassifier`) optimizado para el Apple Neural Engine, capaz de identificar patrones de ronquidos en milisegundos.
-- **DSP Avanzado (vDSP)**: Uso intensivo del framework **Accelerate** para filtrado bandpass y análisis espectral de frecuencia (FFT).
-- **Digital Twin 3D**: Reconstrucción anatómica de la vía aérea en tiempo real. Mediante análisis espectral, Somnera identifica si la obstrucción es **Nasal, Palatal o Lingual**.
-- **PSG Medical Timeline**: Visualización de grado médico que muestra ondas de sonido y pausas respiratorias sincronizadas con el audio original.
-- **Audio Pipeline v2**: Grabación en formato **.caf (PCM Float32)** con amplificación dinámica x8 para una claridad diagnóstica superior durante la reproducción.
+- **Core ML & SoundAnalysis**: Modelo de red neuronal convolucional optimizado para el Apple Neural Engine.
+- **Digital Twin 3D**: Reconstrucción anatómica de la vía aérea que identifica obstrucciones **Nasales, Palatales o Linguales**.
+- **PSG Medical Timeline**: Visualización de grado médico con resolución de 1s y escala estandarizada de 0-90 dB.
 
-![Somnera Recording Mode](Docs/Assets/recording_mockup.png)
+![Somnera Medical Grade Analysis](Docs/Assets/recording_mockup.png)
 
 ### 💎 Diseño Premium & UX
-- **Glassmorphism Design System**: Una interfaz inmersiva basada en materiales ultra-delgados, gradientes dinámicos y micro-animaciones que reducen la fricción cognitiva durante el uso nocturno.
-- **HealthKit Synergy**: Sincronización bidireccional con Apple Health, permitiendo una visión holística de la salud respiratoria del usuario.
+- **Glassmorphism Hub**: Una interfaz inmersiva basada en materiales ultra-delgados y el concepto de "Sleep Galaxy" para navegar por tus sesiones.
+- **HealthKit Synergy**: Sincronización bidireccional con Apple Health.
 
-![Sentinel V2 Analysis](Docs/Assets/sentinel_mockup.png)
+![Sentinel V2 Clinical Interface](Docs/Assets/sentinel_mockup.png)
 
 ## 🛠️ Stack Tecnológico
 
 - **Core**: Swift 5.9 + SwiftUI (MVVM Architecture).
-- **IA**: Core ML, SoundAnalysis, Neural Engine optimization.
-- **Hardware**: CoreMotion (Accelerometer), AVFoundation (AVAudioEngine).
-- **Health**: HealthKit Integration.
-- **DevOps**: XcodeGen (Reproducible project management).
+- **IA**: Core ML, SoundAnalysis, Neural Engine.
+- **Hardware**: Accelerometer, AVAudioEngine (Low latency).
+- **Health**: HealthKit.
+- **Storage**: SwiftData.
 
 ## 🚀 Instalación y Desarrollo
 
-Este proyecto utiliza **XcodeGen** para una gestión de dependencias y configuración de proyecto limpia y determinista.
+Este proyecto utiliza **XcodeGen** para una gestión de proyecto limpia y determinista.
 
 ```bash
 # 1. Instalar XcodeGen
