@@ -25,6 +25,7 @@ final class RecordingViewModel: ObservableObject {
     @Published var currentDistance: Double = 0.5
     
     // Countdown State
+    @Published var isSetup: Bool = true
     @Published var isWaiting: Bool = false
     @Published var countdownRemaining: Int = 0
     @Published var selectedDelayMinutes: Int = 0
@@ -105,6 +106,7 @@ final class RecordingViewModel: ObservableObject {
     private var countdownTask: Task<Void, Never>?
 
     func startWithDelay(minutes: Int) {
+        isSetup = false
         let id = UUID()
         let now = Date()
         sessionID = id
@@ -138,6 +140,7 @@ final class RecordingViewModel: ObservableObject {
     }
 
     func startSession() async {
+        isSetup = false
         isWaiting = false
         guard !isRecording else { return }
         

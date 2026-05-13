@@ -4,7 +4,6 @@ struct DashboardView: View {
     @ObservedObject var viewModel: DashboardViewModel
     @State private var showRecording = false
     @State private var showCreatorMessage = false
-    @State private var selectedDelay: Int = 0 // En minutos
     @EnvironmentObject var appState: AppState
 
     var body: some View {
@@ -31,9 +30,6 @@ struct DashboardView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 32) {
                         headerSection
-                        
-                        delaySelector
-                            .padding(.horizontal)
                         
                         startButton
                             .padding(.horizontal)
@@ -63,7 +59,7 @@ struct DashboardView: View {
             .navigationTitle("")
             .navigationBarHidden(true)
             .fullScreenCover(isPresented: $showRecording) {
-                RecordingView(dashboardVM: viewModel, initialDelay: selectedDelay)
+                RecordingView(dashboardVM: viewModel)
                     .onDisappear { viewModel.load() }
             }
             .sheet(isPresented: $showCreatorMessage) {
@@ -147,61 +143,6 @@ struct DashboardView: View {
         }
         .scaleEffect(appState.isRecording ? 0.95 : 1.0)
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: appState.isRecording)
-    }
-
-    private var delaySelector: some View {
-        VStack(spacing: 12) {
-            HStack {
-                Label("Retardo de inicio", systemImage: "clock.badge.exclamationmark")
-                    .font(.caption.bold())
-                    .foregroundColor(.somTextSecondary)
-                Spacer()
-                Text(selectedDelay == 0 ? "Inmediato" : "\(selectedDelay) min")
-                    .font(.system(.subheadline, design: .monospaced, weight: .bold))
-                    .foregroundColor(.somAccent)
-            }
-            
-            HStack(spacing: 15) {
-                Button {
-                    if selectedDelay > 0 { selectedDelay -= 5 }
-                } label: {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(selectedDelay == 0 ? .somTextSecondary : .somAccent)
-                }
-                .disabled(selectedDelay == 0)
-                
-                // Track bar
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        Capsule()
-                            .fill(Color.white.opacity(0.05))
-                            .frame(height: 8)
-                        
-                        Capsule()
-                            .fill(Color.somAccent.gradient)
-                            .frame(width: geo.size.width * CGFloat(Double(selectedDelay) / 60.0), height: 8)
-                    }
-                    .frame(maxHeight: .infinity)
-                }
-                .frame(height: 8)
-                
-                Button {
-                    if selectedDelay < 60 { selectedDelay += 5 }
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(selectedDelay == 60 ? .somTextSecondary : .somAccent)
-                }
-                .disabled(selectedDelay == 60)
-            }
-            
-            Text("Inicia el análisis después de que te quedes dormido.")
-                .font(.system(size: 10))
-                .foregroundColor(.somTextSecondary.opacity(0.7))
-        }
-        .padding(16)
-        .somGlassStyle(cornerRadius: 20)
     }
 }
 

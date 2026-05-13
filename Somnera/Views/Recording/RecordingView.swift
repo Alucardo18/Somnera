@@ -3,11 +3,11 @@ import SwiftUI
 /// Updated RecordingView with guidance and "Night Mode" focus.
 struct RecordingView: View {
     @ObservedObject var dashboardVM: DashboardViewModel
-    let initialDelay: Int
     @StateObject private var vm = RecordingViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var showStopAlert = false
     @State private var showDebugInfo = false // Option to see the waveform/stats
+    @State private var localDelayMinutes: Int = 0
     
     var body: some View {
         ZStack {
@@ -29,7 +29,9 @@ struct RecordingView: View {
             }
             .ignoresSafeArea()
             
-            if vm.isWaiting {
+            if vm.isSetup {
+                setupView
+            } else if vm.isWaiting {
                 waitingView
             } else if !vm.isCharging {
                 chargerWarningView
@@ -38,25 +40,26 @@ struct RecordingView: View {
             }
             
             // Debug Toggle
-            VStack {
-                HStack {
-                    Spacer()
-                    Button { showDebugInfo.toggle() } label: {
-                        Image(systemName: "chart.bar.xaxis")
-                            .font(.title3)
-                            .foregroundColor(.somSurfaceHigh)
-                            .padding(8)
+            if !vm.isSetup && !vm.isWaiting {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Button { showDebugInfo.toggle() } label: {
+                            Image(systemName: "chart.bar.xaxis")
+                                .font(.title3)
+                                .foregroundColor(.somSurfaceHigh)
+                                .padding(8)
+                        }
                     }
+                    Spacer()
                 }
-                Spacer()
+                .padding()
             }
-            .padding()
             
             if showDebugInfo {
                 debugOverlayView
             }
         }
-        .task { await vm.startSession() }
         .alert("¿Terminar sesión?", isPresented: $showStopAlert) {
             Button("Cancelar", role: .cancel) {}
             Button("Terminar", role: .destructive) {
@@ -74,6 +77,90 @@ struct RecordingView: View {
     }
     
     // MARK: - Views
+    
+    private var setupView: some View {
+        VStack(spacing: 40) {
+            HStack {
+                Button("Cancelar") { dismiss() }
+                    .foregroundColor(.somTextSecondary)
+                Spacer()
+                Text("Configuración")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                Spacer()
+                Button("Ayuda") { }
+                    .opacity(0) // Balance
+            }
+            .padding(.horizontal)
+            .padding(.top, 20)
+            
+            Spacer()
+            
+            VStack(spacing: 12) {
+                Image(systemName: "moon.stars.fill")
+                    .font(.system(size: 50))
+                    .foregroundColor(.somAccent)
+                
+                Text("¿Cuándo empezamos?")
+                    .font(.system(size: 28, weight: .black, design: .rounded))
+                    .foregroundColor(.white)
+            }
+            
+            VStack(spacing: 25) {
+                VStack(spacing: 10) {
+                    Text("Retardo de inicio")
+                        .font(.caption.bold())
+                        .foregroundColor(.somTextSecondary)
+                    
+                    HStack(spacing: 20) {
+                        Button { if localDelayMinutes > 0 { localDelayMinutes -= 5 } } label: {
+                            Image(systemName: "minus.circle.fill").font(.title)
+                        }
+                        .foregroundColor(localDelayMinutes == 0 ? .somSurfaceHigh : .somAccent)
+                        
+                        Text(localDelayMinutes == 0 ? "Inmediato" : "\(localDelayMinutes) min")
+                            .font(.system(.title2, design: .monospaced, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 160)
+                        
+                        Button { if localDelayMinutes < 60 { localDelayMinutes += 5 } } label: {
+                            Image(systemName: "plus.circle.fill").font(.title)
+                        }
+                        .foregroundColor(localDelayMinutes == 60 ? .somSurfaceHigh : .somAccent)
+                    }
+                }
+                .padding(.vertical, 20)
+                .background(Color.white.opacity(0.05))
+                .cornerRadius(20)
+                
+                Text("Selecciona el tiempo que sueles tardar en dormir para evitar falsos positivos.")
+                    .font(.caption)
+                    .foregroundColor(.somTextSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 30)
+            }
+            .padding(.horizontal)
+            
+            Spacer()
+            
+            VStack(spacing: 16) {
+                Button {
+                    vm.startWithDelay(minutes: localDelayMinutes)
+                } label: {
+                    Text(localDelayMinutes == 0 ? "Comenzar ahora" : "Activar sesión")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        .background(Color.somGradient)
+                        .clipShape(Capsule())
+                        .shadow(color: .somAccent.opacity(0.3), radius: 10)
+                }
+            }
+            .padding(.horizontal, 40)
+            .padding(.bottom, 48)
+        }
+    }
     
     private var chargerWarningView: some View {
         VStack(spacing: 40) {
