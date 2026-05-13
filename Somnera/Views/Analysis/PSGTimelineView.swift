@@ -5,6 +5,7 @@ struct PSGTimelineView: View {
     let session: SleepSession
     @Binding var currentTime: TimeInterval
     let onSeek: (TimeInterval) -> Void
+    @State private var showInfo = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -14,12 +15,25 @@ struct PSGTimelineView: View {
                     .font(.system(size: 10, weight: .black))
                     .foregroundColor(.somTextSecondary)
                     .tracking(1)
+                
+                Button {
+                    showInfo = true
+                } label: {
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 12))
+                        .foregroundColor(.somAccent)
+                }
+                
                 Spacer()
                 Text(formatTime(currentTime))
                     .font(.system(.caption2, design: .monospaced))
                     .foregroundColor(.somAccent)
             }
             .padding(.horizontal, 4)
+            .sheet(isPresented: $showInfo) {
+                InfoSheetView()
+                    .presentationDetents([.medium])
+            }
 
             // Timeline Canvas
             ZStack(alignment: .leading) {
@@ -34,25 +48,13 @@ struct PSGTimelineView: View {
                 
                 // Scrubber / Medical Cursor
                 medicalCursor
-                
-                // Debug Data Info (Temporary for diagnosis)
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        Text("SAMPLES: \(session.decibelTimeline.count)")
-                            .font(.system(size: 8, weight: .bold, design: .monospaced))
-                            .foregroundColor(.white.opacity(0.4))
-                            .padding(4)
-                    }
-                }
             }
             .frame(height: 120)
             .background(Color.black.opacity(0.2))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.somAccent.opacity(0.3), lineWidth: 2) // High visibility border
+                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
             )
             .gesture(
                 DragGesture(minimumDistance: 0)
@@ -190,5 +192,78 @@ struct PSGTimelineView: View {
         let m = Int(t) / 60
         let s = Int(t) % 60
         return String(format: "%02d:%02d", m, s)
+    }
+}
+
+// MARK: - Info Sheet
+
+struct InfoSheetView: View {
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        ZStack {
+            Color.somBackground.ignoresSafeArea()
+            
+            VStack(alignment: .leading, spacing: 24) {
+                HStack {
+                    Image(systemName: "waveform.path.ecg")
+                        .font(.title2)
+                        .foregroundColor(.somAccent)
+                    Text("Hipnograma de Respiración")
+                        .font(.system(.title3, design: .rounded).bold())
+                        .foregroundColor(.white)
+                    Spacer()
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title3)
+                            .foregroundColor(.somTextSecondary)
+                    }
+                }
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        infoSection(
+                            title: "¿QUÉ ES?",
+                            text: "Es un mapa detallado de tu esfuerzo respiratorio durante toda la noche. Muestra la intensidad del sonido capturado por el protocolo Sentinel V2.",
+                            icon: "lungs.fill",
+                            color: .somSafe
+                        )
+                        
+                        infoSection(
+                            title: "¿POR QUÉ ES IMPORTANTE?",
+                            text: "Permite identificar visualmente patrones de roncado (picos azules) y posibles pausas respiratorias (espacios planos). Es vital para entender la calidad de tu descanso.",
+                            icon: "star.fill",
+                            color: .somAccent
+                        )
+                        
+                        infoSection(
+                            title: "TRANSPARENCIA TECNOLÓGICA",
+                            text: "Somnera utiliza filtros de 'Crest Factor' para ignorar ruidos constantes como ventiladores o aire acondicionado, enfocándose exclusivamente en tu fisiología.",
+                            icon: "shield.fill",
+                            color: .somWarning
+                        )
+                    }
+                    .padding(.bottom, 20)
+                }
+            }
+            .padding(30)
+        }
+    }
+    
+    private func infoSection(title: String, text: String, icon: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(title, systemImage: icon)
+                .font(.system(size: 10, weight: .black))
+                .foregroundColor(color)
+                .tracking(1.5)
+            
+            Text(text)
+                .font(.system(size: 15, weight: .medium, design: .rounded))
+                .foregroundColor(.white.opacity(0.8))
+                .lineSpacing(4)
+        }
+        .padding(20)
+        .background(Color.somSurface.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
