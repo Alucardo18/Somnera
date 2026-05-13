@@ -1,0 +1,63 @@
+{
+  "buildCommand" : {
+    "command" : "build",
+    "skipDependencies" : false,
+    "style" : "buildOnly"
+  },
+  "configuredTargets" : [
+    {
+      "guid" : "c5f91694ebc1fcd70153c7e24ea8226830b331db81680299a2404353a9210dc6"
+    }
+  ],
+  "containerPath" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera.xcodeproj",
+  "continueBuildingAfterErrors" : false,
+  "dependencyScope" : "workspace",
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "activeArchitecture" : "undefined_arch",
+    "activeRunDestination" : {
+      "disableOnlyActiveArch" : true,
+      "hostTargetedPlatform" : null,
+      "platform" : "iphonesimulator",
+      "sdk" : "iphonesimulator26.5",
+      "sdkVariant" : "iphonesimulator",
+      "supportedArchitectures" : [
+        "i386",
+        "x86_64"
+      ],
+      "targetArchitecture" : "undefined_arch"
+    },
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex",
+      "buildProductsPath" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Products",
+      "derivedDataPath" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build",
+      "indexDataStoreFolderPath" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Index.noindex/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Index.noindex/PrecompiledHeaders",
+      "pchPath" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/PrecompiledHeaders"
+    },
+    "configurationName" : "Debug",
+    "overrides" : {
+      "commandLine" : {
+        "table" : {
+          "SDKROOT" : "iphonesimulator26.5"
+        }
+      },
+      "synthesized" : {
+        "table" : {
+          "ACTION" : "build",
+          "ENABLE_PREVIEWS" : "NO",
+          "ENABLE_XOJIT_PREVIEWS" : "YES"
+        }
+      }
+    }
+  },
+  "schemeCommand" : "launch",
+  "showNonLoggedProgress" : true,
+  "useDryRun" : false,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}

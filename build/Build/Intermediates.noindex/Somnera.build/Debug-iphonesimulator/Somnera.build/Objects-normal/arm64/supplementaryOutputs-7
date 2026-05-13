@@ -1,0 +1,30 @@
+{
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Models/SnoreEvent.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SnoreEvent.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SnoreEvent.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SnoreEvent.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SnoreEvent.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SnoreEvent.swiftdeps"
+  },
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Services/Detection/SnoreDetectionService.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SnoreDetectionService.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SnoreDetectionService.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SnoreDetectionService.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SnoreDetectionService.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SnoreDetectionService.swiftdeps"
+  },
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/SomneraApp.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SomneraApp.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SomneraApp.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SomneraApp.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SomneraApp.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SomneraApp.swiftdeps"
+  },
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Views/Session/SleepTimelineView.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SleepTimelineView.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SleepTimelineView.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SleepTimelineView.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SleepTimelineView.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SleepTimelineView.swiftdeps"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Core/AppState.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AppState.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AppState.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AppState.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AppState.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AppState.swiftdeps"
+  },
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Models/ApneaEvent.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/ApneaEvent.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/ApneaEvent.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/ApneaEvent.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/ApneaEvent.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/ApneaEvent.swiftdeps"
+  },
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Services/AudioEngine/AudioCaptureService.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AudioCaptureService.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AudioCaptureService.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AudioCaptureService.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AudioCaptureService.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AudioCaptureService.swiftdeps"
+  },
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Services/Detection/ApneaDetectionService.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/ApneaDetectionService.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/ApneaDetectionService.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/ApneaDetectionService.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/ApneaDetectionService.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/ApneaDetectionService.swiftdeps"
+  },
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Views/Analysis/AirwayDigitalTwinView.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AirwayDigitalTwinView.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AirwayDigitalTwinView.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AirwayDigitalTwinView.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AirwayDigitalTwinView.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/AirwayDigitalTwinView.swiftdeps"
+  }
+}

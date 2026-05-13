@@ -57,11 +57,24 @@ final class RecordingViewModel: ObservableObject {
     private var decibelTimeline: [Float] = []
     private var lastTimelineSampleTime = Date()
     private var lastAutoSaveTime = Date()
+    private var lastSpectralAnalysis: (nasal: Double, palatal: Double, lingual: Double) = (0, 0, 0)
+    
+    // Sentinel V2 Timelines
+    private var snrTimeline: [Double] = []
+    private var stabilityTimeline: [Double] = []
+    private var tiltTimeline: [Double] = []
+    private var motionTimeline: [Double] = []
     private var sampleAccumulator: [Float] = []
     
     // Stability Averages
     private var stabilitySum: Double = 0.0
     private var stabilityCount: Int = 0
+
+    // Spectral Averages (Digital Twin)
+    private var nasalSum: Double = 0.0
+    private var palatalSum: Double = 0.0
+    private var lingualSum: Double = 0.0
+    private var spectralCount: Int = 0
 
     init() {
         setupInterruptionObservers()
@@ -179,6 +192,14 @@ final class RecordingViewModel: ObservableObject {
             snoreEventCount = 0
             apneaEventCount = 0
             isApneaActive = false
+            nasalSum = 0
+            palatalSum = 0
+            lingualSum = 0
+            spectralCount = 0
+            snrTimeline = []
+            stabilityTimeline = []
+            tiltTimeline = []
+            motionTimeline = []
         }
 
         do {
@@ -235,8 +256,14 @@ final class RecordingViewModel: ObservableObject {
         
         // Final sample
         if wasRecording && !sampleAccumulator.isEmpty {
-            let avgDB = sampleAccumulator.reduce(0, +) / Float(sampleAccumulator.count)
+            let avgDB = sampleAccumulator.reduce(0, +) / Float(max(1, sampleAccumulator.count))
             decibelTimeline.append(avgDB)
+            
+            // Final Sentinel V2 samples
+            snrTimeline.append(currentSNR)
+            stabilityTimeline.append(breathingStability)
+            tiltTimeline.append(currentTiltAngle)
+            motionTimeline.append(currentMotionG)
         }
         
         snoreDetector.teardown()
@@ -335,9 +362,25 @@ final class RecordingViewModel: ObservableObject {
         let now = Date()
         snoreDetector.analyze(buffer, at: time)
         
-        // Link snore events to apnea detector for context
+        // Link snore events to apnea detector
         if snoreDetector.isSnoring {
             apneaDetector.reportSnore(at: now)
+        }
+        
+        // 4. Digital Twin Spectral Analysis
+        // We analyze any buffer that isn't complete silence (> 30dB)
+        if dB > 30 {
+            let spectral = SpectralAnalysisService.shared.analyze(buffer: buffer)
+            self.lastSpectralAnalysis = (spectral.nasal, spectral.palatal, spectral.lingual)
+            
+            if (spectral.nasal + spectral.palatal + spectral.lingual) > 0 {
+                Task { @MainActor in
+                    self.nasalSum += spectral.nasal
+                    self.palatalSum += spectral.palatal
+                    self.lingualSum += spectral.lingual
+                    self.spectralCount += 1
+                }
+            }
         }
 
         // Timeline Sampling (5s)
@@ -345,6 +388,13 @@ final class RecordingViewModel: ObservableObject {
         if now.timeIntervalSince(lastTimelineSampleTime) >= 5.0 {
             let avgDB = sampleAccumulator.reduce(0, +) / Float(max(1, sampleAccumulator.count))
             decibelTimeline.append(avgDB)
+            
+            // Collect Sentinel V2 Telemetry
+            snrTimeline.append(currentSNR)
+            stabilityTimeline.append(breathingStability)
+            tiltTimeline.append(currentTiltAngle)
+            motionTimeline.append(currentMotionG)
+            
             sampleAccumulator = []
             lastTimelineSampleTime = now
             
@@ -377,7 +427,14 @@ final class RecordingViewModel: ObservableObject {
             audioFilePath: id.uuidString,
             peakDecibels: peakDecibels,
             decibelTimeline: decibelTimeline,
-            surfaceType: currentSurface.rawValue
+            surfaceType: currentSurface.rawValue,
+            nasalIntensity: spectralCount > 0 ? (nasalSum / Double(spectralCount)) : 0.0,
+            palatalIntensity: spectralCount > 0 ? (palatalSum / Double(spectralCount)) : 0.0,
+            lingualIntensity: spectralCount > 0 ? (lingualSum / Double(spectralCount)) : 0.0,
+            snrTimeline: snrTimeline,
+            stabilityTimeline: stabilityTimeline,
+            tiltTimeline: tiltTimeline,
+            motionTimeline: motionTimeline
         )
         sessionStorage.save(session)
         self.session = session
@@ -443,7 +500,10 @@ final class RecordingViewModel: ObservableObject {
                     offsetSeconds: offset,
                     durationSeconds: SomneraConstants.Snore.windowDurationSeconds,
                     confidence: confidence,
-                    peakDecibels: self.peakDecibels
+                    peakDecibels: self.peakDecibels,
+                    nasalIntensity: self.lastSpectralAnalysis.nasal,
+                    palatalIntensity: self.lastSpectralAnalysis.palatal,
+                    lingualIntensity: self.lastSpectralAnalysis.lingual
                 )
                 self.currentSnoreEvents.append(event)
                 self.snoreEventCount = self.currentSnoreEvents.count

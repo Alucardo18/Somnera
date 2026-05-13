@@ -32,6 +32,7 @@ final class DashboardViewModel: ObservableObject {
         let id = UUID()
         let label: String
         let score: Int
+        let apneaCount: Int
     }
 
     var weeklyChartData: [ChartData] {
@@ -57,12 +58,16 @@ final class DashboardViewModel: ObservableObject {
                 calendarWithSundayStart.isDate($0.startDate, inSameDayAs: day)
             }
             
-            let score = sessionsOnDay.isEmpty ? 0 : 
+            let score = sessionsOnDay.isEmpty ? 0 :
                 sessionsOnDay.map { $0.snoreScore }.reduce(0, +) / sessionsOnDay.count
+            
+            let apneaCount = sessionsOnDay.isEmpty ? 0 :
+                sessionsOnDay.map { $0.apneaEventCount }.reduce(0, +) / sessionsOnDay.count
             
             return ChartData(
                 label: dayFormatter.string(from: day).uppercased(),
-                score: score
+                score: score,
+                apneaCount: apneaCount
             )
         }
     }
@@ -70,6 +75,24 @@ final class DashboardViewModel: ObservableObject {
     var averageScore: Int {
         guard !sessions.isEmpty else { return 0 }
         return sessions.prefix(7).map { $0.snoreScore }.reduce(0, +) / min(sessions.count, 7)
+    }
+
+    var weeklyAnatomicalAnalysis: (type: String, description: String, icon: String) {
+        let last7 = sessions.prefix(7)
+        guard !last7.isEmpty else { return ("Pendiente", "Aún necesitamos más datos para analizar tu tendencia.", "waveform") }
+        
+        let n = Double(last7.count)
+        let avgNasal = last7.map { $0.nasalIntensity }.reduce(0, +) / n
+        let avgPalatal = last7.map { $0.palatalIntensity }.reduce(0, +) / n
+        let avgLingual = last7.map { $0.lingualIntensity }.reduce(0, +) / n
+        
+        if avgNasal >= avgPalatal && avgNasal >= avgLingual {
+            return ("Nasal", "Tus ronquidos ocurren mayormente en las vías superiores. Esto suele estar relacionado con congestión o desviación del tabique.", "nose")
+        } else if avgPalatal >= avgNasal && avgPalatal >= avgLingual {
+            return ("Palatal", "La vibración ocurre principalmente en el paladar blando. Es el tipo más común de ronquido por relajación muscular.", "mouth")
+        } else {
+            return ("Lingual", "La base de la lengua obstruye parcialmente el paso del aire. Suele ocurrir al dormir boca arriba.", "tongue")
+        }
     }
 
     // MARK: - Delete

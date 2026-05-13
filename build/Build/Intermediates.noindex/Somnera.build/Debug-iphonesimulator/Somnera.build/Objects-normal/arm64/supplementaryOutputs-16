@@ -1,0 +1,30 @@
+{
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Core/SomneraColors.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SomneraColors.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SomneraColors.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SomneraColors.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SomneraColors.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SomneraColors.swiftdeps"
+  },
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Services/Analysis/SpectralAnalysisService.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SpectralAnalysisService.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SpectralAnalysisService.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SpectralAnalysisService.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SpectralAnalysisService.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/SpectralAnalysisService.swiftdeps"
+  },
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Views/Recording/WaveformView.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/WaveformView.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/WaveformView.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/WaveformView.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/WaveformView.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/WaveformView.swiftdeps"
+  },
+  "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Views/Settings/TechInsightsView.swift" : {
+    "const-values" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/TechInsightsView.swiftconstvalues",
+    "dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/TechInsightsView.d",
+    "diagnostics" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/TechInsightsView.dia",
+    "object" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/TechInsightsView.o",
+    "swift-dependencies" : "/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/build/Build/Intermediates.noindex/Somnera.build/Debug-iphonesimulator/Somnera.build/Objects-normal/arm64/TechInsightsView.swiftdeps"
+  }
+}

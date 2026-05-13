@@ -33,6 +33,7 @@ struct DashboardView: View {
                         
                         startButton
                             .padding(.horizontal)
+                        
 
                         if let session = viewModel.lastSession {
                             ScoreCardView(session: session)
@@ -41,6 +42,13 @@ struct DashboardView: View {
                             NightHeatmapView(session: session)
                                 .padding(.horizontal)
                             
+                            AirwayDigitalTwinView(
+                                nasalIntensity: session.nasalIntensity,
+                                palatalIntensity: session.palatalIntensity,
+                                lingualIntensity: session.lingualIntensity
+                            )
+                            .padding(.horizontal)
+                            
                             HighlightsView(session: session) { session, event, feedback in
                                 viewModel.updateFeedback(for: session, event: event, feedback: feedback)
                             }
@@ -48,8 +56,11 @@ struct DashboardView: View {
                         }
 
                         if !viewModel.weeklyChartData.isEmpty {
-                            WeeklyChartView(data: viewModel.weeklyChartData)
-                                .padding(.horizontal)
+                            WeeklyChartView(
+                                data: viewModel.weeklyChartData,
+                                analysis: viewModel.weeklyAnatomicalAnalysis
+                            )
+                            .padding(.horizontal)
                         }
                     }
                     .padding(.top, 16)
@@ -144,6 +155,7 @@ struct DashboardView: View {
         .scaleEffect(appState.isRecording ? 0.95 : 1.0)
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: appState.isRecording)
     }
+
 }
 
 // MARK: - Creator Message (Easter Egg)
@@ -404,48 +416,176 @@ struct ScoreExplanationView: View {
 
 struct WeeklyChartView: View {
     let data: [DashboardViewModel.ChartData]
+    let analysis: (type: String, description: String, icon: String)
+    @State private var appear = false
+
+    private let chartHeight: CGFloat = 100
+    private let safeThreshold: Int = 30
+    private let warningThreshold: Int = 60
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Tendencia Semanal")
-                .font(.system(size: 14, weight: .black))
-                .foregroundColor(.white)
-                .tracking(1)
-
-            HStack(alignment: .bottom, spacing: 10) {
-                ForEach(data) { point in
-                    VStack(spacing: 8) {
-                        ZStack(alignment: .bottom) {
-                            Capsule()
-                                .fill(Color.somSurfaceHigh.opacity(0.3))
-                                .frame(width: 24, height: 80)
-                            
-                            Capsule()
-                                .fill(barColor(score: point.score).gradient)
-                                .frame(width: 24, height: max(10, CGFloat(point.score) * 0.8))
-                        }
-                        
-                        Text(point.label)
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.somTextSecondary)
-                    }
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Tendencia Semanal")
+                        .font(.system(size: 14, weight: .black))
+                        .foregroundColor(.white)
+                    Text("Ronquido vs Apneas")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundColor(.somTextSecondary)
+                        .tracking(1)
+                }
+                
+                Spacer()
+                
+                HStack(spacing: 12) {
+                    legend(label: "Ronquido", color: .somAccent)
+                    legend(label: "Apnea", color: .somApnea)
                 }
             }
-            .frame(maxWidth: .infinity)
+
+            ZStack(alignment: .bottom) {
+                // 1. Background Zones
+                GeometryReader { geo in
+                    VStack(spacing: 0) {
+                        Color.somApnea.opacity(0.03).frame(height: geo.size.height * 0.4) // 60-100
+                        Color.somWarning.opacity(0.03).frame(height: geo.size.height * 0.3) // 30-60
+                        Color.somSafe.opacity(0.03).frame(height: geo.size.height * 0.3) // 0-30
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                }
+                
+                // 2. Apnea Spikes (Background)
+                GeometryReader { geo in
+                    let width = geo.size.width
+                    let stepX = width / CGFloat(max(1, data.count - 1))
+                    
+                    Path { path in
+                        for i in 0..<data.count {
+                            let x = CGFloat(i) * stepX
+                            let count = data[i].apneaCount
+                            if count > 0 {
+                                // Spike height based on apnea count
+                                let h = min(CGFloat(count) * 10, chartHeight)
+                                path.move(to: CGPoint(x: x, y: chartHeight))
+                                path.addLine(to: CGPoint(x: x, y: chartHeight - h))
+                            }
+                        }
+                    }
+                    .stroke(Color.somApnea.opacity(0.4), style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                }
+                
+                // 3. Reference Line
+                Path { path in
+                    let y = yPosition(for: safeThreshold)
+                    path.move(to: CGPoint(x: 0, y: y))
+                    path.addLine(to: CGPoint(x: 350, y: y))
+                }
+                .stroke(Color.somSafe.opacity(0.2), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                
+                GeometryReader { geo in
+                    let width = geo.size.width
+                    let stepX = width / CGFloat(max(1, data.count - 1))
+                    
+                    // 4. Area under the curve
+                    Path { path in
+                        path.move(to: CGPoint(x: 0, y: chartHeight))
+                        for i in 0..<data.count {
+                            let x = CGFloat(i) * stepX
+                            let y = yPosition(for: data[i].score)
+                            path.addLine(to: CGPoint(x: x, y: y))
+                        }
+                        path.addLine(to: CGPoint(x: width, y: chartHeight))
+                        path.closeSubpath()
+                    }
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.somAccent.opacity(0.15), .clear],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+                    
+                    // 5. The Glow Line
+                    Path { path in
+                        for i in 0..<data.count {
+                            let x = CGFloat(i) * stepX
+                            let y = yPosition(for: data[i].score)
+                            if i == 0 { path.move(to: CGPoint(x: x, y: y)) }
+                            else { path.addLine(to: CGPoint(x: x, y: y)) }
+                        }
+                    }
+                    .trim(from: 0, to: appear ? 1 : 0)
+                    .stroke(
+                        LinearGradient(colors: [.somSafe, .somWarning, .somApnea], startPoint: .bottom, endPoint: .top),
+                        style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
+                    )
+                    .shadow(color: .somAccent.opacity(0.4), radius: 6)
+                }
+                .frame(height: chartHeight)
+            }
+            .padding(.top, 10)
+
+            HStack(spacing: 0) {
+                ForEach(data) { point in
+                    Text(point.label)
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.somTextSecondary)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            .padding(.bottom, 8)
+            
+            // 6. Anatomical Insight Card
+            anatomicalInsight(analysis: analysis)
         }
-        .padding(20)
+        .padding(24)
         .somGlassStyle(cornerRadius: 24)
-        .frame(height: 180)
+        .onAppear {
+            withAnimation(.easeOut(duration: 1.2)) { appear = true }
+        }
     }
 
-    private func barColor(score: Int) -> Color {
-        switch score {
-        case 0..<30:  return .somSafe
-        case 30..<60: return .somWarning
-        default:      return .somApnea
+    // Removed the simulated private property
+
+    private func anatomicalInsight(analysis: (type: String, description: String, icon: String)) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: analysis.icon)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(.somAccent)
+                .padding(8)
+                .background(Color.somAccent.opacity(0.1))
+                .clipShape(Circle())
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text("PATRÓN PREDOMINANTE: \(analysis.type.uppercased())")
+                    .font(.system(size: 9, weight: .black))
+                    .foregroundColor(.somAccent)
+                
+                Text(analysis.description)
+                    .font(.system(size: 10))
+                    .foregroundColor(.somTextSecondary)
+                    .lineLimit(2)
+            }
+        }
+        .padding(12)
+        .background(Color.white.opacity(0.03))
+        .cornerRadius(16)
+    }
+
+    private func legend(label: String, color: Color) -> some View {
+        HStack(spacing: 4) {
+            Circle().fill(color).frame(width: 6, height: 6)
+            Text(label).font(.system(size: 9, weight: .bold)).foregroundColor(.somTextSecondary)
         }
     }
+
+    private func yPosition(for score: Int) -> CGFloat {
+        let normalizedScore = CGFloat(min(100, max(0, score)))
+        return chartHeight - (normalizedScore / 100 * chartHeight)
+    }
 }
+
+
 #Preview {
     DashboardView(viewModel: {
         let vm = DashboardViewModel()

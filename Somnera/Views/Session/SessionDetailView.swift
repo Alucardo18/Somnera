@@ -42,6 +42,26 @@ struct SessionDetailView: View {
                     // Main Score & Quick Stats
                     headerStats
                     
+                    // PSG Medical Hypnogram
+                    PSGTimelineView(
+                        session: session,
+                        currentTime: $playbackTime,
+                        onSeek: { time in
+                            player?.currentTime = time
+                            playbackTime = time
+                            updateProgress()
+                        }
+                    )
+                    
+                    AirwayDigitalTwinView(
+                        nasalIntensity: session.snoreEvents.first(where: { abs($0.offsetSeconds - playbackTime) < 2.0 })?.nasalIntensity ?? session.nasalIntensity,
+                        palatalIntensity: session.snoreEvents.first(where: { abs($0.offsetSeconds - playbackTime) < 2.0 })?.palatalIntensity ?? session.palatalIntensity,
+                        lingualIntensity: session.snoreEvents.first(where: { abs($0.offsetSeconds - playbackTime) < 2.0 })?.lingualIntensity ?? session.lingualIntensity
+                    )
+                    
+                    // Vanguard Engineering Panel (Sentinel V2 Telemetry)
+                    VanguardPanelView(session: session)
+                    
                     // Snore events summary
                     if !session.snoreEvents.isEmpty {
                         eventsSection(
@@ -560,6 +580,113 @@ struct SessionDetailView: View {
     }
     private func stopPlayback() { player?.stop(); playbackTimer?.invalidate() }
     private func formatTime(_ t: TimeInterval) -> String { let m = Int(t) / 60; let s = Int(t) % 60; return String(format: "%d:%02d", m, s) }
+}
+
+// MARK: - Vanguard Engineering Panel
+
+struct VanguardPanelView: View {
+    let session: SleepSession
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Header
+            HStack {
+                Image(systemName: "cpu")
+                    .foregroundColor(.somAccent)
+                Text("PANEL DE INGENIERÍA VANGUARD")
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundColor(.somTextSecondary)
+                    .tracking(1.5)
+                Spacer()
+                Text("SENTINEL V2.0")
+                    .font(.system(size: 8, weight: .bold, design: .monospaced))
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.somAccent.opacity(0.1))
+                    .foregroundColor(.somAccent)
+                    .cornerRadius(4)
+            }
+            .padding(.horizontal, 4)
+            
+            // Telemetry Grid
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                TelemetryChartCell(
+                    title: "SNR (CLARIDAD)",
+                    value: String(format: "%.1f dB", session.snrTimeline.last ?? 0),
+                    data: session.snrTimeline,
+                    color: .somAccent
+                )
+                
+                TelemetryChartCell(
+                    title: "ESTABILIDAD",
+                    value: String(format: "%.0f%%", (session.stabilityTimeline.last ?? 0) * 100),
+                    data: session.stabilityTimeline,
+                    color: .somSafe
+                )
+                
+                TelemetryChartCell(
+                    title: "INCLINACIÓN",
+                    value: String(format: "%.1f°", session.tiltTimeline.last ?? 0),
+                    data: session.tiltTimeline,
+                    color: .somWarning
+                )
+                
+                TelemetryChartCell(
+                    title: "VIBRACIÓN (G)",
+                    value: String(format: "%.3f", session.motionTimeline.last ?? 0),
+                    data: session.motionTimeline,
+                    color: .somInfo
+                )
+            }
+        }
+        .padding(20)
+        .somGlassStyle(cornerRadius: 24)
+    }
+}
+
+struct TelemetryChartCell: View {
+    let title: String
+    let value: String
+    let data: [Double]
+    let color: Color
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 8, weight: .black))
+                    .foregroundColor(.somTextSecondary)
+                Text(value)
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .foregroundColor(.white)
+            }
+            
+            // Sparkline
+            GeometryReader { geo in
+                Path { path in
+                    guard data.count > 1 else { return }
+                    let stepX = geo.size.width / CGFloat(data.count - 1)
+                    let minVal = data.min() ?? 0
+                    let maxVal = data.max() ?? 1
+                    let range = max(0.001, maxVal - minVal)
+                    
+                    for (index, val) in data.enumerated() {
+                        let x = CGFloat(index) * stepX
+                        let y = geo.size.height - CGFloat((val - minVal) / range) * geo.size.height
+                        if index == 0 { path.move(to: CGPoint(x: x, y: y)) }
+                        else { path.addLine(to: CGPoint(x: x, y: y)) }
+                    }
+                }
+                .stroke(color, style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
+            }
+            .frame(height: 30)
+            .background(color.opacity(0.05))
+            .cornerRadius(4)
+        }
+        .padding(12)
+        .background(Color.white.opacity(0.03))
+        .cornerRadius(16)
+    }
 }
 
 // MARK: - Insight Card

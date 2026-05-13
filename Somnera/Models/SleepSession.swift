@@ -11,6 +11,17 @@ struct SleepSession: Identifiable, Codable, Hashable {
     var peakDecibels: Float
     var decibelTimeline: [Float]      // Average dB sampled every 5 seconds
     var surfaceType: String?          // "bed" or "nightstand"
+    
+    // MARK: - Sentinel V2 Telemetry
+    var snrTimeline: [Double] = []
+    var stabilityTimeline: [Double] = []
+    var tiltTimeline: [Double] = []
+    var motionTimeline: [Double] = []
+    
+    // MARK: - Spectral Analysis (Digital Twin)
+    var nasalIntensity: Double = 0.0
+    var palatalIntensity: Double = 0.0
+    var lingualIntensity: Double = 0.0
 
     // MARK: - Computed
 
@@ -42,6 +53,8 @@ struct SleepSession: Identifiable, Codable, Hashable {
                 return total + 12.0 // Crítica
             }
         }
+        
+        
         
         return min(100, Int(percentWeight + dbWeight + apneaRiskPoints))
     }
@@ -162,7 +175,14 @@ struct SleepSession: Identifiable, Codable, Hashable {
         audioFilePath: String? = nil,
         peakDecibels: Float = 0,
         decibelTimeline: [Float] = [],
-        surfaceType: String? = nil
+        surfaceType: String? = nil,
+        nasalIntensity: Double = 0.0,
+        palatalIntensity: Double = 0.0,
+        lingualIntensity: Double = 0.0,
+        snrTimeline: [Double] = [],
+        stabilityTimeline: [Double] = [],
+        tiltTimeline: [Double] = [],
+        motionTimeline: [Double] = []
     ) {
         self.id = id
         self.startDate = startDate
@@ -173,6 +193,44 @@ struct SleepSession: Identifiable, Codable, Hashable {
         self.peakDecibels = peakDecibels
         self.decibelTimeline = decibelTimeline
         self.surfaceType = surfaceType
+        self.nasalIntensity = nasalIntensity
+        self.palatalIntensity = palatalIntensity
+        self.lingualIntensity = lingualIntensity
+        self.snrTimeline = snrTimeline
+        self.stabilityTimeline = stabilityTimeline
+        self.tiltTimeline = tiltTimeline
+        self.motionTimeline = motionTimeline
+    }
+
+
+    // MARK: - Codable Compatibility
+    enum CodingKeys: String, CodingKey {
+        case id, startDate, endDate, snoreEvents, apneaEvents, audioFilePath, peakDecibels, decibelTimeline, surfaceType
+        case nasalIntensity, palatalIntensity, lingualIntensity
+        case snrTimeline, stabilityTimeline, tiltTimeline, motionTimeline
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        startDate = try container.decode(Date.self, forKey: .startDate)
+        endDate = try container.decode(Date.self, forKey: .endDate)
+        snoreEvents = try container.decode([SnoreEvent].self, forKey: .snoreEvents)
+        apneaEvents = try container.decode([ApneaEvent].self, forKey: .apneaEvents)
+        audioFilePath = try container.decodeIfPresent(String.self, forKey: .audioFilePath)
+        peakDecibels = try container.decode(Float.self, forKey: .peakDecibels)
+        decibelTimeline = try container.decode([Float].self, forKey: .decibelTimeline)
+        surfaceType = try container.decodeIfPresent(String.self, forKey: .surfaceType)
+        
+        // Backward compatibility: provide default 0.0 if keys are missing
+        nasalIntensity = try container.decodeIfPresent(Double.self, forKey: .nasalIntensity) ?? 0.0
+        palatalIntensity = try container.decodeIfPresent(Double.self, forKey: .palatalIntensity) ?? 0.0
+        lingualIntensity = try container.decodeIfPresent(Double.self, forKey: .lingualIntensity) ?? 0.0
+        
+        snrTimeline = try container.decodeIfPresent([Double].self, forKey: .snrTimeline) ?? []
+        stabilityTimeline = try container.decodeIfPresent([Double].self, forKey: .stabilityTimeline) ?? []
+        tiltTimeline = try container.decodeIfPresent([Double].self, forKey: .tiltTimeline) ?? []
+        motionTimeline = try container.decodeIfPresent([Double].self, forKey: .motionTimeline) ?? []
     }
 
     // MARK: - Mock Data for Previews
@@ -193,7 +251,10 @@ struct SleepSession: Identifiable, Codable, Hashable {
             audioFilePath: nil,
             peakDecibels: 72,
             decibelTimeline: (0..<500).map { _ in Float.random(in: 10...75) },
-            surfaceType: "bed"
+            surfaceType: "bed",
+            nasalIntensity: 0.12,
+            palatalIntensity: 0.78,
+            lingualIntensity: 0.35
         )
     }
 }

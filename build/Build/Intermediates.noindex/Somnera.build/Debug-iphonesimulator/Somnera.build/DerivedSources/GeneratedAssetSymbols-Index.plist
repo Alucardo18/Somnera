@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>colors</key>
+	<array/>
+	<key>images</key>
+	<array>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/emmanuel/Documents/ANTIGRAVITY/SNORE-APP/Somnera/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACImageNameDigitalTwin3D</string>
+			<key>relativePath</key>
+			<string>./digital_twin_3d.imageset</string>
+			<key>swiftSymbol</key>
+			<string>digitalTwin3D</string>
+		</dict>
+	</array>
+	<key>symbols</key>
+	<array/>
+</dict>
+</plist>
