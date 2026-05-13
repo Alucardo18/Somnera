@@ -27,25 +27,41 @@ struct SessionListView: View {
                         Spacer()
                     } else {
                         ScrollView {
-                            VStack(alignment: .leading, spacing: 30) {
-                                // 2. Bubble Cloud Section (Keep the visual wow)
-                                bubbleCloud
-                                    .padding(.top, 20)
-                                
-                                // 3. List
-                                VStack(alignment: .leading, spacing: 20) {
-                                    Text("Historial")
-                                        .font(.headline)
-                                        .foregroundColor(.white)
+                            VStack(alignment: .leading, spacing: 32) {
+                                // 1. THE SLEEP GALAXY (Visual Explorer)
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Explorador Estelar")
+                                        .font(.system(size: 12, weight: .black))
+                                        .foregroundColor(.somAccent)
+                                        .tracking(2)
+                                        .padding(.horizontal)
                                     
-                                    ForEach(viewModel.sessions) { session in
-                                        NavigationLink(destination: SessionDetailView(session: session)) {
-                                            SessionRowView(session: session)
-                                        }
-                                        .buttonStyle(.plain)
-                                    }
+                                    bubbleCloud
+                                        .padding(.vertical, 10)
                                 }
-                                .padding(.horizontal)
+                                
+                                // 2. WEEKLY SUMMARY CARD
+                                weeklySummaryCard
+                                    .padding(.horizontal)
+                                
+                                // 3. VISUAL INSIGHT GALLERY
+                                VStack(alignment: .leading, spacing: 16) {
+                                    Text("Análisis Reciente")
+                                        .font(.system(size: 14, weight: .black))
+                                        .foregroundColor(.white)
+                                        .tracking(1)
+                                        .padding(.horizontal)
+                                    
+                                    VStack(spacing: 16) {
+                                        ForEach(viewModel.sessions.prefix(5)) { session in
+                                            NavigationLink(destination: SessionDetailView(session: session)) {
+                                                SessionInsightCard(session: session)
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
+                                    }
+                                    .padding(.horizontal)
+                                }
                             }
                             .padding(.vertical)
                         }
@@ -90,6 +106,42 @@ struct SessionListView: View {
             }
         }
         .frame(maxWidth: .infinity)
+    }
+
+    private var weeklySummaryCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("RESUMEN SEMANAL")
+                        .font(.system(size: 10, weight: .black))
+                        .foregroundColor(.somAccent)
+                    Text("Tendencia de Mejora")
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                }
+                Spacer()
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .foregroundColor(.somSafe)
+                    .font(.title2)
+            }
+            
+            Text("Tus niveles de obstrucción nasal han bajado un 12% respecto a la semana pasada. Mantén tu posición lateral para mejores resultados.")
+                .font(.system(size: 12))
+                .foregroundColor(.somTextSecondary)
+                .lineSpacing(4)
+        }
+        .padding(20)
+        .background(
+            ZStack {
+                Color.somAccent.opacity(0.05)
+                LinearGradient(colors: [.somAccent.opacity(0.1), .clear], startPoint: .topLeading, endPoint: .bottomTrailing)
+            }
+        )
+        .cornerRadius(24)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(Color.somAccent.opacity(0.2), lineWidth: 1)
+        )
     }
 }
 
@@ -150,7 +202,7 @@ struct SessionBubbleView: View {
     }
 }
 
-struct SessionRowView: View {
+struct SessionInsightCard: View {
     let session: SleepSession
     
     var scoreColor: Color {
@@ -162,28 +214,71 @@ struct SessionRowView: View {
     }
     
     var body: some View {
-        HStack(spacing: 16) {
-            Circle()
-                .fill(scoreColor.opacity(0.2))
-                .frame(width: 40, height: 40)
-                .overlay(Text("\(session.snoreScore)").font(.caption.bold()).foregroundColor(scoreColor))
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(session.startDate.formatted(.dateTime.weekday(.wide).day().month()))
-                    .font(.subheadline.bold())
-                    .foregroundColor(.white)
-                Text(session.formattedDuration)
-                    .font(.caption)
+        HStack(spacing: 0) {
+            // Left: Score & Date
+            VStack(alignment: .leading, spacing: 4) {
+                Text(session.startDate.formatted(.dateTime.weekday(.abbreviated).day().month()))
+                    .font(.system(size: 10, weight: .black))
                     .foregroundColor(.somTextSecondary)
+                    .textCase(.uppercase)
+                
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text("\(session.snoreScore)")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    Text("pts")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.somTextSecondary)
+                }
             }
-            Spacer()
-            Image(systemName: "chevron.right")
-                .font(.caption2)
-                .foregroundColor(.somSurfaceHigh)
+            .frame(width: 80, alignment: .leading)
+            
+            // Middle: Sparkline Hypnogram
+            GeometryReader { geo in
+                Path { path in
+                    let count = session.decibelTimeline.count
+                    guard count > 1 else { return }
+                    let stepX = geo.size.width / CGFloat(count - 1)
+                    path.move(to: CGPoint(x: 0, y: geo.size.height))
+                    
+                    for (index, db) in session.decibelTimeline.enumerated() {
+                        let normalized = db < 0 ? (db + 60) / 50 : (db - 30) / 50
+                        let y = geo.size.height - (CGFloat(max(0.1, min(1.0, normalized))) * geo.size.height * 0.6)
+                        path.addLine(to: CGPoint(x: CGFloat(index) * stepX, y: y))
+                    }
+                }
+                .stroke(scoreColor.gradient, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+            }
+            .frame(height: 40)
+            .padding(.horizontal, 10)
+            
+            // Right: Anatomical Quick View
+            HStack(spacing: 8) {
+                anatomicalMiniDot(label: "N", intensity: session.nasalIntensity)
+                anatomicalMiniDot(label: "P", intensity: session.palatalIntensity)
+                anatomicalMiniDot(label: "L", intensity: session.lingualIntensity)
+            }
         }
-        .padding()
-        .background(Color.white.opacity(0.05))
-        .cornerRadius(16)
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white.opacity(0.05))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.white.opacity(0.05), lineWidth: 1)
+                )
+        )
+    }
+    
+    private func anatomicalMiniDot(label: String, intensity: Double) -> some View {
+        VStack(spacing: 4) {
+            Circle()
+                .fill(intensity > 0.4 ? Color.somApnea : (intensity > 0.1 ? Color.somWarning : Color.somSafe))
+                .frame(width: 6, height: 6)
+            Text(label)
+                .font(.system(size: 8, weight: .bold))
+                .foregroundColor(.somTextSecondary)
+        }
     }
 }
 
