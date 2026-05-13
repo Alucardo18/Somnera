@@ -183,8 +183,9 @@ struct SleepTimelineView: View {
     }
     
     private func normalizedHeight(_ db: Float) -> CGFloat {
-        let minDB: Float = -60
-        let maxDB: Float = -10
+        // Updated to match 0-90dB positive scale
+        let minDB: Float = 30
+        let maxDB: Float = 80
         let normalized = (db - minDB) / (maxDB - minDB)
         return CGFloat(max(4, min(1.0, normalized)) * 60)
     }

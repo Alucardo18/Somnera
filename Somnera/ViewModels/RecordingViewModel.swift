@@ -325,7 +325,7 @@ final class RecordingViewModel: ObservableObject {
         let now = Date()
         // 1. Metrics
         let rms = DSPFilter.rms(of: buffer) ?? 0.0001
-        let dB = DSPFilter.toDecibels(rms)
+        let dB = (20 * log10(max(1e-5, rms))) + 90 // Normalized to 0-90 dB range
         
         // --- SNR CALCULATION ---
         // Slowly track the lowest RMS to find the noise floor
