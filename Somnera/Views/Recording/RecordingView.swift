@@ -373,6 +373,8 @@ struct RecordingView: View {
                                 .font(.system(.body, design: .monospaced, weight: .bold))
                                 .foregroundColor(.white)
                         }
+                    }
+                    
                     HStack(spacing: 30) {
                         VStack(alignment: .leading) {
                             Text("INCLINACIÓN").font(.caption2).foregroundColor(.somTextSecondary)
@@ -400,8 +402,11 @@ struct RecordingView: View {
                 
                 Button("Cerrar") { showDebugInfo = false }
                     .foregroundColor(.somAccent)
+                    .padding(.top, 10)
             }
-            .padding()
+            .padding(40)
+            .somGlassStyle(cornerRadius: 30)
+            .padding(20)
         }
     }
     
