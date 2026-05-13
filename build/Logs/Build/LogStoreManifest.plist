@@ -48,6 +48,48 @@
 			<key>uniqueIdentifier</key>
 			<string>23ED4E46-1C92-43D8-8324-1EE595FEFC02</string>
 		</dict>
+		<key>9037F476-D63B-4D99-A4BE-408415A28D3A</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>9037F476-D63B-4D99-A4BE-408415A28D3A.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>W</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>4</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Somnera project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Somnera</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project Somnera with scheme Somnera and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>800380816.63760602</real>
+			<key>timeStoppedRecording</key>
+			<real>800380844.87642896</real>
+			<key>title</key>
+			<string>Building project Somnera with scheme Somnera and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>9037F476-D63B-4D99-A4BE-408415A28D3A</string>
+		</dict>
 		<key>EA71AC91-1AA6-4FA7-9758-C8657BA1A5B8</key>
 		<dict>
 			<key>className</key>
