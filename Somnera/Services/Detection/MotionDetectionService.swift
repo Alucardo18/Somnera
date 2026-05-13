@@ -86,10 +86,15 @@ final class MotionDetectionService {
         guard !varianceBuffer.isEmpty else { return }
         let avg = varianceBuffer.reduce(0, +) / Double(varianceBuffer.count)
         
+        // RE-CALIBRATED THRESHOLDS:
+        // - < 0.005: Nightstand (Mesa rígida con ruido ambiental)
+        // - 0.005 to 0.06: Bed (Colchón/Respiración)
+        // - > 0.08: Handheld
+        
         let newSurface: SurfaceType
         if avg > 0.08 {
             newSurface = .handheld
-        } else if avg < 0.0014 {
+        } else if avg < 0.005 {
             newSurface = .nightstand
         } else {
             newSurface = .bed
