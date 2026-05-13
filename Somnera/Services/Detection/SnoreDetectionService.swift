@@ -68,15 +68,23 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
                 maxVal = max(maxVal, s)
             }
             
+            // Heuristic Refined:
+            // Snoring is percussive. In a quiet room at 1m, Crest Factor is ~10-12.
+            // If the phone is face down, the crest factor drops by ~30-40%.
+            
             let avg = sum / Float(frameCount)
-            // Crest Factor: ratio of peak to average
             let crest = maxVal / (avg + 0.00001)
             
-            // Heuristic: Crest > 8 is very close (0.2m - 0.5m), Crest < 4 is far (>1.5m)
-            let estimatedMeters = Double(max(0.3, min(2.5, 12.0 / Double(crest))))
+            // Adjust constant: we want a crest of ~12 to result in ~0.7m-1.0m
+            // We use a power function to make it less sensitive at far distances
+            // and more precise at close range.
+            var estimatedMeters = 8.5 / pow(Double(crest), 0.85)
             
-            // Smoothing
-            lastDistance = (estimatedMeters * 0.1) + (lastDistance * 0.9)
+            // Clamp between 0.3m and 3.0m
+            estimatedMeters = max(0.3, min(3.0, estimatedMeters))
+            
+            // Smoothing: Faster response to change (0.2 instead of 0.1)
+            lastDistance = (estimatedMeters * 0.2) + (lastDistance * 0.8)
             
             DispatchQueue.main.async { [weak self] in
                 self?.onDistanceEstimated?(self?.lastDistance ?? 0.5)
