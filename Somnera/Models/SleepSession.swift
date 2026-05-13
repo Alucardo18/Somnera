@@ -35,13 +35,17 @@ struct SleepSession: Identifiable, Codable, Hashable {
 
     var snorePercentage: Double {
         guard duration > 0 else { return 0 }
-        return min(100, (snoreDurationSeconds / duration) * 100)
+        // Each snore event captures a ~1s detection window, but snoring episodes are continuous.
+        // We estimate actual snoring time by multiplying event count by a realistic episode factor (5s).
+        // This reflects that a single detection usually means ~5s of real snoring around it.
+        let estimatedSnoreTime = Double(snoreEvents.count) * 5.0
+        return min(100, (estimatedSnoreTime / duration) * 100)
     }
 
     /// 0–100 score: weighted average of % time snoring + intensity + apnea severity
     var snoreScore: Int {
         let percentWeight = snorePercentage * 0.5                    // Máximo 50 pts por duración
-        let dbWeight = Double(peakDecibels / 90.0) * 20              // Máximo 20 pts por volumen
+        let dbWeight = Double(max(0, peakDecibels) / 90.0) * 20     // Máximo 20 pts por volumen
         
         // Cálculo de Severidad de Apnea
         let apneaRiskPoints = apneaEvents.reduce(0.0) { total, event in
@@ -54,17 +58,27 @@ struct SleepSession: Identifiable, Codable, Hashable {
             }
         }
         
+        // Event density bonus: more events = higher score
+        let eventDensityBonus = min(10.0, Double(snoreEvents.count) * 0.5)
         
-        
-        return min(100, Int(percentWeight + dbWeight + apneaRiskPoints))
+        return min(100, Int(percentWeight + dbWeight + apneaRiskPoints + eventDensityBonus))
     }
 
     var apneaEventCount: Int { apneaEvents.count }
 
     var formattedDuration: String {
-        let h = Int(duration) / 3600
-        let m = (Int(duration) % 3600) / 60
-        return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+        let totalSeconds = Int(duration)
+        let h = totalSeconds / 3600
+        let m = (totalSeconds % 3600) / 60
+        let s = totalSeconds % 60
+        
+        if h > 0 {
+            return "\(h)h \(m)m"
+        } else if m > 0 {
+            return "\(m)m \(s)s"
+        } else {
+            return "\(s)s"
+        }
     }
 
     /// Returns the top snoring events (highest confidence * intensity)
@@ -252,9 +266,9 @@ struct SleepSession: Identifiable, Codable, Hashable {
             peakDecibels: 72,
             decibelTimeline: (0..<500).map { _ in Float.random(in: 10...75) },
             surfaceType: "bed",
-            nasalIntensity: 0.12,
-            palatalIntensity: 0.78,
-            lingualIntensity: 0.35
+            nasalIntensity: 0.45,
+            palatalIntensity: 0.15,
+            lingualIntensity: 0.10
         )
     }
 }

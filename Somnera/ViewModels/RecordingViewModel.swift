@@ -373,8 +373,8 @@ final class RecordingViewModel: ObservableObject {
         }
         
         // 4. Digital Twin Spectral Analysis
-        // We analyze any buffer that isn't complete silence (> 30dB)
-        if dB > 30 {
+        // Only analyze during CONFIRMED snore events for accurate anatomical classification
+        if snoreDetector.isSnoring && dB > 30 {
             let spectral = SpectralAnalysisService.shared.analyze(buffer: buffer)
             self.lastSpectralAnalysis = (spectral.nasal, spectral.palatal, spectral.lingual)
             
@@ -428,6 +428,8 @@ final class RecordingViewModel: ObservableObject {
         guard let id = sessionID, let start = sessionStart else { return }
         print("[Somnera] 💾 Guardando sesión: \(id.uuidString)")
         print("[Somnera] 📈 Puntos del Heatmap: \(decibelTimeline.count)")
+        print("[Somnera] 🎙️ Eventos de ronquido: \(currentSnoreEvents.count)")
+        print("[Somnera] 🫁 Intensidades: N:\(nasalSum/Double(max(1,spectralCount))) P:\(palatalSum/Double(max(1,spectralCount))) L:\(lingualSum/Double(max(1,spectralCount)))")
         
         let session = SleepSession(
             id: id,

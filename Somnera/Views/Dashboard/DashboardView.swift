@@ -302,7 +302,8 @@ struct ScoreCardView: View {
             // Stats
             VStack(alignment: .leading, spacing: 10) {
                 statRow(icon: "timer", label: "Duración", value: session.formattedDuration)
-                statRow(icon: "waveform", label: "Roncando", value: String(format: "%.0f%%", session.snorePercentage))
+                statRow(icon: "waveform", label: "Roncando", value: String(format: "%.1f%%", session.snorePercentage))
+                statRow(icon: "number", label: "Eventos", value: "\(session.snoreEvents.count)")
                 statRow(icon: "lungs.fill", label: "Apneas", value: "\(session.apneaEventCount)",
                         color: session.apneaEventCount > 0 ? .somApnea : .somSafe)
             }

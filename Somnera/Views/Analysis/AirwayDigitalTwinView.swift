@@ -2,17 +2,62 @@ import SwiftUI
 
 /// A professional 3D-styled visualization of the human airway with dynamic blueprint callouts.
 struct AirwayDigitalTwinView: View {
-    var nasalIntensity: Double = 0.2
-    var palatalIntensity: Double = 0.8
-    var lingualIntensity: Double = 0.4
+    var nasalIntensity: Double
+    var palatalIntensity: Double
+    var lingualIntensity: Double
     
     @State private var animate = false
     @State private var showDisclaimer = false
+    
+    
+    private var hasData: Bool {
+        (nasalIntensity + palatalIntensity + lingualIntensity) > 0.001
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             header
             
+            if hasData {
+                mainContent
+            } else {
+                noDataView
+            }
+            
+            footer
+        }
+        .padding(20)
+        .somGlassStyle(cornerRadius: 24)
+        .alert("Información Médica", isPresented: $showDisclaimer) {
+            Button("Entendido", role: .cancel) { }
+        } message: {
+            Text("Esta es una representación visual estimada mediante modelos matemáticos y análisis de frecuencia acústica (FFT). Somnera no es un dispositivo médico y esta información no sustituye un estudio de sueño clínico (Polisomnografía) ni un diagnóstico médico profesional.")
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                animate = true
+            }
+        }
+    }
+    
+    private var noDataView: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "waveform.badge.magnifyingglass")
+                .font(.system(size: 30))
+                .foregroundColor(.somTextSecondary.opacity(0.4))
+            Text("Sin datos espectrales")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.somTextSecondary)
+            Text("Los datos se generan durante sesiones con ronquidos detectados.")
+                .font(.system(size: 10))
+                .foregroundColor(.somTextSecondary.opacity(0.6))
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+    }
+    
+    private var mainContent: some View {
             ZStack {
                 // Background Callout Lines (Blueprint effect)
                 CalloutLinesShape(
@@ -64,23 +109,7 @@ struct AirwayDigitalTwinView: View {
                             hotspot(at: CGPoint(x: 62, y: 92), intensity: lingualIntensity, color: .somApnea)
                         }
                         .frame(width: 140, height: 140)
-                    }
-                    .frame(width: 150)
                 }
-            }
-            
-            footer
-        }
-        .padding(20)
-        .somGlassStyle(cornerRadius: 24)
-        .alert("Información Médica", isPresented: $showDisclaimer) {
-            Button("Entendido", role: .cancel) { }
-        } message: {
-            Text("Esta es una representación visual estimada mediante modelos matemáticos y análisis de frecuencia acústica (FFT). Somnera no es un dispositivo médico y esta información no sustituye un estudio de sueño clínico (Polisomnografía) ni un diagnóstico médico profesional.")
-        }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
-                animate = true
             }
         }
     }
