@@ -59,7 +59,7 @@ final class HealthKitService {
             value: HKCategoryValueSleepAnalysis.awake.rawValue,
             start: timestamp,
             end: timestamp.addingTimeInterval(duration),
-            metadata: [HKMetadataKeyDescription: "Somnera: Potential Apnea Detected"]
+            metadata: ["SomneraEventNote": "Potential Apnea Detected"]
         )
         
         try await store.save(sample)
