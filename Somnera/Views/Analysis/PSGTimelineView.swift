@@ -34,13 +34,25 @@ struct PSGTimelineView: View {
                 
                 // Scrubber / Medical Cursor
                 medicalCursor
+                
+                // Debug Data Info (Temporary for diagnosis)
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Text("SAMPLES: \(session.decibelTimeline.count)")
+                            .font(.system(size: 8, weight: .bold, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.4))
+                            .padding(4)
+                    }
+                }
             }
             .frame(height: 120)
             .background(Color.black.opacity(0.2))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                    .stroke(Color.somAccent.opacity(0.3), lineWidth: 2) // High visibility border
             )
             .gesture(
                 DragGesture(minimumDistance: 0)
@@ -59,6 +71,14 @@ struct PSGTimelineView: View {
     private var medicalGrid: some View {
         GeometryReader { geo in
             Path { path in
+                // Horizontal Lines (dB Levels)
+                for i in 0...4 {
+                    let y = geo.size.height * CGFloat(i) * 0.25
+                    path.move(to: CGPoint(x: 0, y: y))
+                    path.addLine(to: CGPoint(x: geo.size.width, y: y))
+                }
+                
+                // Vertical Lines (Time)
                 let hourCount = Int(session.duration / 3600) + 1
                 for i in 0...hourCount {
                     let x = CGFloat(i) * (geo.size.width / CGFloat(max(1, hourCount)))
@@ -66,14 +86,17 @@ struct PSGTimelineView: View {
                     path.addLine(to: CGPoint(x: x, y: geo.size.height))
                 }
             }
-            .stroke(Color.white.opacity(0.05), lineWidth: 0.5)
+            .stroke(Color.white.opacity(0.1), lineWidth: 0.5)
         }
     }
     
     private var snoreWaveLayer: some View {
         GeometryReader { geo in
             Path { path in
-                let stepX = geo.size.width / CGFloat(max(1, session.decibelTimeline.count - 1))
+                let count = session.decibelTimeline.count
+                guard count > 1 else { return }
+                
+                let stepX = geo.size.width / CGFloat(count - 1)
                 path.move(to: CGPoint(x: 0, y: geo.size.height))
                 
                 for (index, db) in session.decibelTimeline.enumerated() {
@@ -87,11 +110,12 @@ struct PSGTimelineView: View {
             }
             .fill(
                 LinearGradient(
-                    colors: [.somAccent.opacity(0.6), .somAccent.opacity(0.1)],
+                    colors: [.somAccent.opacity(0.8), .somAccent.opacity(0.2)],
                     startPoint: .top,
                     endPoint: .bottom
                 )
             )
+            .background(Color.somAccent.opacity(0.05)) // Subtle background for the wave area
         }
     }
     

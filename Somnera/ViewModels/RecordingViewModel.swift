@@ -486,6 +486,7 @@ final class RecordingViewModel: ObservableObject {
         session.apneaEvents = currentApneaEvents
         session.peakDecibels = peakDecibels
         session.decibelTimeline = decibelTimeline
+        print("[Somnera] 📈 Guardando Hipnograma: \(decibelTimeline.count) muestras.")
         session.surfaceType = currentSurface.rawValue
         
         // Anatomical Average: Based on validated SnoreEvents for maximum clinical accuracy.
