@@ -20,31 +20,31 @@ struct TechInsightsView: View {
                         
                         VStack(spacing: 20) {
                             TechCard(
-                                title: "Sentinel V2",
-                                icon: "sensor.tag.radiowaves.forward.fill",
-                                color: .somSafe,
-                                description: "Fusión de sensores que combina el acelerómetro con el micrófono. Detecta micro-vibraciones en el colchón para confirmar eventos respiratorios y filtrar ruidos ambientales externos."
-                            )
-                            
-                            TechCard(
-                                title: "Echo-Location Pasivo",
-                                icon: "waveform.and.mic",
+                                title: "Digital Twin Anatómico",
+                                icon: "person.fill.viewfinder",
                                 color: .somAccent,
-                                description: "Analiza el 'Crest Factor' y la reverberación de la habitación. Somnera estima la distancia entre tú y el iPhone para calibrar la sensibilidad del análisis de sonido automáticamente."
+                                description: "Nuestra IA mapea en tiempo real el origen físico del ronquido (Nasal, Palatal o Lingual) mediante análisis espectral avanzado, creando un gemelo digital de tu vía aérea para un diagnóstico preciso."
                             )
                             
                             TechCard(
-                                title: "Core ML & SoundAnalysis",
+                                title: "Sentinel V2 & Crest Factor",
+                                icon: "shield.checkered",
+                                color: .somSafe,
+                                description: "Algoritmo de vanguardia que aísla la energía percusiva del ronquido humano. Ignoramos inteligentemente ruidos constantes como ventiladores o aire acondicionado mediante el cálculo dinámico del factor de cresta."
+                            )
+                            
+                            TechCard(
+                                title: "Neural Snore Detection",
                                 icon: "brain.head.profile",
                                 color: .somWarning,
-                                description: "Redes neuronales convolucionales ejecutándose 100% en el dispositivo. Identificamos patrones de ronquido y apnea sin enviar ni un solo bit de audio a la nube."
+                                description: "Modelos de Machine Learning optimizados para el chip Apple Silicon. Clasificamos eventos respiratorios con precisión clínica, ejecutando redes neuronales convolucionales 100% offline."
                             )
                             
                             TechCard(
-                                title: "DSP Filter Pipeline",
-                                icon: "wave.3.right",
+                                title: "Pipeline DSP Médico",
+                                icon: "waveform.path.ecg",
                                 color: .somInfo,
-                                description: "Procesamiento Digital de Señales en tiempo real. Aplicamos filtros pasa-altos y normalización dinámica para aislar la frecuencia fundamental del ronquido humano del ruido de fondo."
+                                description: "Procesamiento de señal estandarizado en una escala de 0-90 dB. Generamos un hipnograma de respiración de alta resolución (1s) para visualizar la profundidad y el esfuerzo de cada ciclo respiratorio."
                             )
                         }
                         .padding(.horizontal)
