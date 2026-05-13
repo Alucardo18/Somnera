@@ -379,7 +379,17 @@ final class RecordingViewModel: ObservableObject {
                 self.updateWaveform(rms: capturedRMS)
                 
                 // Digital Twin Live UI Update with Smoothing (EMA Filter)
-                if capturedDB > 35 {
+                let frameCount = Int(buffer.frameLength)
+                var peak: Float = 0
+                if let ptr = buffer.floatChannelData?[0] {
+                    let samples = UnsafeBufferPointer(start: ptr, count: frameCount)
+                    for s in samples { peak = max(peak, abs(s)) }
+                }
+                let crest = capturedRMS > 0 ? peak / capturedRMS : 0
+                
+                // Only react if sound is > 35dB AND it has a non-flat signature (Crest > 2.2)
+                // This filters out steady white noise like fans and AC.
+                if capturedDB > 35 && crest > 2.2 {
                     self.currentNasalIntensity = (self.currentNasalIntensity * 0.7) + (capturedSpectral.nasal * 0.3)
                     self.currentPalatalIntensity = (self.currentPalatalIntensity * 0.7) + (capturedSpectral.palatal * 0.3)
                     self.currentLingualIntensity = (self.currentLingualIntensity * 0.7) + (capturedSpectral.lingual * 0.3)
