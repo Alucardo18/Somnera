@@ -11,7 +11,7 @@ final class MotionDetectionService {
     private let updateInterval = 0.1 // 10Hz for sleep tracking
     
     enum SurfaceType: String {
-        case bed, nightstand, unknown
+        case bed, nightstand, handheld, unknown
     }
     
     // Callbacks
@@ -54,11 +54,25 @@ final class MotionDetectionService {
         let magnitude = sqrt(x*x + y*y + z*z)
         let intensity = abs(magnitude - 1.0)
         
-        // --- CONTINUOUS SURFACE MONITORING ---
-        varianceBuffer.append(intensity)
-        if varianceBuffer.count > calibrationLimit {
-            varianceBuffer.removeFirst()
-            updateSurfaceType()
+        // --- TILT DETECTION (Inclinación) ---
+        // If the phone is NOT flat (Z ~ 1.0 or -1.0), it's likely being held.
+        // We look for a Z-gravity of at least 0.85 to consider it "flat on a surface"
+        let isFlat = abs(z) > 0.85
+        
+        if !isFlat {
+            // Force handheld state immediately if tilted
+            if currentSurface != .handheld {
+                currentSurface = .handheld
+                onSurfaceDetected?(.handheld)
+                varianceBuffer.removeAll() // Clear buffer to avoid stale data
+            }
+        } else {
+            // --- CONTINUOUS SURFACE MONITORING (Only when flat) ---
+            varianceBuffer.append(intensity)
+            if varianceBuffer.count > calibrationLimit {
+                varianceBuffer.removeFirst()
+                updateSurfaceType()
+            }
         }
         
         // Apply a simple low-pass filter to smooth out noise
@@ -72,14 +86,9 @@ final class MotionDetectionService {
         guard !varianceBuffer.isEmpty else { return }
         let avg = varianceBuffer.reduce(0, +) / Double(varianceBuffer.count)
         
-        // Thresholds calibrated for Sentinel V2
-        // - < 0.0012: Nightstand (Superficie rígida, ruido de micro-acelerómetro puro)
-        // - 0.0012 to 0.04: Bed (Vibraciones elásticas de colchón/respiración)
-        // - > 0.08: Handheld / Moving (El usuario tiene el móvil en la mano)
-        
         let newSurface: SurfaceType
         if avg > 0.08 {
-            newSurface = .unknown // Representa "En movimiento/Mano"
+            newSurface = .handheld
         } else if avg < 0.0014 {
             newSurface = .nightstand
         } else {
