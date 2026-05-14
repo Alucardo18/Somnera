@@ -1,96 +1,84 @@
 import HealthKit
 
-/// Manages all HealthKit read/write operations for Somnera.
 final class HealthKitService {
-
-    private let store = HKHealthStore()
-
-    private var sleepType: HKCategoryType {
-        HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+    static let shared = HealthKitService()
+    private let healthStore = HKHealthStore()
+    
+    private init() {}
+    
+    var isAvailable: Bool {
+        HKHealthStore.isHealthDataAvailable()
     }
-
-    // MARK: - Authorization
-
-    var isAvailable: Bool { HKHealthStore.isHealthDataAvailable() }
-
-    func requestAuthorization() async throws {
-        guard isAvailable else { return }
-        let share: Set<HKSampleType> = [sleepType]
-        let read:  Set<HKObjectType> = [sleepType]
-        try await store.requestAuthorization(toShare: share, read: read)
-    }
-
-    // MARK: - Write Sleep Session
-
-    /// Writes an inBed + asleepUnspecified sample for the session duration.
-    func saveSleepSession(start: Date, end: Date, apneaEventCount: Int, avgStability: Double) async throws {
-        guard isAvailable else { return }
-
-        let tz = TimeZone.current.identifier
-        let metadata: [String: Any] = [
-            HKMetadataKeyTimeZone: tz,
-            "SomneraApneaCount": apneaEventCount,
-            "SomneraAvgStability": String(format: "%.2f", avgStability)
+    
+    func requestAuthorization() async throws -> Bool {
+        guard isAvailable else {
+            throw HKError(.errorHealthDataUnavailable)
+        }
+        
+        // Tipos de datos que queremos LEER (Read)
+        let readTypes: Set<HKObjectType> = [
+            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
+            HKObjectType.quantityType(forIdentifier: .heartRate)!,
+            HKObjectType.quantityType(forIdentifier: .oxygenSaturation)!
         ]
-
-        let inBed = HKCategorySample(
-            type: sleepType,
-            value: HKCategoryValueSleepAnalysis.inBed.rawValue,
-            start: start, end: end,
-            metadata: metadata
-        )
-
-        let asleep = HKCategorySample(
-            type: sleepType,
-            value: HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue,
-            start: start, end: end,
-            metadata: metadata
-        )
-
-        try await store.save([inBed, asleep])
+        
+        // Tipos de datos que queremos ESCRIBIR (Write)
+        let writeTypes: Set<HKSampleType> = [
+            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+        ]
+        
+        do {
+            try await healthStore.requestAuthorization(toShare: writeTypes, read: readTypes)
+            return true
+        } catch {
+            print("[Somnera] ❌ Error solicitando autorización de HealthKit: \(error.localizedDescription)")
+            throw error
+        }
     }
-
-    /// Records a specific apnea event as a momentary sleep interruption.
-    func saveApneaEvent(at timestamp: Date, duration: TimeInterval) async throws {
-        guard isAvailable else { return }
+    
+    func getAuthorizationStatus() -> HKAuthorizationStatus {
+        healthStore.authorizationStatus(for: HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!)
+    }
+    
+    // MARK: - Writing Data
+    
+    func saveSleepSession(start: Date, end: Date, apneaEventCount: Int, avgStability: Double) async throws {
+        guard getAuthorizationStatus() == .sharingAuthorized else { return }
+        
+        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+        let metadata: [String: Any] = [
+            "SomneraApneaEvents": apneaEventCount,
+            "SomneraBreathingStability": avgStability
+        ]
         
         let sample = HKCategorySample(
             type: sleepType,
-            value: HKCategoryValueSleepAnalysis.awake.rawValue,
-            start: timestamp,
-            end: timestamp.addingTimeInterval(duration),
-            metadata: ["SomneraEventNote": "Potential Apnea Detected"]
+            value: HKCategoryValueSleepAnalysis.asleep.rawValue,
+            start: start,
+            end: end,
+            metadata: metadata
         )
         
-        try await store.save(sample)
+        try await healthStore.save(sample)
+        print("[Somnera] ✅ Sesión de sueño guardada en HealthKit (\(apneaEventCount) apneas)")
     }
-
-    // MARK: - Read Recent Sessions
-
-    /// Returns HK sleep samples for the last 7 days.
-    func fetchRecentSleepSamples() async throws -> [HKCategorySample] {
-        guard isAvailable else { return [] }
-
-        let predicate = HKQuery.predicateForSamples(
-            withStart: Calendar.current.date(byAdding: .day, value: -7, to: Date()),
-            end: Date(),
-            options: .strictStartDate
+    
+    func saveApneaEvent(at date: Date, duration: Double) async throws {
+        guard getAuthorizationStatus() == .sharingAuthorized else { return }
+        
+        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+        let start = date.addingTimeInterval(-duration)
+        
+        // Guardamos la apnea como un periodo de "despierto" o interrupción del sueño
+        let sample = HKCategorySample(
+            type: sleepType,
+            value: HKCategoryValueSleepAnalysis.awake.rawValue,
+            start: start,
+            end: date,
+            metadata: ["Notes": "Evento de Apnea detectado por Somnera"]
         )
-
-        return try await withCheckedThrowingContinuation { continuation in
-            let query = HKSampleQuery(
-                sampleType: sleepType,
-                predicate: predicate,
-                limit: HKObjectQueryNoLimit,
-                sortDescriptors: [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
-            ) { _, samples, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(returning: (samples as? [HKCategorySample]) ?? [])
-                }
-            }
-            store.execute(query)
-        }
+        
+        try await healthStore.save(sample)
+        print("[Somnera] ✅ Evento de apnea guardado en HealthKit")
     }
 }

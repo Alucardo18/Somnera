@@ -9,7 +9,7 @@ final class DashboardViewModel: ObservableObject {
     @Published var sessionToNavigate: SleepSession? = nil // Nueva propiedad para auto-navegación
 
     private let storageService = SessionStorageService.shared
-    private let healthKitService = HealthKitService()
+    private let healthKitService = HealthKitService.shared
     private let analyticsService = SessionAnalyticsService.shared
 
     // MARK: - Load

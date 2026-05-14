@@ -77,6 +77,7 @@
 		9534FA9D5926D2DB79C4FD1C /* SleepSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepSession.swift; sourceTree = "<group>"; };
 		9F2505D2FD600CF0C37C77EA /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
 		A3A934A6A37ACF0D4EF20C62 /* RecordingActiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingActiveView.swift; sourceTree = "<group>"; };
+		A57C07929CAE288962DFDA04 /* SomneraApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SomneraApp.entitlements; sourceTree = "<group>"; };
 		ABCCF241CD3C994C70F32EAF /* CreatorMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatorMessageView.swift; sourceTree = "<group>"; };
 		B0880F6CD8EAE1F05C7F7C65 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		B4C0809D82B808ADD30C22C5 /* SleepTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepTimelineView.swift; sourceTree = "<group>"; };
@@ -130,6 +131,7 @@
 				C3E86F3D5316977DDE2DD56B /* Assets.xcassets */,
 				76B9C440F7BFC784E1C8C4D6 /* Info.plist */,
 				57EE0EB93E7FFF684806E21B /* Somnera.entitlements */,
+				A57C07929CAE288962DFDA04 /* SomneraApp.entitlements */,
 				18F8753C37E0A8EBA772DD30 /* SomneraApp.swift */,
 				0F4FE4C41DE5BB98718C6840 /* Core */,
 				8D9C70FD5DF967DD0918359B /* Models */,

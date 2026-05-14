@@ -54,7 +54,7 @@ final class RecordingViewModel: ObservableObject {
     private let motionDetector = MotionDetectionService.shared
     private let sessionStorage = SessionStorageService.shared
     private let audioFileService = AudioFileService.shared
-    private let healthKitService = HealthKitService()
+    private let healthKitService = HealthKitService.shared
     
     // MARK: - Session State
     private var sessionID: UUID?

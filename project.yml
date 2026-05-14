@@ -46,9 +46,10 @@ targets:
           - UIInterfaceOrientationPortrait
         LSRequiresIPhoneOS: true
         CFBundleDisplayName: Somnera
-
+ 
     entitlements:
       path: Somnera/Somnera.entitlements
+
     settings:
       base:
         PRODUCT_NAME: Somnera
@@ -58,7 +59,6 @@ targets:
     dependencies:
       []                               # No external dependencies — all Apple frameworks
     capabilities:
-      healthKit: {}
       backgroundModes:
         modes:
           - audio

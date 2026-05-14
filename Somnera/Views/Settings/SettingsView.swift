@@ -69,8 +69,20 @@ struct SettingsView: View {
                         }
                         .onChange(of: healthKitEnabled) { _, enabled in
                             if enabled { 
-                                showHealthKitSheet = true 
                                 appState.highlightHealthSetting = false
+                                Task {
+                                    do {
+                                        let success = try await HealthKitService.shared.requestAuthorization()
+                                        await MainActor.run {
+                                            appState.healthKitAuthorized = success
+                                        }
+                                    } catch {
+                                        await MainActor.run {
+                                            healthKitEnabled = false
+                                            appState.healthKitAuthorized = false
+                                        }
+                                    }
+                                }
                             }
                         }
 
