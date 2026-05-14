@@ -59,6 +59,32 @@ struct RecordingView: View {
             if showDebugInfo {
                 debugOverlayView
             }
+            
+            // MARK: - Sleep Shield Overlay
+            if vm.isDimmed {
+                ZStack {
+                    Color.black
+                        .ignoresSafeArea()
+                    
+                    VStack(spacing: 20) {
+                        Image(systemName: "moon.stars.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(.somAccent.opacity(0.1))
+                        
+                        Text("Modo Ahorro Activo")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .foregroundColor(.somTextSecondary.opacity(0.1))
+                    }
+                }
+                .transition(.opacity)
+                .onTapGesture {
+                    vm.wakeUp()
+                }
+            }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            vm.resetInactivityTimer()
         }
         .alert("¿Terminar sesión?", isPresented: $showStopAlert) {
             Button("Cancelar", role: .cancel) {}

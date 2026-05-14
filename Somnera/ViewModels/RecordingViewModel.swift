@@ -39,6 +39,13 @@ final class RecordingViewModel: ObservableObject {
     @Published var countdownRemaining: Int = 0
     @Published var selectedDelayMinutes: Int = 0
     
+    // Sleep Shield (Screen Management)
+    @Published var isDimmed: Bool = false
+    @Published var isProximityCovered: Bool = false
+    private var lastInteractionDate = Date()
+    private var originalBrightness: CGFloat = UIScreen.main.brightness
+    private var screenDimmerTask: Task<Void, Never>?
+    
     // MARK: - Services
     private let audioCapture = AudioCaptureService.shared
     private let snoreDetector = SnoreDetectionService.shared
@@ -86,6 +93,66 @@ final class RecordingViewModel: ObservableObject {
     init() {
         setupInterruptionObservers()
         setupBatteryMonitoring()
+        setupProximityMonitoring()
+        resetInactivityTimer()
+    }
+    
+    private func setupProximityMonitoring() {
+        UIDevice.current.isProximityMonitoringEnabled = true
+        
+        NotificationCenter.default.addObserver(
+            forName: UIDevice.proximityStateDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleProximityChange()
+        }
+    }
+    
+    private func handleProximityChange() {
+        let isCovered = UIDevice.current.proximityState
+        isProximityCovered = isCovered
+        
+        if isCovered {
+            // Screen is physically off via iOS proximity logic, but we track state
+            print("🛡️ Sleep Shield: Sensor cubierto (Pantalla física OFF)")
+        } else {
+            print("🛡️ Sleep Shield: Sensor liberado")
+            wakeUp()
+        }
+    }
+
+    func resetInactivityTimer() {
+        lastInteractionDate = Date()
+        if isDimmed { wakeUp() }
+        
+        screenDimmerTask?.cancel()
+        screenDimmerTask = Task {
+            // Wait 2 minutes (120 seconds) of inactivity
+            try? await Task.sleep(nanoseconds: 120_000_000_000)
+            if !Task.isCancelled && (isRecording || isWaiting) {
+                await MainActor.run { enterDimmedState() }
+            }
+        }
+    }
+
+    private func enterDimmedState() {
+        guard !isDimmed else { return }
+        print("🌙 Sleep Shield: Entrando en modo ahorro (2 min inactividad)")
+        originalBrightness = UIScreen.main.brightness
+        UIScreen.main.brightness = 0.01 // Minimum brightness
+        isDimmed = true
+    }
+
+    func wakeUp() {
+        guard isDimmed else { 
+            lastInteractionDate = Date()
+            return 
+        }
+        print("☀️ Sleep Shield: Despertando pantalla")
+        UIScreen.main.brightness = originalBrightness
+        isDimmed = false
+        resetInactivityTimer()
     }
     
     private func setupBatteryMonitoring() {
@@ -267,6 +334,11 @@ final class RecordingViewModel: ObservableObject {
         isWaiting = false
         isSetup = true
         timerTask?.cancel()
+        screenDimmerTask?.cancel()
+        
+        // Restore screen
+        wakeUp()
+        UIDevice.current.isProximityMonitoringEnabled = false
 
         // Stop services
         audioCapture.stop()
