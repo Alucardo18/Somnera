@@ -4,6 +4,7 @@ struct SettingsView: View {
     @AppStorage("somnera_healthkit_enabled") private var healthKitEnabled = false
     @AppStorage("somnera_notifications_enabled") private var notificationsEnabled = true
     @AppStorage("somnera_sensitivity") private var sensitivity: Double = 1.0
+    @AppStorage(SomneraConstants.Storage.maxSessionsKey) private var maxSessions: Int = 7
 
     @State private var showHealthKitSheet = false
     @State private var showDeleteAlert = false
@@ -63,14 +64,41 @@ struct SettingsView: View {
 
                     // Storage
                     Section {
-                        HStack {
-                            Label("Sesiones guardadas", systemImage: "internaldrive.fill")
-                                .foregroundColor(.somTextPrimary)
-                            Spacer()
-                            Text("Máx. 7")
-                                .font(.caption)
-                                .foregroundColor(.somTextSecondary)
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Label("Límite de Historial", systemImage: "internaldrive.fill")
+                                    .foregroundColor(.somTextPrimary)
+                                Spacer()
+                                Text("\(maxSessions) sesiones")
+                                    .font(.system(.subheadline, design: .rounded).bold())
+                                    .foregroundColor(.somAccent)
+                            }
+                            
+                            Slider(value: Binding(
+                                get: { Double(maxSessions) },
+                                set: { maxSessions = Int($0) }
+                            ), in: 1...31, step: 1)
+                            .tint(.somAccent)
+                            
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: "info.circle.fill")
+                                    .font(.caption)
+                                    .foregroundColor(maxSessions > 20 ? .somApnea : .somTextSecondary)
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(storageEstimateText)
+                                        .font(.caption2.bold())
+                                        .foregroundColor(maxSessions > 20 ? .somApnea : .somTextPrimary)
+                                    
+                                    Text("Somnera eliminará automáticamente la sesión más antigua al superar este límite para proteger tu espacio.")
+                                        .font(.system(size: 10))
+                                        .foregroundColor(.somTextSecondary)
+                                }
+                            }
+                            .padding(.top, 4)
                         }
+                        .padding(.vertical, 8)
+
                         HStack {
                             Label("Formato de audio", systemImage: "waveform")
                                 .foregroundColor(.somTextPrimary)
@@ -140,6 +168,17 @@ struct SettingsView: View {
         case ..<1.15: return "Media (Recomendado)"
         case ..<1.25: return "Alta"
         default:      return "Muy Alta"
+        }
+    }
+
+    private var storageEstimateText: String {
+        let mbPerSession = 120 // Estimado para 8h en AAC 32kbps
+        let totalMB = maxSessions * mbPerSession
+        if totalMB >= 1024 {
+            let gb = Double(totalMB) / 1024.0
+            return "Espacio estimado: \(String(format: "%.1f", gb)) GB"
+        } else {
+            return "Espacio estimado: \(totalMB) MB"
         }
     }
 

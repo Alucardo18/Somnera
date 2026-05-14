@@ -39,6 +39,7 @@ enum SomneraConstants {
     // MARK: - Storage
     enum Storage {
         static let maxSessions: Int         = 7
+        static let maxSessionsKey           = "somnera_max_sessions"
         static let sessionsFolderName       = "SomneraSessions"
         static let audioExtension           = "m4a"
     }

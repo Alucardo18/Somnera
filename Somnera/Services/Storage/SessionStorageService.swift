@@ -8,7 +8,11 @@ final class SessionStorageService {
     
     let container: ModelContainer?
     private let audioFileService = AudioFileService()
-    private let maxSessions = SomneraConstants.Storage.maxSessions
+    
+    private var maxSessions: Int {
+        let savedLimit = UserDefaults.standard.integer(forKey: SomneraConstants.Storage.maxSessionsKey)
+        return savedLimit > 0 ? savedLimit : SomneraConstants.Storage.maxSessions
+    }
 
     private init() {
         do {
