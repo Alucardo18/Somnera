@@ -6,7 +6,7 @@
 	<integer>12</integer>
 	<key>logs</key>
 	<dict>
-		<key>8FE2CA6B-D396-4FF1-8B28-1C9486F78CE2</key>
+		<key>42702CB9-6C00-41E6-8435-EB9A5300757C</key>
 		<dict>
 			<key>className</key>
 			<string>IDECommandLineBuildLog</string>
@@ -15,7 +15,7 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
 			<key>fileName</key>
-			<string>8FE2CA6B-D396-4FF1-8B28-1C9486F78CE2.xcactivitylog</string>
+			<string>42702CB9-6C00-41E6-8435-EB9A5300757C.xcactivitylog</string>
 			<key>hasPrimaryLog</key>
 			<true/>
 			<key>primaryObservable</key>
@@ -25,11 +25,11 @@
 				<key>totalNumberOfAnalyzerIssues</key>
 				<integer>0</integer>
 				<key>totalNumberOfErrors</key>
-				<integer>4</integer>
+				<integer>3</integer>
 				<key>totalNumberOfTestFailures</key>
 				<integer>0</integer>
 				<key>totalNumberOfWarnings</key>
-				<integer>4</integer>
+				<integer>0</integer>
 			</dict>
 			<key>schemeIdentifier-containerName</key>
 			<string>Somnera project</string>
@@ -40,15 +40,15 @@
 			<key>signature</key>
 			<string>Building project Somnera with scheme Somnera and configuration Debug</string>
 			<key>timeStartedRecording</key>
-			<real>800388728.37265503</real>
+			<real>800399223.18713605</real>
 			<key>timeStoppedRecording</key>
-			<real>800388732.39787495</real>
+			<real>800399229.14196098</real>
 			<key>title</key>
 			<string>Building project Somnera with scheme Somnera and configuration Debug</string>
 			<key>uniqueIdentifier</key>
-			<string>8FE2CA6B-D396-4FF1-8B28-1C9486F78CE2</string>
+			<string>42702CB9-6C00-41E6-8435-EB9A5300757C</string>
 		</dict>
-		<key>A3BF1D6A-2310-481A-A135-5ABF494F954F</key>
+		<key>B3431FB0-08D0-491B-8FAF-A2B5256A7CA2</key>
 		<dict>
 			<key>className</key>
 			<string>IDECommandLineBuildLog</string>
@@ -57,49 +57,7 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
 			<key>fileName</key>
-			<string>A3BF1D6A-2310-481A-A135-5ABF494F954F.xcactivitylog</string>
-			<key>hasPrimaryLog</key>
-			<true/>
-			<key>primaryObservable</key>
-			<dict>
-				<key>highLevelStatus</key>
-				<string>W</string>
-				<key>totalNumberOfAnalyzerIssues</key>
-				<integer>0</integer>
-				<key>totalNumberOfErrors</key>
-				<integer>0</integer>
-				<key>totalNumberOfTestFailures</key>
-				<integer>0</integer>
-				<key>totalNumberOfWarnings</key>
-				<integer>4</integer>
-			</dict>
-			<key>schemeIdentifier-containerName</key>
-			<string>Somnera project</string>
-			<key>schemeIdentifier-schemeName</key>
-			<string>Somnera</string>
-			<key>schemeIdentifier-sharedScheme</key>
-			<integer>1</integer>
-			<key>signature</key>
-			<string>Building project Somnera with scheme Somnera and configuration Debug</string>
-			<key>timeStartedRecording</key>
-			<real>800388756.13405204</real>
-			<key>timeStoppedRecording</key>
-			<real>800388763.10796297</real>
-			<key>title</key>
-			<string>Building project Somnera with scheme Somnera and configuration Debug</string>
-			<key>uniqueIdentifier</key>
-			<string>A3BF1D6A-2310-481A-A135-5ABF494F954F</string>
-		</dict>
-		<key>AE894C3C-5E7B-470D-BAC9-D19CB5837197</key>
-		<dict>
-			<key>className</key>
-			<string>IDECommandLineBuildLog</string>
-			<key>documentTypeString</key>
-			<string>&lt;nil&gt;</string>
-			<key>domainType</key>
-			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
-			<key>fileName</key>
-			<string>AE894C3C-5E7B-470D-BAC9-D19CB5837197.xcactivitylog</string>
+			<string>B3431FB0-08D0-491B-8FAF-A2B5256A7CA2.xcactivitylog</string>
 			<key>hasPrimaryLog</key>
 			<true/>
 			<key>primaryObservable</key>
@@ -109,11 +67,11 @@
 				<key>totalNumberOfAnalyzerIssues</key>
 				<integer>0</integer>
 				<key>totalNumberOfErrors</key>
-				<integer>2</integer>
+				<integer>6</integer>
 				<key>totalNumberOfTestFailures</key>
 				<integer>0</integer>
 				<key>totalNumberOfWarnings</key>
-				<integer>2</integer>
+				<integer>0</integer>
 			</dict>
 			<key>schemeIdentifier-containerName</key>
 			<string>Somnera project</string>
@@ -124,13 +82,55 @@
 			<key>signature</key>
 			<string>Building project Somnera with scheme Somnera and configuration Debug</string>
 			<key>timeStartedRecording</key>
-			<real>800388736.83653104</real>
+			<real>800398750.07057297</real>
 			<key>timeStoppedRecording</key>
-			<real>800388739.23819304</real>
+			<real>800398754.84767604</real>
 			<key>title</key>
 			<string>Building project Somnera with scheme Somnera and configuration Debug</string>
 			<key>uniqueIdentifier</key>
-			<string>AE894C3C-5E7B-470D-BAC9-D19CB5837197</string>
+			<string>B3431FB0-08D0-491B-8FAF-A2B5256A7CA2</string>
+		</dict>
+		<key>FC54F95E-F377-4781-973B-3F1E947C99CD</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>FC54F95E-F377-4781-973B-3F1E947C99CD.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>E</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>3</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>Somnera project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>Somnera</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Building project Somnera with scheme Somnera and configuration Debug</string>
+			<key>timeStartedRecording</key>
+			<real>800398759.151443</real>
+			<key>timeStoppedRecording</key>
+			<real>800398762.74012494</real>
+			<key>title</key>
+			<string>Building project Somnera with scheme Somnera and configuration Debug</string>
+			<key>uniqueIdentifier</key>
+			<string>FC54F95E-F377-4781-973B-3F1E947C99CD</string>
 		</dict>
 	</dict>
 </dict>

@@ -116,29 +116,28 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
 
     func request(_ request: SNRequest, didProduce result: SNResult) {
         guard
-            let result = result as? SNClassificationResult,
-            let snoreClass = result.classifications.first(where: {
-                // Inclusive check: matches "snore" (custom) and "snoring" (Apple V1)
-                let label = $0.identifier.lowercased()
-                return label.contains("snore") || label.contains("snoring")
-            })
+            let result = result as? SNClassificationResult
         else {
             self.isSnoring = false
             return
         }
+
+        let snoreClass = result.classifications.first(where: {
+            // Inclusive check: matches "snore" (custom) and "snoring" (Apple V1)
+            let label = $0.identifier.lowercased()
+            return label.contains("snore") || label.contains("snoring")
+        })
         
         // Use the session-specific threshold
-        if snoreClass.confidence >= self.confidenceThreshold {
+        if let snore = snoreClass, snore.confidence >= self.confidenceThreshold {
             self.isSnoring = true
-            // print("[Somnera] 🎤 IA Detectó: \(snoreClass.identifier) (\(Int(snoreClass.confidence*100))%)")
+            let offset = sessionStart.map { Date().timeIntervalSince($0) } ?? 0
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.onSnoreDetected?(snore.confidence, offset, self.lastDistance)
+            }
         } else {
             self.isSnoring = false
-        }
-
-        let offset = sessionStart.map { Date().timeIntervalSince($0) } ?? 0
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.onSnoreDetected?(snoreClass.confidence, offset, self.lastDistance)
         }
     }
 

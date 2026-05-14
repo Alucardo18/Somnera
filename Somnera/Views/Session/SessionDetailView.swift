@@ -54,6 +54,11 @@ struct SessionDetailView: View {
                         }
                     )
                     
+                    // Audio player - MOVED HERE for better context
+                    if session.audioFilePath != nil {
+                        audioPlayerSection
+                    }
+                    
                     AirwayDigitalTwinView(
                         nasalIntensity: session.snoreEvents.first(where: { abs($0.offsetSeconds - playbackTime) < 2.0 })?.nasalIntensity ?? session.nasalIntensity,
                         palatalIntensity: session.snoreEvents.first(where: { abs($0.offsetSeconds - playbackTime) < 2.0 })?.palatalIntensity ?? session.palatalIntensity,
@@ -101,10 +106,6 @@ struct SessionDetailView: View {
                         }
                     }
 
-                    // Audio player
-                    if session.audioFilePath != nil {
-                        audioPlayerSection
-                    }
 
                     disclaimerView.padding(.bottom, 32)
                 }

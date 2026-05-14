@@ -182,8 +182,8 @@ struct PSGTimelineView: View {
             // Old Scale: -60 to -10
             normalized = (db - (-60)) / 50
         } else {
-            // New Scale: 30 to 80
-            normalized = (db - 30) / 50
+            // New Scale: 20 to 80
+            normalized = (db - 20) / 60
         }
         return CGFloat(max(0.05, min(1.0, normalized)) * 120 * 0.8) // Relative to canvas height
     }

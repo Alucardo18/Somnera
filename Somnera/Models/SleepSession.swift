@@ -79,8 +79,34 @@ final class SleepSession: Identifiable {
 
     var snorePercentage: Double {
         guard duration > 0 else { return 0 }
-        let totalSnoreSeconds = snoreEvents.reduce(0.0) { $0 + $1.durationSeconds }
-        return min(100, (totalSnoreSeconds / duration) * 100)
+        
+        // Use a more robust overlapping interval merge to calculate real snore duration
+        let sortedEvents = snoreEvents.sorted { $0.offsetSeconds < $1.offsetSeconds }
+        var mergedDuration: Double = 0
+        var currentStart: Double = -1
+        var currentEnd: Double = -1
+        
+        for event in sortedEvents {
+            let start = event.offsetSeconds
+            let end = event.offsetSeconds + event.durationSeconds
+            
+            if start > currentEnd {
+                // New interval
+                mergedDuration += (currentEnd - currentStart)
+                currentStart = start
+                currentEnd = end
+            } else {
+                // Overlapping interval - extend end if needed
+                currentEnd = max(currentEnd, end)
+            }
+        }
+        
+        // Add last interval
+        if currentStart != -1 {
+            mergedDuration += (currentEnd - currentStart)
+        }
+        
+        return min(100, (mergedDuration / duration) * 100)
     }
 
     var snoreScore: Int {

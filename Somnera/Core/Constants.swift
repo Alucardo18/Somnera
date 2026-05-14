@@ -21,7 +21,7 @@ enum SomneraConstants {
 
     // MARK: - Snore Detection
     enum Snore {
-        static let confidenceThreshold: Double = 0.55
+        static let confidenceThreshold: Double = 0.70
         static let windowDurationSeconds: Float64 = 1.0
         static let overlapFactor: Double = 0.5
         static let minDurationSeconds: Double = 0.4    // ignore micro-triggers

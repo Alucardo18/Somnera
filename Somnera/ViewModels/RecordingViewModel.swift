@@ -100,9 +100,9 @@ final class RecordingViewModel: ObservableObject {
     @AppStorage("somnera_sensitivity") private var userSensitivity: Double = 1.0
     
     // Thread-safe snapshots for the audio processing loop
-    private var sessionConfidenceThreshold: Double = 0.55
-    private var sessionDBThreshold: Float = 30.0
-    private var sessionCrestThreshold: Float = 2.0
+    private var sessionConfidenceThreshold: Double = 0.70
+    private var sessionDBThreshold: Float = 35.0
+    private var sessionCrestThreshold: Float = 2.5
     private var sessionApneaThreshold: Float = 0.0006
     
     private var sensitivityMultiplier: Double {
@@ -316,8 +316,8 @@ final class RecordingViewModel: ObservableObject {
                 // Capture snapshots on MainActor before entering the audio thread
                 let multiplier = self.sensitivityMultiplier
                 sessionConfidenceThreshold = SomneraConstants.Snore.confidenceThreshold * multiplier
-                sessionDBThreshold = Float(30.0 * multiplier)
-                sessionCrestThreshold = Float(2.0 * multiplier)
+                sessionDBThreshold = Float(35.0 * multiplier)
+                sessionCrestThreshold = Float(2.5 * multiplier)
                 sessionApneaThreshold = SomneraConstants.Apnea.silenceRMSThreshold * Float(multiplier)
                 
                 print("[Somnera] 🎯 Umbrales de sesión: dB > \(Int(sessionDBThreshold)), Crest > \(String(format: "%.1f", sessionCrestThreshold)), IA > \(Int(sessionConfidenceThreshold*100))%")
@@ -441,7 +441,7 @@ final class RecordingViewModel: ObservableObject {
             let now = Date()
             // 1. Metrics
             let rms = DSPFilter.rms(of: buffer) ?? 0.0001
-            let dB = (20 * log10(max(1e-5, rms))) + 90 // Normalized to 0-90 dB range
+            let dB = (20 * log10(max(1e-5, rms))) + 80 // Normalized to 0-80 dB range
             
             // Track peak on processing thread to ensure we don't lose it during UI throttling
             sessionPeakDecibels = max(sessionPeakDecibels, dB)
