@@ -4,6 +4,7 @@ struct SynergyView: View {
     @AppStorage("somnera_synergy_onboarded") var onboarded = false
     @AppStorage("somnera_healthkit_enabled") var healthKitEnabled = false
     @State private var showIntro = false
+    @State private var showDetails = false
     @ObservedObject var viewModel: DashboardViewModel
     @EnvironmentObject var appState: AppState
     
@@ -63,7 +64,7 @@ struct SynergyView: View {
     
     private var activeState: some View {
         ScrollView {
-            VStack(spacing: 25) {
+            VStack(spacing: 30) {
                 // Estado de Conexión (Convertido en Botón de Navegación)
                 if !healthKitEnabled {
                     Button {
@@ -76,56 +77,96 @@ struct SynergyView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 
-                // Próximamente: Análisis Bio-Informáticos
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Análisis Biométrico")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    
-                    VStack(spacing: 12) {
-                        SynergyFeatureRow(
-                            icon: "heart.text.square",
-                            title: "Correlación de Pulso",
-                            status: "Pendiente de Sesión",
-                            description: "Visualiza picos de estrés cardíaco alineados con tus ronquidos."
-                        )
-                        
-                        SynergyFeatureRow(
-                            icon: "lungs",
-                            title: "Oxigenación SpO2",
-                            status: "Configurar HealthKit",
-                            description: "Importa caídas de oxígeno para validar eventos de apnea."
-                        )
-                        
-                        SynergyFeatureRow(
-                            icon: "figure.run",
-                            title: "Impacto de Actividad",
-                            status: "Listo",
-                            description: "Analiza cómo tu ejercicio diario mejora tu respiración nocturna."
-                        )
-                    }
-                }
-                .padding(.horizontal)
+                // Visual Indicator of Synergy
+                SynergyEcosystemGraphic()
                 
-                // Info Card
-                VStack(alignment: .leading, spacing: 12) {
-                    Label("Sinergia Somnera", systemImage: "info.circle.fill")
-                        .font(.headline)
-                        .foregroundColor(.somAccent)
-                    
-                    Text("Los algoritmos de Somnera se vuelven un 40% más confiables cuando se combinan con la frecuencia cardíaca en reposo.")
-                        .font(.caption)
-                        .foregroundColor(.somTextSecondary)
+                // Info Card (Entry point to details)
+                Button {
+                    showDetails = true
+                } label: {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Label("Sinergia Somnera", systemImage: "info.circle.fill")
+                                .font(.headline)
+                                .foregroundColor(.somAccent)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption.bold())
+                                .foregroundColor(.somAccent.opacity(0.5))
+                        }
+                        
+                        Text("Descubre cómo tu Apple Watch transforma los datos de audio en diagnósticos biológicos precisos.")
+                            .font(.subheadline)
+                            .foregroundColor(.somTextSecondary)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .padding(24)
+                    .background(Color.somSurface)
+                    .cornerRadius(24)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(Color.somAccent.opacity(0.2), lineWidth: 1)
+                    )
                 }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.somSurface.opacity(0.5))
-                .cornerRadius(20)
+                .buttonStyle(PlainButtonStyle())
                 .padding(.horizontal)
             }
             .padding(.top)
             .animation(.spring(), value: healthKitEnabled)
         }
+        .sheet(isPresented: $showDetails) {
+            SynergyDetailView()
+        }
+    }
+}
+
+struct SynergyEcosystemGraphic: View {
+    var body: some View {
+        VStack(spacing: 20) {
+            ZStack {
+                Circle()
+                    .stroke(Color.somAccent.opacity(0.1), lineWidth: 2)
+                    .frame(width: 200, height: 200)
+                
+                // Icons orbiting
+                Group {
+                    SynergyIconCircle(icon: "heart.fill", color: .somAccent, angle: -45)
+                    SynergyIconCircle(icon: "lungs.fill", color: .somSafe, angle: 180)
+                    SynergyIconCircle(icon: "applewatch", color: .white, angle: 90)
+                }
+                
+                // Central Somnera Icon
+                Image(systemName: "sparkles")
+                    .font(.system(size: 40))
+                    .foregroundColor(.somAccent)
+                    .padding(25)
+                    .background(Circle().fill(Color.somSurface))
+                    .shadow(color: .somAccent.opacity(0.3), radius: 20)
+            }
+            .frame(height: 220)
+            
+            Text("Tu ecosistema está listo.")
+                .font(.caption.bold())
+                .foregroundColor(.somTextSecondary)
+                .tracking(2)
+                .textCase(.uppercase)
+        }
+        .padding(.vertical)
+    }
+}
+
+struct SynergyIconCircle: View {
+    let icon: String
+    let color: Color
+    let angle: Double
+    
+    var body: some View {
+        Image(systemName: icon)
+            .font(.caption)
+            .foregroundColor(color)
+            .padding(10)
+            .background(Circle().fill(Color.somSurface))
+            .offset(x: 100 * cos(angle * .pi / 180), y: 100 * sin(angle * .pi / 180))
     }
 }
 

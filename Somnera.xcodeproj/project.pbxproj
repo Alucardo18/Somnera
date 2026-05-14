@@ -13,6 +13,7 @@
 		16BB5ED902AACC2371AC9BC0 /* ApneaDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134D5724A2BD322053DD0E27 /* ApneaDetectionService.swift */; };
 		1AF06821B7A87503FC9896D9 /* SnoreDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDCA8B8718033F1E9CB041C /* SnoreDetectionService.swift */; };
 		1E17734C1692790F8335D82D /* TechInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73BD85843E37370605B41E3 /* TechInsightsView.swift */; };
+		2C3D1E78CCB6047DF0296A7C /* SynergyDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D290828FE3AE170D4715CD5 /* SynergyDetailView.swift */; };
 		2E64EA16A40C97996C5677FD /* AudioPlaybackService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FB8ACA65890D15EDBD28EC8 /* AudioPlaybackService.swift */; };
 		3F6A009825950E4930DA9D04 /* SessionStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7CEC54DEF50257FB2E9DDF9 /* SessionStorageService.swift */; };
 		44F2265B0C725580928F10DA /* SomneraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F8753C37E0A8EBA772DD30 /* SomneraApp.swift */; };
@@ -56,6 +57,7 @@
 		14193D691360C3AF9E20123B /* SessionAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionAnalyticsService.swift; sourceTree = "<group>"; };
 		18D276AE55AD993017F0F0BE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		18F8753C37E0A8EBA772DD30 /* SomneraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SomneraApp.swift; sourceTree = "<group>"; };
+		1D290828FE3AE170D4715CD5 /* SynergyDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynergyDetailView.swift; sourceTree = "<group>"; };
 		1F6DCB5A701234D74777DD6F /* NightHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightHeatmapView.swift; sourceTree = "<group>"; };
 		1FE9B522D4105FC040519727 /* PSGTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSGTimelineView.swift; sourceTree = "<group>"; };
 		1FEDBB312C5EB7200C5F4171 /* DSPFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSPFilter.swift; sourceTree = "<group>"; };
@@ -276,6 +278,7 @@
 		E7D63D8CA0BC7ACB8C8AAF33 /* Synergy */ = {
 			isa = PBXGroup;
 			children = (
+				1D290828FE3AE170D4715CD5 /* SynergyDetailView.swift */,
 				FDC3E71C37F4544E7DEA8371 /* SynergyIntroView.swift */,
 				282DB09338C6AD9D1CB9EAB2 /* SynergyView.swift */,
 			);
@@ -404,6 +407,7 @@
 				44F2265B0C725580928F10DA /* SomneraApp.swift in Sources */,
 				D29EF7E10DE9B2D727384D5B /* SomneraColors.swift in Sources */,
 				00773AC1AB4EB65BBD23B2A1 /* SpectralAnalysisService.swift in Sources */,
+				2C3D1E78CCB6047DF0296A7C /* SynergyDetailView.swift in Sources */,
 				6F799ED0F368847C1177C3BC /* SynergyIntroView.swift in Sources */,
 				714A7667F387BCE0895FA03B /* SynergyView.swift in Sources */,
 				1E17734C1692790F8335D82D /* TechInsightsView.swift in Sources */,
