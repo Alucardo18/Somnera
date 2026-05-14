@@ -84,8 +84,12 @@ final class SleepSession: Identifiable {
     }
 
     var snoreScore: Int {
-        let percentWeight = snorePercentage * 0.5
-        let dbWeight = Double(max(0, peakDecibels) / 90.0) * 20
+        // Calculate penalties only based on validated respiratory events.
+        // Ambient noise (peakDecibels) is ignored if no snores are detected.
+        let maxSnoreDB = snoreEvents.map { $0.peakDecibels }.max() ?? 0
+        
+        let percentWeight = snoreEvents.isEmpty ? 0 : (snorePercentage * 0.5)
+        let dbWeight = snoreEvents.isEmpty ? 0 : (Double(max(0, maxSnoreDB) / 90.0) * 20)
         
         let apneaRiskPoints = apneaEvents.reduce(0.0) { total, event in
             if event.durationSeconds < 15 { return total + 2.0 }
@@ -93,8 +97,9 @@ final class SleepSession: Identifiable {
             else { return total + 12.0 }
         }
         
-        let eventDensityBonus = min(10.0, Double(snoreEvents.count) * 0.5)
-        return min(100, Int(percentWeight + dbWeight + apneaRiskPoints + eventDensityBonus))
+        let eventDensityPenalty = min(10.0, Double(snoreEvents.count) * 0.5)
+        let totalPenalty = Int(percentWeight + dbWeight + apneaRiskPoints + eventDensityPenalty)
+        return max(0, 100 - totalPenalty)
     }
 
     var apneaEventCount: Int { apneaEvents.count }
@@ -122,14 +127,15 @@ final class SleepSession: Identifiable {
         func pick(_ options: [String]) -> String { options[seed % options.count] }
 
         let baseMessage: String
-        if apneaEvents.isEmpty && snoreScore < 15 {
-            baseMessage = pick(["¡Noche perfecta! Tu respiración fue constante y silenciosa.", "Silencio total. No detectamos ronquidos ni interrupciones."])
+        // NEW LOGIC: High score (85+) is perfect
+        if apneaEvents.isEmpty && snoreScore >= 85 {
+            baseMessage = pick(["¡Noche perfecta! Tu respiración fue constante y silenciosa.", "Salud respiratoria óptima. No detectamos ronquidos ni interrupciones."])
         } else if apneaEvents.contains(where: { $0.durationSeconds > 30 }) {
-            baseMessage = pick(["Detectamos pausas respiratorias prolongadas (>30s).", "Alerta de apnea crítica."])
+            baseMessage = pick(["Alerta: Detectamos pausas respiratorias prolongadas (>30s).", "Riesgo de apnea crítica detectado."])
         } else if apneaEventCount > 0 {
-            baseMessage = pick(["Tu noche fue movida. Detectamos \(apneaEventCount) pausas respiratorias breves."])
-        } else if snoreScore > 50 {
-            baseMessage = pick(["Ronquidos intensos detectados durante gran parte de la noche."])
+            baseMessage = pick(["Tu respiración tuvo interrupciones. Detectamos \(apneaEventCount) pausas respiratorias."])
+        } else if snoreScore < 50 {
+            baseMessage = pick(["Ronquidos intensos detectados. Tu eficiencia respiratoria fue baja anoche."])
         } else {
             baseMessage = pick(["Noche estable con algunos ronquidos aislados."])
         }
