@@ -5,6 +5,10 @@ struct SynergyView: View {
     @AppStorage("somnera_healthkit_enabled") var healthKitEnabled = false
     @State private var showIntro = false
     @State private var showDetails = false
+    @State private var showGuide = false
+    @State private var showAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
     @ObservedObject var viewModel: DashboardViewModel
     @EnvironmentObject var appState: AppState
     
@@ -28,6 +32,9 @@ struct SynergyView: View {
             }
             .fullScreenCover(isPresented: $showIntro) {
                 SynergyIntroView()
+            }
+            .fullScreenCover(isPresented: $showGuide) {
+                SynergyGuideView()
             }
         }
     }
@@ -65,7 +72,34 @@ struct SynergyView: View {
     private var activeState: some View {
         ScrollView {
             VStack(spacing: 30) {
-                // Estado de Conexión (Convertido en Botón de Navegación)
+                // Header Interactivo
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Análisis de Bio-Arquitectura")
+                            .font(.caption.bold())
+                            .foregroundColor(.somTextSecondary)
+                            .tracking(1)
+                    }
+                    Spacer()
+                    
+                    Button {
+                        showGuide = true
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "book.fill")
+                            Text("Guía de Lectura")
+                        }
+                        .font(.caption.bold())
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.somAccent.opacity(0.1))
+                        .foregroundColor(.somAccent)
+                        .cornerRadius(20)
+                    }
+                }
+                .padding(.horizontal)
+                
+                // Estado de Conexión
                 if !healthKitEnabled {
                     Button {
                         appState.highlightHealthSetting = true
@@ -77,8 +111,45 @@ struct SynergyView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
                 
-                // Visual Indicator of Synergy
-                SynergyEcosystemGraphic()
+                // Topografía de la Conciencia
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Topografía de la Conciencia")
+                            .font(.headline)
+                        Button {
+                            alertTitle = "Topografía de la Conciencia"
+                            alertMessage = "Mapea las fases del sueño y la actividad cerebral para cuantificar la consolidación de la memoria y la intensidad de los sueños, transformando los ciclos REM en métricas de recuperación cognitiva."
+                            showAlert = true
+                        } label: {
+                            Image(systemName: "info.circle")
+                                .foregroundColor(.somAccent)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .foregroundColor(.white)
+                    
+                    SleepTopographyView()
+                }
+                
+                // Hélice de Sinergia (NUEVO)
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Hélice de Sinergia")
+                            .font(.headline)
+                        Button {
+                            alertTitle = "Hélice de Sinergia"
+                            alertMessage = "Coteja y sincroniza de manera sinérgica los registros de audio con las métricas de HealthKit una vez finalizada la sesión, validando eventos respiratorios mediante el cruce de datos biométricos precisos para un diagnóstico profundo."
+                            showAlert = true
+                        } label: {
+                            Image(systemName: "info.circle")
+                                .foregroundColor(.somAccent)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .foregroundColor(.white)
+                    
+                    SynergyHelixView()
+                }
                 
                 // Info Card (Entry point to details)
                 Button {
@@ -113,6 +184,11 @@ struct SynergyView: View {
             }
             .padding(.top)
             .animation(.spring(), value: healthKitEnabled)
+        }
+        .alert(alertTitle, isPresented: $showAlert) {
+            Button("Entendido", role: .cancel) { }
+        } message: {
+            Text(alertMessage)
         }
         .sheet(isPresented: $showDetails) {
             SynergyDetailView()

@@ -27,6 +27,7 @@
 		5E12475F2C22D449CD2EBC55 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 328498EC4943C45D0733EE7B /* ContentView.swift */; };
 		619472A35195A2486D180F3F /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF801BF7ADF691DDB5C9B089 /* RecordingView.swift */; };
 		61ABA7E1DABBE3BB41A7839F /* SessionAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14193D691360C3AF9E20123B /* SessionAnalyticsService.swift */; };
+		643DCFD0F029B843A628E58D /* SleepTopographyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7951DFAE73356A2B420A5C19 /* SleepTopographyView.swift */; };
 		67F1CF301A9ED62C0B602B6F /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB6235F0F8E154DB382BCCA /* AppState.swift */; };
 		6F799ED0F368847C1177C3BC /* SynergyIntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC3E71C37F4544E7DEA8371 /* SynergyIntroView.swift */; };
 		714A7667F387BCE0895FA03B /* SynergyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282DB09338C6AD9D1CB9EAB2 /* SynergyView.swift */; };
@@ -44,15 +45,18 @@
 		BA216FBA2213ADE00997C59B /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0880F6CD8EAE1F05C7F7C65 /* OnboardingView.swift */; };
 		BF0FC41A7D2D2A7D1D0A28DA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D276AE55AD993017F0F0BE /* SettingsView.swift */; };
 		CB5CBD8EBA8EBAE2E2940F36 /* MotionDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2548508BAEEBC059223A96B9 /* MotionDetectionService.swift */; };
+		CF4D8DE331E0653A163C492F /* SynergyGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1160189743C4ED38CD858550 /* SynergyGuideView.swift */; };
 		D29EF7E10DE9B2D727384D5B /* SomneraColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD8E31AD6D8C6997476CDB33 /* SomneraColors.swift */; };
 		D2F59F0043D5B67ECC65B802 /* SleepSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9534FA9D5926D2DB79C4FD1C /* SleepSession.swift */; };
 		D421ECCADD274DE920B43A9A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C3E86F3D5316977DDE2DD56B /* Assets.xcassets */; };
 		E3A4D275F4A7697755B399F0 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44757D08C8733C3E1E37DE1E /* Constants.swift */; };
+		EDD99E37045ACDD3F35C6409 /* SynergyHelixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E626FE4C65AA7766A19BB3 /* SynergyHelixView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0DC885CED0AF5616524143DA /* AudioCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCaptureService.swift; sourceTree = "<group>"; };
 		0FB8ACA65890D15EDBD28EC8 /* AudioPlaybackService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlaybackService.swift; sourceTree = "<group>"; };
+		1160189743C4ED38CD858550 /* SynergyGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynergyGuideView.swift; sourceTree = "<group>"; };
 		134D5724A2BD322053DD0E27 /* ApneaDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApneaDetectionService.swift; sourceTree = "<group>"; };
 		14193D691360C3AF9E20123B /* SessionAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionAnalyticsService.swift; sourceTree = "<group>"; };
 		18D276AE55AD993017F0F0BE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -63,6 +67,7 @@
 		1FEDBB312C5EB7200C5F4171 /* DSPFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSPFilter.swift; sourceTree = "<group>"; };
 		2548508BAEEBC059223A96B9 /* MotionDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionDetectionService.swift; sourceTree = "<group>"; };
 		282DB09338C6AD9D1CB9EAB2 /* SynergyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynergyView.swift; sourceTree = "<group>"; };
+		28E626FE4C65AA7766A19BB3 /* SynergyHelixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynergyHelixView.swift; sourceTree = "<group>"; };
 		328498EC4943C45D0733EE7B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3B2CDFF3AAE5762CBD959BED /* RecordingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingViewModel.swift; sourceTree = "<group>"; };
 		3B5CDDD6F190D10700AF53E1 /* AudioSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionManager.swift; sourceTree = "<group>"; };
@@ -74,6 +79,7 @@
 		5B369953ECB83A7DB4D461F5 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		5C29EAFC96C99B4C35E34B73 /* SpectralAnalysisService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectralAnalysisService.swift; sourceTree = "<group>"; };
 		76B9C440F7BFC784E1C8C4D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7951DFAE73356A2B420A5C19 /* SleepTopographyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepTopographyView.swift; sourceTree = "<group>"; };
 		7CB6235F0F8E154DB382BCCA /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		7EDCA8B8718033F1E9CB041C /* SnoreDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoreDetectionService.swift; sourceTree = "<group>"; };
 		9534FA9D5926D2DB79C4FD1C /* SleepSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepSession.swift; sourceTree = "<group>"; };
@@ -278,7 +284,10 @@
 		E7D63D8CA0BC7ACB8C8AAF33 /* Synergy */ = {
 			isa = PBXGroup;
 			children = (
+				7951DFAE73356A2B420A5C19 /* SleepTopographyView.swift */,
 				1D290828FE3AE170D4715CD5 /* SynergyDetailView.swift */,
+				1160189743C4ED38CD858550 /* SynergyGuideView.swift */,
+				28E626FE4C65AA7766A19BB3 /* SynergyHelixView.swift */,
 				FDC3E71C37F4544E7DEA8371 /* SynergyIntroView.swift */,
 				282DB09338C6AD9D1CB9EAB2 /* SynergyView.swift */,
 			);
@@ -402,12 +411,15 @@
 				BF0FC41A7D2D2A7D1D0A28DA /* SettingsView.swift in Sources */,
 				D2F59F0043D5B67ECC65B802 /* SleepSession.swift in Sources */,
 				13A7C8EF2FDBE2396F2FE9F6 /* SleepTimelineView.swift in Sources */,
+				643DCFD0F029B843A628E58D /* SleepTopographyView.swift in Sources */,
 				1AF06821B7A87503FC9896D9 /* SnoreDetectionService.swift in Sources */,
 				577718D06B7BFF9F34897C46 /* SnoreEvent.swift in Sources */,
 				44F2265B0C725580928F10DA /* SomneraApp.swift in Sources */,
 				D29EF7E10DE9B2D727384D5B /* SomneraColors.swift in Sources */,
 				00773AC1AB4EB65BBD23B2A1 /* SpectralAnalysisService.swift in Sources */,
 				2C3D1E78CCB6047DF0296A7C /* SynergyDetailView.swift in Sources */,
+				CF4D8DE331E0653A163C492F /* SynergyGuideView.swift in Sources */,
+				EDD99E37045ACDD3F35C6409 /* SynergyHelixView.swift in Sources */,
 				6F799ED0F368847C1177C3BC /* SynergyIntroView.swift in Sources */,
 				714A7667F387BCE0895FA03B /* SynergyView.swift in Sources */,
 				1E17734C1692790F8335D82D /* TechInsightsView.swift in Sources */,
