@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var showHealthKitSheet = false
     @State private var showDeleteAlert = false
     @State private var showTechSheet = false
+    @State private var showCreatorSheet = false
     @ObservedObject var viewModel: DashboardViewModel
 
     var body: some View {
@@ -121,6 +122,19 @@ struct SettingsView: View {
                     // About
                     Section {
                         Button {
+                            showCreatorSheet = true
+                        } label: {
+                            HStack {
+                                Label("¿Por qué Somnera es gratuita?", systemImage: "heart.fill")
+                                    .foregroundColor(.somAccent)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundColor(.somTextSecondary)
+                            }
+                        }
+
+                        Button {
                             showTechSheet = true
                         } label: {
                             HStack {
@@ -148,6 +162,9 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $showTechSheet) {
                 TechInsightsView()
+            }
+            .sheet(isPresented: $showCreatorSheet) {
+                CreatorMessageView()
             }
             .toolbarBackground(Color.somBackground, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
