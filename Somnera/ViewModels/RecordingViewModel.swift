@@ -67,6 +67,7 @@ final class RecordingViewModel: ObservableObject {
     // Visualization & Timeline
     private var waveformBuffer: [Float] = Array(repeating: 0, count: 60)
     private var decibelTimeline: [Float] = []
+    private var sessionPeakDecibels: Float = -100 // Process-thread safe peak tracking
     private var lastTimelineSampleTime = Date(timeIntervalSince1970: 0)
     private var lastAutoSaveTime = Date()
     private var lastUIUpdateTime = Date()
@@ -114,8 +115,11 @@ final class RecordingViewModel: ObservableObject {
         isProximityCovered = isCovered
         
         if isCovered {
-            // Screen is physically off via iOS proximity logic, but we track state
             print("🛡️ Sleep Shield: Sensor cubierto (Pantalla física OFF)")
+            // Trigger UI throttling immediately when screen is covered
+            Task { @MainActor in
+                self.enterDimmedState()
+            }
         } else {
             print("🛡️ Sleep Shield: Sensor liberado")
             wakeUp()
@@ -262,6 +266,7 @@ final class RecordingViewModel: ObservableObject {
             lastTimelineSampleTime = now
             lastAutoSaveTime = now
             peakDecibels = -100
+            sessionPeakDecibels = -100
             elapsedSeconds = 0
             snoreEventCount = 0
             apneaEventCount = 0
@@ -394,10 +399,14 @@ final class RecordingViewModel: ObservableObject {
     private var peakIntervals: [TimeInterval] = []
 
     private func processBuffer(_ buffer: AVAudioPCMBuffer, time: AVAudioTime) {
-        let now = Date()
-        // 1. Metrics
-        let rms = DSPFilter.rms(of: buffer) ?? 0.0001
-        let dB = (20 * log10(max(1e-5, rms))) + 90 // Normalized to 0-90 dB range
+        autoreleasepool {
+            let now = Date()
+            // 1. Metrics
+            let rms = DSPFilter.rms(of: buffer) ?? 0.0001
+            let dB = (20 * log10(max(1e-5, rms))) + 90 // Normalized to 0-90 dB range
+            
+            // Track peak on processing thread to ensure we don't lose it during UI throttling
+            sessionPeakDecibels = max(sessionPeakDecibels, dB)
         
         // --- SNR CALCULATION ---
         // Slowly track the lowest RMS to find the noise floor
@@ -444,10 +453,14 @@ final class RecordingViewModel: ObservableObject {
             let capturedIsSnoring = snoreDetector.isSnoring
             
             Task { @MainActor in
+                // UI THROTTLING: If screen is dimmed (Sleep Shield), skip all visual updates
+                // to save CPU, battery and prevent memory pressure from MainActor tasks.
+                guard !self.isDimmed else { return }
+                
                 self.currentRMS = capturedRMS
                 self.currentDecibels = capturedDB
                 self.currentSNR = Double(capturedSNR)
-                self.peakDecibels = max(self.peakDecibels, capturedDB)
+                self.peakDecibels = self.sessionPeakDecibels
                 self.updateWaveform(rms: capturedRMS)
                 
                 // Digital Twin Live UI Update with Smoothing (EMA Filter)
@@ -507,46 +520,45 @@ final class RecordingViewModel: ObservableObject {
         }
 
         // IF WAITING: We just return here but the engine keeps running!
-        // This is the trick to keep the app alive in background.
-        guard isRecording && !isWaiting else { return }
+            // This is the trick to keep the app alive in background.
+            guard isRecording && !isWaiting else { return }
 
-        let motion = motionDetector.lastIntensity
-        apneaDetector.update(rms: rms, motionIntensity: motion, at: Date())
-        
-        // 2. Save amplified copy
-        self.writeAmplifiedBuffer(buffer)
-        
-        // 3. IA Analysis
-        snoreDetector.analyze(buffer, at: time)
-        
-        // Link snore events to apnea detector
-        if snoreDetector.isSnoring {
-            apneaDetector.reportSnore(at: now)
-        }
-
-        // Timeline Sampling (1s resolution for smoother hypnogram)
-        sampleAccumulator.append(dB)
-        if now.timeIntervalSince(lastTimelineSampleTime) >= 1.0 {
-            let avgDB = sampleAccumulator.reduce(0, +) / Float(max(1, sampleAccumulator.count))
-            decibelTimeline.append(avgDB)
+            let motion = motionDetector.lastIntensity
+            apneaDetector.update(rms: rms, motionIntensity: motion, at: Date())
             
-            // Collect Sentinel V2 Telemetry
-            snrTimeline.append(currentSNR)
-            stabilityTimeline.append(breathingStability)
-            tiltTimeline.append(currentTiltAngle)
-            motionTimeline.append(currentMotionG)
+            // 2. Save amplified copy
+            self.writeAmplifiedBuffer(buffer)
             
-            sampleAccumulator = []
-            lastTimelineSampleTime = now
+            // 3. IA Analysis
+            snoreDetector.analyze(buffer, at: time)
             
-            // Auto-save metadata every 5 minutes
-            if now.timeIntervalSince(lastAutoSaveTime) >= 300 {
-                saveCurrentSessionState(isFinal: false)
-                lastAutoSaveTime = now
+            // Link snore events to apnea detector
+            if snoreDetector.isSnoring {
+                apneaDetector.reportSnore(at: now)
             }
-        }
 
-        // Throttled UI updates handled at the beginning of the function
+            // Timeline Sampling (1s resolution for smoother hypnogram)
+            sampleAccumulator.append(dB)
+            if now.timeIntervalSince(lastTimelineSampleTime) >= 1.0 {
+                let avgDB = sampleAccumulator.reduce(0, +) / Float(max(1, sampleAccumulator.count))
+                decibelTimeline.append(avgDB)
+                
+                // Collect Sentinel V2 Telemetry
+                snrTimeline.append(currentSNR)
+                stabilityTimeline.append(breathingStability)
+                tiltTimeline.append(currentTiltAngle)
+                motionTimeline.append(currentMotionG)
+                
+                sampleAccumulator = []
+                lastTimelineSampleTime = now
+                
+                // Auto-save metadata every 5 minutes
+                if now.timeIntervalSince(lastAutoSaveTime) >= 300 {
+                    saveCurrentSessionState(isFinal: false)
+                    lastAutoSaveTime = now
+                }
+            }
+        } // End autoreleasepool
     }
 
     private func saveCurrentSessionState(isFinal: Bool) {
@@ -556,7 +568,7 @@ final class RecordingViewModel: ObservableObject {
         session.endDate = Date()
         session.snoreEvents = currentSnoreEvents
         session.apneaEvents = currentApneaEvents
-        session.peakDecibels = peakDecibels
+        session.peakDecibels = sessionPeakDecibels
         session.decibelTimeline = decibelTimeline
         print("[Somnera] 📈 Guardando Hipnograma: \(decibelTimeline.count) muestras.")
         session.surfaceType = currentSurface.rawValue
@@ -699,6 +711,7 @@ final class RecordingViewModel: ObservableObject {
             }
         }
     }
+
 
     var formattedElapsed: String {
         let h = elapsedSeconds / 3600
