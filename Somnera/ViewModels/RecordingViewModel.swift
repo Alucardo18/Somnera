@@ -72,6 +72,11 @@ final class RecordingViewModel: ObservableObject {
     private var lastAutoSaveTime = Date()
     private var lastUIUpdateTime = Date()
     private var lastValidSpectralTime = Date()
+    
+    // Internal thread-safe intensities for Digital Twin
+    private var internalNasalIntensity: Double = 0.0
+    private var internalPalatalIntensity: Double = 0.0
+    private var internalLingualIntensity: Double = 0.0
     private var lastSpectralAnalysis: (nasal: Double, palatal: Double, lingual: Double) = (0, 0, 0)
     
     // Sentinel V2 Timelines
@@ -275,6 +280,12 @@ final class RecordingViewModel: ObservableObject {
             palatalSum = 0
             lingualSum = 0
             spectralCount = 0
+            internalNasalIntensity = 0
+            internalPalatalIntensity = 0
+            internalLingualIntensity = 0
+            currentNasalIntensity = 0
+            currentPalatalIntensity = 0
+            currentLingualIntensity = 0
             snrTimeline = []
             stabilityTimeline = []
             tiltTimeline = []
@@ -445,6 +456,18 @@ final class RecordingViewModel: ObservableObject {
         let spectral = SpectralAnalysisService.shared.analyze(buffer: buffer)
         self.lastSpectralAnalysis = (spectral.nasal, spectral.palatal, spectral.lingual)
         
+        // Always update internal intensities for clinical accuracy (independent of UI)
+        if dB > 35 && (rms / max(0.0001, noiseFloorRMS)) > 1.5 {
+            internalNasalIntensity = (internalNasalIntensity * 0.7) + (spectral.nasal * 0.3)
+            internalPalatalIntensity = (internalPalatalIntensity * 0.7) + (spectral.palatal * 0.3)
+            internalLingualIntensity = (internalLingualIntensity * 0.7) + (spectral.lingual * 0.3)
+            lastValidSpectralTime = now
+        } else if now.timeIntervalSince(lastValidSpectralTime) > 1.5 {
+            internalNasalIntensity *= 0.9
+            internalPalatalIntensity *= 0.9
+            internalLingualIntensity *= 0.9
+        }
+        
         if shouldUpdateUI {
             let capturedSNR = snr
             let capturedRMS = rms
@@ -463,37 +486,10 @@ final class RecordingViewModel: ObservableObject {
                 self.peakDecibels = self.sessionPeakDecibels
                 self.updateWaveform(rms: capturedRMS)
                 
-                // Digital Twin Live UI Update with Smoothing (EMA Filter)
-                let frameCount = Int(buffer.frameLength)
-                var peak: Float = 0
-                if let ptr = buffer.floatChannelData?[0] {
-                    let samples = UnsafeBufferPointer(start: ptr, count: frameCount)
-                    for s in samples { peak = max(peak, abs(s)) }
-                }
-                let crest = capturedRMS > 0 ? peak / capturedRMS : 0
-                
-                // Only react if sound is > 35dB AND it has a non-flat signature (Crest > 2.2)
-                // This filters out steady white noise like fans and AC.
-                if capturedDB > 35 && crest > 2.2 {
-                    self.currentNasalIntensity = (self.currentNasalIntensity * 0.7) + (capturedSpectral.nasal * 0.3)
-                    self.currentPalatalIntensity = (self.currentPalatalIntensity * 0.7) + (capturedSpectral.palatal * 0.3)
-                    self.currentLingualIntensity = (self.currentLingualIntensity * 0.7) + (capturedSpectral.lingual * 0.3)
-                    self.lastValidSpectralTime = Date() // Reset hold timer
-                } else {
-                    // Start fading out ONLY after 1.5 seconds of silence
-                    if Date().timeIntervalSince(self.lastValidSpectralTime) > 1.5 {
-                        // Slower fade out for a more premium feel (Alpha 0.9)
-                        self.currentNasalIntensity *= 0.9
-                        self.currentPalatalIntensity *= 0.9
-                        self.currentLingualIntensity *= 0.9
-                        
-                        if self.currentNasalIntensity < 0.05 {
-                            self.currentNasalIntensity = 0
-                            self.currentPalatalIntensity = 0
-                            self.currentLingualIntensity = 0
-                        }
-                    }
-                }
+                // Digital Twin Live UI Update (Sync with internal values)
+                self.currentNasalIntensity = self.internalNasalIntensity
+                self.currentPalatalIntensity = self.internalPalatalIntensity
+                self.currentLingualIntensity = self.internalLingualIntensity
                 
                 // Accumulation for final report (Gated by IA & Energy Stability)
                 // Threshold set to 35dB as per user preference to capture lighter snoring events.
@@ -660,9 +656,9 @@ final class RecordingViewModel: ObservableObject {
                     durationSeconds: SomneraConstants.Snore.windowDurationSeconds,
                     confidence: confidence,
                     peakDecibels: self.peakDecibels,
-                    nasalIntensity: self.currentNasalIntensity,
-                    palatalIntensity: self.currentPalatalIntensity,
-                    lingualIntensity: self.currentLingualIntensity
+                    nasalIntensity: self.internalNasalIntensity,
+                    palatalIntensity: self.internalPalatalIntensity,
+                    lingualIntensity: self.internalLingualIntensity
                 )
                 self.currentSnoreEvents.append(event)
                 self.snoreEventCount = self.currentSnoreEvents.count
