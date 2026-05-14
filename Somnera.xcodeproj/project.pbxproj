@@ -27,6 +27,8 @@
 		619472A35195A2486D180F3F /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF801BF7ADF691DDB5C9B089 /* RecordingView.swift */; };
 		61ABA7E1DABBE3BB41A7839F /* SessionAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14193D691360C3AF9E20123B /* SessionAnalyticsService.swift */; };
 		67F1CF301A9ED62C0B602B6F /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB6235F0F8E154DB382BCCA /* AppState.swift */; };
+		6F799ED0F368847C1177C3BC /* SynergyIntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC3E71C37F4544E7DEA8371 /* SynergyIntroView.swift */; };
+		714A7667F387BCE0895FA03B /* SynergyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282DB09338C6AD9D1CB9EAB2 /* SynergyView.swift */; };
 		75B60EE4D6DA102CA711957E /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5394E29B5A0C2BAB2CE84C3D /* HealthKitService.swift */; };
 		7DB6162BE85B4D229CD1451E /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F26113D7731C71EA988F1 /* SessionListView.swift */; };
 		8EC0E3DFEC5EA1D981D309DD /* HighlightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E07F10F08F4F429A8839E280 /* HighlightsView.swift */; };
@@ -58,6 +60,7 @@
 		1FE9B522D4105FC040519727 /* PSGTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSGTimelineView.swift; sourceTree = "<group>"; };
 		1FEDBB312C5EB7200C5F4171 /* DSPFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSPFilter.swift; sourceTree = "<group>"; };
 		2548508BAEEBC059223A96B9 /* MotionDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionDetectionService.swift; sourceTree = "<group>"; };
+		282DB09338C6AD9D1CB9EAB2 /* SynergyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynergyView.swift; sourceTree = "<group>"; };
 		328498EC4943C45D0733EE7B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3B2CDFF3AAE5762CBD959BED /* RecordingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingViewModel.swift; sourceTree = "<group>"; };
 		3B5CDDD6F190D10700AF53E1 /* AudioSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionManager.swift; sourceTree = "<group>"; };
@@ -89,6 +92,7 @@
 		E07F10F08F4F429A8839E280 /* HighlightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightsView.swift; sourceTree = "<group>"; };
 		EF801BF7ADF691DDB5C9B089 /* RecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingView.swift; sourceTree = "<group>"; };
 		F509AD2979EB2C017BED8411 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		FDC3E71C37F4544E7DEA8371 /* SynergyIntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynergyIntroView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -155,6 +159,7 @@
 				54C67E0E8F6B5B6E9ED7032F /* Recording */,
 				A2362EB6A7BC606D71B80389 /* Session */,
 				55E640C535D3EAF88A0DF4BA /* Settings */,
+				E7D63D8CA0BC7ACB8C8AAF33 /* Synergy */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -264,6 +269,15 @@
 				7EDCA8B8718033F1E9CB041C /* SnoreDetectionService.swift */,
 			);
 			path = Detection;
+			sourceTree = "<group>";
+		};
+		E7D63D8CA0BC7ACB8C8AAF33 /* Synergy */ = {
+			isa = PBXGroup;
+			children = (
+				FDC3E71C37F4544E7DEA8371 /* SynergyIntroView.swift */,
+				282DB09338C6AD9D1CB9EAB2 /* SynergyView.swift */,
+			);
+			path = Synergy;
 			sourceTree = "<group>";
 		};
 		EEF97CA16C25DF0D1C4D7219 /* ViewModels */ = {
@@ -388,6 +402,8 @@
 				44F2265B0C725580928F10DA /* SomneraApp.swift in Sources */,
 				D29EF7E10DE9B2D727384D5B /* SomneraColors.swift in Sources */,
 				00773AC1AB4EB65BBD23B2A1 /* SpectralAnalysisService.swift in Sources */,
+				6F799ED0F368847C1177C3BC /* SynergyIntroView.swift in Sources */,
+				714A7667F387BCE0895FA03B /* SynergyView.swift in Sources */,
 				1E17734C1692790F8335D82D /* TechInsightsView.swift in Sources */,
 				A18A94C8EF02870E5A43B6E9 /* WaveformView.swift in Sources */,
 			);

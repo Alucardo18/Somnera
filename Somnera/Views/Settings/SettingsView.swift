@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var showTechSheet = false
     @State private var showCreatorSheet = false
     @ObservedObject var viewModel: DashboardViewModel
+    @EnvironmentObject var appState: AppState
 
     var body: some View {
         NavigationStack {
@@ -48,8 +49,29 @@ struct SettingsView: View {
                                 .foregroundColor(.somTextPrimary)
                         }
                         .tint(.somAccent)
+                        .padding(.horizontal, appState.highlightHealthSetting ? 10 : 0)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(appState.highlightHealthSetting ? Color.somAccent.opacity(0.15) : Color.clear)
+                        )
+                        // Efecto Latido (Heartbeat) usando Keyframes
+                        .keyframeAnimator(initialValue: 1.0, repeating: appState.highlightHealthSetting) { content, scale in
+                            content
+                                .scaleEffect(scale)
+                                .shadow(color: appState.highlightHealthSetting ? .somAccent.opacity(scale - 0.5) : .clear, radius: (scale - 1.0) * 60)
+                        } keyframes: { _ in
+                            KeyframeTrack {
+                                SpringKeyframe(1.15, duration: 0.15) // Primer latido
+                                SpringKeyframe(1.0, duration: 0.1)
+                                SpringKeyframe(1.1, duration: 0.15) // Segundo latido (más suave)
+                                SpringKeyframe(1.0, duration: 0.8)  // Pausa
+                            }
+                        }
                         .onChange(of: healthKitEnabled) { _, enabled in
-                            if enabled { showHealthKitSheet = true }
+                            if enabled { 
+                                showHealthKitSheet = true 
+                                appState.highlightHealthSetting = false
+                            }
                         }
 
                         Toggle(isOn: $notificationsEnabled) {
@@ -175,6 +197,9 @@ struct SettingsView: View {
                 }
             } message: {
                 Text("Esta acción eliminará permanentemente todas tus grabaciones y datos de sueño. No se puede deshacer.")
+            }
+            .onDisappear {
+                appState.highlightHealthSetting = false
             }
         }
     }

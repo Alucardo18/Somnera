@@ -7,6 +7,7 @@ final class AppState: ObservableObject {
     @Published var currentTab: AppTab = .dashboard
     @Published var healthKitAuthorized: Bool = false
     @Published var showOnboarding: Bool = false
+    @Published var highlightHealthSetting: Bool = false
 
     init() {
         showOnboarding = !UserDefaults.standard.bool(forKey: "somnera_onboarding_complete")
@@ -21,5 +22,6 @@ final class AppState: ObservableObject {
 enum AppTab: String, CaseIterable {
     case dashboard = "dashboard"
     case sessions  = "sessions"
+    case synergy   = "synergy"
     case settings  = "settings"
 }

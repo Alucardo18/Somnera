@@ -18,6 +18,12 @@ struct ContentView: View {
                 }
                 .tag(AppTab.sessions)
 
+            SynergyView(viewModel: dashboard)
+                .tabItem {
+                    Label("Sinergia", systemImage: "sparkles")
+                }
+                .tag(AppTab.synergy)
+
             SettingsView(viewModel: dashboard)
                 .tabItem {
                     Label("Ajustes", systemImage: "gearshape.fill")
