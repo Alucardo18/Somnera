@@ -3,7 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @AppStorage("somnera_healthkit_enabled") private var healthKitEnabled = false
     @AppStorage("somnera_notifications_enabled") private var notificationsEnabled = true
-    @AppStorage("somnera_sensitivity") private var sensitivity: Double = 0.75
+    @AppStorage("somnera_sensitivity") private var sensitivity: Double = 1.0
 
     @State private var showHealthKitSheet = false
     @State private var showDeleteAlert = false
@@ -27,9 +27,9 @@ struct SettingsView: View {
                                     .font(.caption.bold())
                                     .foregroundColor(.somAccent)
                             }
-                            Slider(value: $sensitivity, in: 0.60...0.95, step: 0.05)
+                            Slider(value: $sensitivity, in: 0.7...1.3, step: 0.1)
                                 .tint(.somAccent)
-                            Text("Valores más altos reducen falsos positivos pero pueden perder ronquidos suaves.")
+                            Text("Ajusta la reactividad de la IA. Usa una sensibilidad mayor en habitaciones muy silenciosas o menor si hay ruido de fondo (ventiladores, AC).")
                                 .font(.caption2)
                                 .foregroundColor(.somTextSecondary)
                         }
@@ -99,7 +99,7 @@ struct SettingsView: View {
                                 Label("Versión", systemImage: "info.circle.fill")
                                     .foregroundColor(.somTextPrimary)
                                 Spacer()
-                                Text("2.0.0")
+                                Text("2.0.1")
                                     .font(.caption)
                                     .foregroundColor(.somAccent)
                             }
@@ -136,10 +136,10 @@ struct SettingsView: View {
 
     private var sensitivityLabel: String {
         switch sensitivity {
-        case ..<0.65: return "Muy Alta"
-        case ..<0.75: return "Alta"
-        case ..<0.85: return "Media"
-        default:      return "Baja"
+        case ..<0.85: return "Baja"
+        case ..<1.15: return "Media (Recomendado)"
+        case ..<1.25: return "Alta"
+        default:      return "Muy Alta"
         }
     }
 

@@ -16,12 +16,12 @@ enum SomneraConstants {
     enum DSP {
         static let bandpassLowHz: Float  = 80.0
         static let bandpassHighHz: Float = 2_500.0
-        static let vadRMSThreshold: Float = 0.001   // Más sensible para el heatmap (~30 dB)
+        static let vadRMSThreshold: Float = 0.0008  // Más sensible (~28 dB)
     }
 
     // MARK: - Snore Detection
     enum Snore {
-        static let confidenceThreshold: Double = 0.75
+        static let confidenceThreshold: Double = 0.55
         static let windowDurationSeconds: Float64 = 1.0
         static let overlapFactor: Double = 0.5
         static let minDurationSeconds: Double = 0.4    // ignore micro-triggers
@@ -31,7 +31,7 @@ enum SomneraConstants {
 
     // MARK: - Apnea Detection
     enum Apnea {
-        static let silenceRMSThreshold: Float   = 0.0008  // ~25 dB (Cerca del ruido de fondo real)
+        static let silenceRMSThreshold: Float   = 0.0006  // ~22 dB (Más estricto para silencios)
         static let triggerSeconds: TimeInterval  = 12.0    // 12s para más seguridad
         static let checkIntervalSeconds: Double  = 1.0
     }

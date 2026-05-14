@@ -257,9 +257,9 @@ struct ScoreCardView: View {
 
     var scoreColor: Color {
         switch session.snoreScore {
-        case 0..<30:  return .somSafe
-        case 30..<60: return .somWarning
-        default:      return .somApnea
+        case 70...100: return .somSafe
+        case 40..<70:  return .somWarning
+        default:       return .somApnea
         }
     }
 
@@ -378,7 +378,7 @@ struct ScoreExplanationView: View {
                     }
                     .padding(.horizontal, 24)
                     
-                    Text("Una puntuación baja indica una noche tranquila, mientras que una alta sugiere ronquidos persistentes o muy ruidosos.")
+                    Text("Una puntuación alta indica una respiración eficiente y silenciosa, mientras que una baja sugiere ronquidos persistentes o interrupciones respiratorias.")
                         .font(.system(size: 13))
                         .foregroundColor(.somTextSecondary)
                         .multilineTextAlignment(.center)
@@ -421,8 +421,8 @@ struct WeeklyChartView: View {
     @State private var appear = false
 
     private let chartHeight: CGFloat = 100
-    private let safeThreshold: Int = 30
-    private let warningThreshold: Int = 60
+    private let safeThreshold: Int = 70
+    private let warningThreshold: Int = 40
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -449,9 +449,9 @@ struct WeeklyChartView: View {
                 // 1. Background Zones
                 GeometryReader { geo in
                     VStack(spacing: 0) {
-                        Color.somApnea.opacity(0.03).frame(height: geo.size.height * 0.4) // 60-100
-                        Color.somWarning.opacity(0.03).frame(height: geo.size.height * 0.3) // 30-60
-                        Color.somSafe.opacity(0.03).frame(height: geo.size.height * 0.3) // 0-30
+                        Color.somSafe.opacity(0.03).frame(height: geo.size.height * 0.3)    // 70-100
+                        Color.somWarning.opacity(0.03).frame(height: geo.size.height * 0.3) // 40-70
+                        Color.somApnea.opacity(0.03).frame(height: geo.size.height * 0.4)   // 0-40
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 4))
                 }

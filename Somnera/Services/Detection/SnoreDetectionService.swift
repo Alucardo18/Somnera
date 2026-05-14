@@ -17,24 +17,34 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
     private var sessionStart: Date?
     private var lastDistance: Double = 0.5
     private(set) var isSnoring: Bool = false
+    private var confidenceThreshold: Double = SomneraConstants.Snore.confidenceThreshold
     private let analysisQueue = DispatchQueue(label: "com.somnera.soundAnalysis", qos: .userInitiated)
 
     // MARK: - Setup
 
     /// Call after AudioCaptureService has started to get the live input format.
-    func setup(format: AVAudioFormat) throws {
+    func setup(format: AVAudioFormat, confidenceThreshold: Double? = nil) throws {
+        if let threshold = confidenceThreshold {
+            self.confidenceThreshold = threshold
+        }
         streamAnalyzer = SNAudioStreamAnalyzer(format: format)
 
         let request: SNClassifySoundRequest
-
-        // Attempt to load trained model — falls back to Apple's built-in classifier
+        
+        // Attempt to load trained model with robust fallback
         if let modelURL = Bundle.main.url(forResource: SomneraConstants.Snore.modelFileName, withExtension: "mlmodelc") {
-            let config = MLModelConfiguration()
-            config.computeUnits = .all  // Use Neural Engine when available
-            let mlModel = try MLModel(contentsOf: modelURL, configuration: config)
-            request = try SNClassifySoundRequest(mlModel: mlModel)
+            do {
+                let config = MLModelConfiguration()
+                // Use default compute units to avoid ANE/fopen errors on some devices
+                let mlModel = try MLModel(contentsOf: modelURL, configuration: config)
+                request = try SNClassifySoundRequest(mlModel: mlModel)
+                print("[Somnera] 🧠 IA: Modelo personalizado cargado con éxito.")
+            } catch {
+                print("[Somnera] ⚠️ IA: Error al cargar modelo personalizado, usando fallback de Apple: \(error.localizedDescription)")
+                request = try SNClassifySoundRequest(classifierIdentifier: .version1)
+            }
         } else {
-            // Placeholder: classify all sounds (for development before model is trained)
+            print("[Somnera] ℹ️ IA: Modelo personalizado no encontrado, usando detector estándar.")
             request = try SNClassifySoundRequest(classifierIdentifier: .version1)
         }
 
@@ -108,15 +118,22 @@ final class SnoreDetectionService: NSObject, SNResultsObserving {
         guard
             let result = result as? SNClassificationResult,
             let snoreClass = result.classifications.first(where: {
-                $0.identifier.lowercased().contains(SomneraConstants.Snore.snoreLabel)
-            }),
-            snoreClass.confidence >= SomneraConstants.Snore.confidenceThreshold
+                // Inclusive check: matches "snore" (custom) and "snoring" (Apple V1)
+                let label = $0.identifier.lowercased()
+                return label.contains("snore") || label.contains("snoring")
+            })
         else {
             self.isSnoring = false
             return
         }
         
-        self.isSnoring = true
+        // Use the session-specific threshold
+        if snoreClass.confidence >= self.confidenceThreshold {
+            self.isSnoring = true
+            // print("[Somnera] 🎤 IA Detectó: \(snoreClass.identifier) (\(Int(snoreClass.confidence*100))%)")
+        } else {
+            self.isSnoring = false
+        }
 
         let offset = sessionStart.map { Date().timeIntervalSince($0) } ?? 0
         DispatchQueue.main.async { [weak self] in

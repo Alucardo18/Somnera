@@ -98,7 +98,10 @@ final class SleepSession: Identifiable {
         }
         
         let eventDensityPenalty = min(10.0, Double(snoreEvents.count) * 0.5)
-        let totalPenalty = Int(percentWeight + dbWeight + apneaRiskPoints + eventDensityPenalty)
+        let rawPenalty = percentWeight + dbWeight + apneaRiskPoints + eventDensityPenalty
+        
+        // Safety check to avoid crashes if any value is NaN or Infinite
+        let totalPenalty = rawPenalty.isFinite ? Int(rawPenalty) : 0
         return max(0, 100 - totalPenalty)
     }
 

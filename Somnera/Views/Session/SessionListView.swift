@@ -152,9 +152,9 @@ struct SessionBubbleView: View {
     
     var scoreColor: Color {
         switch session.snoreScore {
-        case 0..<30:  return .somSafe
-        case 30..<60: return .somWarning
-        default:      return .somApnea
+        case 70...100: return .somSafe
+        case 40..<70:  return .somWarning
+        default:       return .somApnea
         }
     }
     
@@ -207,9 +207,9 @@ struct SessionInsightCard: View {
     
     var scoreColor: Color {
         switch session.snoreScore {
-        case 0..<30:  return .somSafe
-        case 30..<60: return .somWarning
-        default:      return .somApnea
+        case 70...100: return .somSafe
+        case 40..<70:  return .somWarning
+        default:       return .somApnea
         }
     }
     
@@ -384,11 +384,11 @@ struct CalendarNavigatorView: View {
         let isToday = calendar.isDateInToday(date)
         
         // Color based on the worst score of the day
-        let worstScore = sessionsOnDay.map { $0.snoreScore }.max() ?? 0
+        let worstScore = sessionsOnDay.map { $0.snoreScore }.min() ?? 100 // Use MIN because low score = danger
         let statusColor: Color = {
             if !hasSession { return .clear }
-            if worstScore < 30 { return .somSafe }
-            if worstScore < 60 { return .somWarning }
+            if worstScore >= 70 { return .somSafe }
+            if worstScore >= 40 { return .somWarning }
             return .somApnea
         }()
         

@@ -160,9 +160,9 @@ struct SessionDetailView: View {
 
     private var scoreColor: Color {
         switch session.snoreScore {
-        case 0..<30:  return .somSafe
-        case 30..<60: return .somWarning
-        default:      return .somApnea
+        case 70...100: return .somSafe
+        case 40..<70:  return .somWarning
+        default:       return .somApnea
         }
     }
 

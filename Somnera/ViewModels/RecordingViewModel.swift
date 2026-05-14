@@ -2,6 +2,7 @@ import Foundation
 import AVFoundation
 import Combine
 import UIKit
+import SwiftUI
 
 /// Central coordinator for a live sleep recording session.
 /// Connects AudioCapture → DSP → SnoreDetection + ApneaDetection → Storage.
@@ -95,6 +96,18 @@ final class RecordingViewModel: ObservableObject {
     private var palatalSum: Double = 0.0
     private var lingualSum: Double = 0.0
     private var spectralCount: Int = 0
+    
+    @AppStorage("somnera_sensitivity") private var userSensitivity: Double = 1.0
+    
+    // Thread-safe snapshots for the audio processing loop
+    private var sessionConfidenceThreshold: Double = 0.55
+    private var sessionDBThreshold: Float = 30.0
+    private var sessionCrestThreshold: Float = 2.0
+    private var sessionApneaThreshold: Float = 0.0006
+    
+    private var sensitivityMultiplier: Double {
+        return 2.0 - userSensitivity
+    }
 
     init() {
         setupInterruptionObservers()
@@ -300,8 +313,22 @@ final class RecordingViewModel: ObservableObject {
             try audioCapture.start()
             
             if !isWaitingPhase {
-                try snoreDetector.setup(format: audioCapture.outputFormat)
+                // Capture snapshots on MainActor before entering the audio thread
+                let multiplier = self.sensitivityMultiplier
+                sessionConfidenceThreshold = SomneraConstants.Snore.confidenceThreshold * multiplier
+                sessionDBThreshold = Float(30.0 * multiplier)
+                sessionCrestThreshold = Float(2.0 * multiplier)
+                sessionApneaThreshold = SomneraConstants.Apnea.silenceRMSThreshold * Float(multiplier)
+                
+                print("[Somnera] 🎯 Umbrales de sesión: dB > \(Int(sessionDBThreshold)), Crest > \(String(format: "%.1f", sessionCrestThreshold)), IA > \(Int(sessionConfidenceThreshold*100))%")
+
+                try snoreDetector.setup(
+                    format: audioCapture.outputFormat,
+                    confidenceThreshold: sessionConfidenceThreshold
+                )
                 motionDetector.start()
+                
+                apneaDetector.silenceThreshold = sessionApneaThreshold
                 
                 // Create AVAudioFile with AAC settings
                 let audioURL = audioFileService.audioURL(for: sessionID ?? UUID())
@@ -456,8 +483,19 @@ final class RecordingViewModel: ObservableObject {
         let spectral = SpectralAnalysisService.shared.analyze(buffer: buffer)
         self.lastSpectralAnalysis = (spectral.nasal, spectral.palatal, spectral.lingual)
         
+        // Calculate Crest Factor (Peak / RMS) once to determine if it's a textured sound (snore) 
+        // or flat noise (AC/Fan). Standard for clinical snore gating.
+        let frameCount = Int(buffer.frameLength)
+        var peak: Float = 0
+        if let ptr = buffer.floatChannelData?[0] {
+            let samples = UnsafeBufferPointer(start: ptr, count: frameCount)
+            for s in samples { peak = max(peak, abs(s)) }
+        }
+        let crest = rms > 0 ? peak / rms : 0
+        
         // Always update internal intensities for clinical accuracy (independent of UI)
-        if dB > 35 && (rms / max(0.0001, noiseFloorRMS)) > 1.5 {
+        // Use thread-safe session snapshots.
+        if dB > sessionDBThreshold && crest > sessionCrestThreshold {
             internalNasalIntensity = (internalNasalIntensity * 0.7) + (spectral.nasal * 0.3)
             internalPalatalIntensity = (internalPalatalIntensity * 0.7) + (spectral.palatal * 0.3)
             internalLingualIntensity = (internalLingualIntensity * 0.7) + (spectral.lingual * 0.3)
@@ -490,29 +528,17 @@ final class RecordingViewModel: ObservableObject {
                 self.currentNasalIntensity = self.internalNasalIntensity
                 self.currentPalatalIntensity = self.internalPalatalIntensity
                 self.currentLingualIntensity = self.internalLingualIntensity
-                
-                // Accumulation for final report (Gated by IA & Energy Stability)
-                // Threshold set to 35dB as per user preference to capture lighter snoring events.
-                if capturedIsSnoring && capturedDB > 35 {
-                    let frameCount = Int(buffer.frameLength)
-                    let crest: Float
-                    if let ptr = buffer.floatChannelData?[0], capturedRMS > 0 {
-                        let samples = UnsafeBufferPointer(start: ptr, count: frameCount)
-                        let peak = samples.reduce(0) { max($0, abs($1)) }
-                        crest = peak / capturedRMS
-                    } else {
-                        crest = 0
-                    }
-                    
-                    if crest > 3.0 && (capturedSpectral.nasal + capturedSpectral.palatal + capturedSpectral.lingual) > 0 {
-                        self.nasalSum += capturedSpectral.nasal
-                        self.palatalSum += capturedSpectral.palatal
-                        self.lingualSum += capturedSpectral.lingual
-                        self.spectralCount += 1
-                    }
-                }
             }
             lastUIUpdateTime = now
+        }
+        
+        // 5. Accumulation for final report (Independent of UI Throttling)
+        // Gated by IA & Crest Factor Stability using session snapshots.
+        if snoreDetector.isSnoring && dB > sessionDBThreshold && crest > sessionCrestThreshold {
+            nasalSum += spectral.nasal
+            palatalSum += spectral.palatal
+            lingualSum += spectral.lingual
+            spectralCount += 1
         }
 
         // IF WAITING: We just return here but the engine keeps running!
@@ -536,8 +562,9 @@ final class RecordingViewModel: ObservableObject {
             // Timeline Sampling (1s resolution for smoother hypnogram)
             sampleAccumulator.append(dB)
             if now.timeIntervalSince(lastTimelineSampleTime) >= 1.0 {
-                let avgDB = sampleAccumulator.reduce(0, +) / Float(max(1, sampleAccumulator.count))
-                decibelTimeline.append(avgDB)
+                // Use maximum (Peak) instead of Average to ensure snores are visible in the hypnogram.
+                let peakInWindow = sampleAccumulator.max() ?? dB
+                decibelTimeline.append(peakInWindow)
                 
                 // Collect Sentinel V2 Telemetry
                 snrTimeline.append(currentSNR)
@@ -585,7 +612,11 @@ final class RecordingViewModel: ObservableObject {
             session.lingualIntensity = spectralCount > 0 ? (lingualSum / Double(spectralCount)) : 0.0
         }
         
-        print("[Somnera] 📊 Persistiendo reporte anatómico - Nasal: \(Int(session.nasalIntensity * 100))%, Palatal: \(Int(session.palatalIntensity * 100))%, Lingual: \(Int(session.lingualIntensity * 100))% (Eventos: \(eventsWithIntensity.count))")
+        let nasalVal = session.nasalIntensity.isFinite ? Int(session.nasalIntensity * 100) : 0
+        let palatalVal = session.palatalIntensity.isFinite ? Int(session.palatalIntensity * 100) : 0
+        let lingualVal = session.lingualIntensity.isFinite ? Int(session.lingualIntensity * 100) : 0
+        
+        print("[Somnera] 📊 Persistiendo reporte anatómico - Nasal: \(nasalVal)%, Palatal: \(palatalVal)%, Lingual: \(lingualVal)% (Eventos: \(eventsWithIntensity.count))")
         
         session.snrTimeline = snrTimeline
         session.stabilityTimeline = stabilityTimeline
@@ -649,16 +680,24 @@ final class RecordingViewModel: ObservableObject {
         }
         
         snoreDetector.onSnoreDetected = { [weak self] confidence, offset, distance in
+            guard let self = self else { return }
+            
+            // CRITICAL: Capture intensities IMMEDIATELY on the processing thread.
+            // If we wait for the @MainActor Task to run, the values might have already decayed.
+            let capturedNasal = self.internalNasalIntensity
+            let capturedPalatal = self.internalPalatalIntensity
+            let capturedLingual = self.internalLingualIntensity
+            
             Task { @MainActor [weak self] in
-                guard let self else { return }
+                guard let self = self else { return }
                 let event = SnoreEvent(
                     offsetSeconds: offset,
                     durationSeconds: SomneraConstants.Snore.windowDurationSeconds,
                     confidence: confidence,
                     peakDecibels: self.peakDecibels,
-                    nasalIntensity: self.internalNasalIntensity,
-                    palatalIntensity: self.internalPalatalIntensity,
-                    lingualIntensity: self.internalLingualIntensity
+                    nasalIntensity: capturedNasal,
+                    palatalIntensity: capturedPalatal,
+                    lingualIntensity: capturedLingual
                 )
                 self.currentSnoreEvents.append(event)
                 self.snoreEventCount = self.currentSnoreEvents.count

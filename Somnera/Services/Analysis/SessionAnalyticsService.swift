@@ -33,12 +33,12 @@ final class SessionAnalyticsService {
             return "Tu noche fue silenciosa. No se detectaron patrones de ronquido significativos."
         }
         
-        if score < 30 {
-            return "Ronquidos leves y ocasionales detectados. Es probable que no afecten la calidad de tu descanso."
-        } else if score < 60 {
+        if score >= 70 {
+            return "Eficiencia respiratoria alta. Ronquidos mínimos detectados, lo cual es ideal para un descanso reparador."
+        } else if score >= 40 {
             return "Patrón de ronquido moderado. Se observan ráfagas rítmicas que podrían estar relacionadas con tu posición al dormir."
         } else {
-            return "Ronquido persistente de alta intensidad. Este patrón suele causar sequedad de garganta y fatiga matutina."
+            return "Salud respiratoria comprometida. Ronquido persistente de alta intensidad que sugiere un descanso de baja calidad."
         }
     }
     
@@ -64,10 +64,10 @@ final class SessionAnalyticsService {
     // MARK: - Overall Summary
     
     private func summarizeOverall(_ session: SleepSession) -> String {
-        if session.snoreScore < 20 && session.apneaEvents.isEmpty {
-            return "Descanso Óptimo"
-        } else if session.snoreScore > 70 || !session.apneaEvents.isEmpty {
-            return "Atención Necesaria"
+        if session.snoreScore >= 80 && session.apneaEvents.isEmpty {
+            return "Salud Respiratoria Óptima"
+        } else if session.snoreScore < 40 || !session.apneaEvents.isEmpty {
+            return "Atención Sugerida"
         } else {
             return "Calidad de Sueño Media"
         }

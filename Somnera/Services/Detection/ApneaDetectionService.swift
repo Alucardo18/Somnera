@@ -21,7 +21,7 @@ final class ApneaDetectionService {
     private let windowSize = 50 // ~5 seconds for better context
     private var lastSnoreDate: Date?
 
-    private let silenceThreshold = SomneraConstants.Apnea.silenceRMSThreshold
+    var silenceThreshold = SomneraConstants.Apnea.silenceRMSThreshold
     private let apneaTriggerSeconds = SomneraConstants.Apnea.triggerSeconds
 
     // Analysis Buffers
