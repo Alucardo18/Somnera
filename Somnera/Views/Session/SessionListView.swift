@@ -5,6 +5,13 @@ struct SessionListView: View {
     @State private var selectedSession: SleepSession? = nil
     @State private var isCalendarExpanded = false
     @State private var currentMonth = Date()
+    @State private var selectedDate = Date()
+    
+    private var filteredSessions: [SleepSession] {
+        viewModel.sessions.filter { 
+            Calendar.current.isDate($0.startDate, inSameDayAs: selectedDate)
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -17,11 +24,12 @@ struct SessionListView: View {
                     CalendarNavigatorView(
                         sessions: viewModel.sessions,
                         isExpanded: $isCalendarExpanded,
-                        currentMonth: $currentMonth
+                        currentMonth: $currentMonth,
+                        selectedDate: $selectedDate
                     )
                     .padding(.top, 8)
                     
-                    if viewModel.sessions.isEmpty {
+                    if filteredSessions.isEmpty {
                         Spacer()
                         emptyState
                         Spacer()
@@ -36,7 +44,7 @@ struct SessionListView: View {
                                         .tracking(2)
                                         .padding(.horizontal)
                                     
-                                    bubbleCloud
+                                    bubbleCloud(sessions: filteredSessions)
                                         .padding(.vertical, 10)
                                 }
                                 
@@ -53,7 +61,7 @@ struct SessionListView: View {
                                         .padding(.horizontal)
                                     
                                     VStack(spacing: 16) {
-                                        ForEach(viewModel.sessions.prefix(5)) { session in
+                                        ForEach(filteredSessions) { session in
                                             NavigationLink(destination: SessionDetailView(session: session)) {
                                                 SessionInsightCard(session: session)
                                             }
@@ -86,14 +94,9 @@ struct SessionListView: View {
         }
     }
     
-    private var bubbleCloud: some View {
-        // We arrange bubbles in a dynamic flow
-        // To make it look like a "cloud", we use a simple ZStack with offsets
-        // or a custom wrapping layout. For simplicity and robustness, 
-        // we'll use a dynamic HStack/VStack grouping.
-        
+    private func bubbleCloud(sessions: [SleepSession]) -> some View {
         VStack(spacing: 40) {
-            let chunks = viewModel.sessions.chunked(into: 3)
+            let chunks = sessions.chunked(into: 3)
             ForEach(0..<chunks.count, id: \.self) { rowIndex in
                 HStack(spacing: rowIndex % 2 == 0 ? 30 : 50) {
                     ForEach(chunks[rowIndex]) { session in
@@ -251,6 +254,10 @@ struct SessionInsightCard: View {
             }
             .frame(height: 40)
             .padding(.horizontal, 10)
+            .onAppear {
+                // STABILITY FIX: Pre-fetch timeline to avoid SwiftData context crashes
+                _ = session.decibelTimeline 
+            }
             
             // Right: Anatomical Quick View
             HStack(spacing: 8) {
@@ -297,6 +304,7 @@ struct CalendarNavigatorView: View {
     let sessions: [SleepSession]
     @Binding var isExpanded: Bool
     @Binding var currentMonth: Date
+    @Binding var selectedDate: Date
     
     let calendar = Calendar.current
     let daysOfWeek = ["D", "L", "M", "M", "J", "V", "S"]
@@ -308,6 +316,12 @@ struct CalendarNavigatorView: View {
                 Text(currentMonth.formatted(.dateTime.month(.wide).year()))
                     .font(.headline)
                     .foregroundColor(.white)
+                    .onTapGesture {
+                        withAnimation {
+                            currentMonth = Date()
+                            selectedDate = Date()
+                        }
+                    }
                 
                 Spacer()
                 
@@ -358,6 +372,11 @@ struct CalendarNavigatorView: View {
                 ForEach(0..<days.count, id: \.self) { index in
                     if let date = days[index] {
                         dayCell(for: date)
+                            .onTapGesture {
+                                withAnimation(.spring()) {
+                                    selectedDate = date
+                                }
+                            }
                     } else {
                         Color.clear.frame(height: 32)
                     }
@@ -373,6 +392,12 @@ struct CalendarNavigatorView: View {
             ForEach(last7Days(), id: \.self) { date in
                 dayCell(for: date, compact: true)
                     .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        withAnimation(.spring()) {
+                            selectedDate = date
+                        }
+                    }
             }
         }
         .padding(.horizontal)
@@ -382,6 +407,7 @@ struct CalendarNavigatorView: View {
         let sessionsOnDay = sessions.filter { calendar.isDate($0.startDate, inSameDayAs: date) }
         let hasSession = !sessionsOnDay.isEmpty
         let isToday = calendar.isDateInToday(date)
+        let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
         
         // Color based on the worst score of the day
         let worstScore = sessionsOnDay.map { $0.snoreScore }.min() ?? 100 // Use MIN because low score = danger
@@ -405,8 +431,13 @@ struct CalendarNavigatorView: View {
             
             ZStack {
                 Circle()
-                    .fill(statusColor.opacity(0.2))
+                    .fill(isSelected ? Color.somAccent.opacity(0.3) : statusColor.opacity(0.2))
                     .frame(width: 28, height: 28)
+                    .overlay(
+                        Circle()
+                            .stroke(isSelected ? Color.somAccent : Color.clear, lineWidth: 2)
+                            .blur(radius: isSelected ? 4 : 0)
+                    )
                 
                 if hasSession {
                     Circle()
