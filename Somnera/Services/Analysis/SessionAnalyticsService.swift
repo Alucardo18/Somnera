@@ -11,6 +11,15 @@ final class SessionAnalyticsService {
         let overallHealth: String
     }
     
+    struct WeeklyReport {
+        let averageScore: Int
+        let scoreTrend: Int // Difference from previous period
+        let mainInsight: String
+        let trendDescription: String
+        let recommendation: String
+        let isImproving: Bool
+    }
+    
     func generateReport(for session: SleepSession) -> DiagnosticReport {
         let snoreMsg = analyzeSnores(session)
         let apneaMsg = analyzeApneas(session)
@@ -20,6 +29,77 @@ final class SessionAnalyticsService {
             snoreInsight: snoreMsg,
             apneaInsight: apneaMsg,
             overallHealth: healthMsg
+        )
+    }
+    
+    func generateWeeklyReport(sessions: [SleepSession]) -> WeeklyReport {
+        guard !sessions.isEmpty else {
+            return WeeklyReport(
+                averageScore: 0,
+                scoreTrend: 0,
+                mainInsight: "Sin Datos",
+                trendDescription: "Aún no hay suficientes sesiones para generar un análisis.",
+                recommendation: "Comienza tu primera grabación esta noche.",
+                isImproving: true
+            )
+        }
+        
+        // Split sessions into current week and previous week
+        let calendar = Calendar.current
+        let now = Date()
+        let sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: now)!
+        let fourteenDaysAgo = calendar.date(byAdding: .day, value: -14, to: now)!
+        
+        let currentWeekSessions = sessions.filter { $0.startDate >= sevenDaysAgo }
+        let previousWeekSessions = sessions.filter { $0.startDate >= fourteenDaysAgo && $0.startDate < sevenDaysAgo }
+        
+        let currentAvg = currentWeekSessions.isEmpty ? 0 : 
+            currentWeekSessions.map { $0.snoreScore }.reduce(0, +) / currentWeekSessions.count
+            
+        let previousAvg = previousWeekSessions.isEmpty ? currentAvg : 
+            previousWeekSessions.map { $0.snoreScore }.reduce(0, +) / previousWeekSessions.count
+            
+        let trend = currentAvg - previousAvg
+        
+        // 1. Analyze Anatomical Predominance
+        let n = Double(currentWeekSessions.count)
+        let avgNasal = currentWeekSessions.map { $0.nasalIntensity }.reduce(0, +) / (n > 0 ? n : 1.0)
+        let avgPalatal = currentWeekSessions.map { $0.palatalIntensity }.reduce(0, +) / (n > 0 ? n : 1.0)
+        let avgLingual = currentWeekSessions.map { $0.lingualIntensity }.reduce(0, +) / (n > 0 ? n : 1.0)
+        
+        var anatomicalMsg = ""
+        if avgNasal > 0.3 { anatomicalMsg = "Tu patrón es predominantemente nasal, lo que sugiere congestión." }
+        else if avgLingual > 0.3 { anatomicalMsg = "Detectamos obstrucción lingual, común al dormir boca arriba." }
+        else { anatomicalMsg = "Tu respiración es mayormente palatal y estable." }
+        
+        // 2. Postural Analysis (Sentinel V2)
+        let sessionsWithTilt = currentWeekSessions.filter { !$0.tiltTimeline.isEmpty }
+        var posturalTip = "Mantén tu iPhone en el colchón para análisis postural."
+        
+        if !sessionsWithTilt.isEmpty {
+            // Check if snore events happen more at low tilt (< 25 degrees = boca arriba)
+            let flatSnores = sessionsWithTilt.reduce(0) { count, session in
+                // Simplified heuristic: if avg tilt is low, assume supine
+                let avgTilt = session.tiltTimeline.reduce(0, +) / Double(session.tiltTimeline.count)
+                return count + (avgTilt < 25.0 ? session.snoreEvents.count : 0)
+            }
+            if flatSnores > 10 {
+                posturalTip = "Evita dormir boca arriba; tus ronquidos aumentan en esa posición."
+            } else {
+                posturalTip = "Tu posición lateral está ayudando a mantener tus vías abiertas."
+            }
+        }
+        
+        let isImproving = trend >= 0
+        let trendText = trend == 0 ? "Estable" : "\(abs(trend))% \(isImproving ? "mejor" : "menor") que la semana pasada"
+        
+        return WeeklyReport(
+            averageScore: currentAvg,
+            scoreTrend: trend,
+            mainInsight: isImproving ? "Tendencia de Mejora" : "Atención Necesaria",
+            trendDescription: "Tu puntuación promedio es de \(currentAvg) pts. \(trendText).",
+            recommendation: "\(anatomicalMsg) \(posturalTip)",
+            isImproving: isImproving
         )
     }
     

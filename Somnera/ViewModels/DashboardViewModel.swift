@@ -10,6 +10,7 @@ final class DashboardViewModel: ObservableObject {
 
     private let storageService = SessionStorageService.shared
     private let healthKitService = HealthKitService()
+    private let analyticsService = SessionAnalyticsService.shared
 
     // MARK: - Load
 
@@ -75,6 +76,10 @@ final class DashboardViewModel: ObservableObject {
     var averageScore: Int {
         guard !sessions.isEmpty else { return 0 }
         return sessions.prefix(7).map { $0.snoreScore }.reduce(0, +) / min(sessions.count, 7)
+    }
+
+    var weeklyInsight: SessionAnalyticsService.WeeklyReport {
+        analyticsService.generateWeeklyReport(sessions: sessions)
     }
 
     var weeklyAnatomicalAnalysis: (type: String, description: String, icon: String) {

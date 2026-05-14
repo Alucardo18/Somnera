@@ -112,23 +112,29 @@ struct SessionListView: View {
     }
 
     private var weeklySummaryCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        let insight = viewModel.weeklyInsight
+        
+        return VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("RESUMEN SEMANAL")
                         .font(.system(size: 10, weight: .black))
                         .foregroundColor(.somAccent)
-                    Text("Tendencia de Mejora")
+                    Text(insight.mainInsight)
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                 }
                 Spacer()
-                Image(systemName: "chart.line.uptrend.xyaxis")
-                    .foregroundColor(.somSafe)
+                Image(systemName: insight.isImproving ? "chart.line.uptrend.xyaxis" : "chart.line.downtrend.xyaxis")
+                    .foregroundColor(insight.isImproving ? .somSafe : .somApnea)
                     .font(.title2)
             }
             
-            Text("Tus niveles de obstrucción nasal han bajado un 12% respecto a la semana pasada. Mantén tu posición lateral para mejores resultados.")
+            Text(insight.trendDescription)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.white.opacity(0.9))
+            
+            Text(insight.recommendation)
                 .font(.system(size: 12))
                 .foregroundColor(.somTextSecondary)
                 .lineSpacing(4)
@@ -136,14 +142,14 @@ struct SessionListView: View {
         .padding(20)
         .background(
             ZStack {
-                Color.somAccent.opacity(0.05)
-                LinearGradient(colors: [.somAccent.opacity(0.1), .clear], startPoint: .topLeading, endPoint: .bottomTrailing)
+                (insight.isImproving ? Color.somSafe : Color.somApnea).opacity(0.05)
+                LinearGradient(colors: [(insight.isImproving ? Color.somSafe : Color.somApnea).opacity(0.1), .clear], startPoint: .topLeading, endPoint: .bottomTrailing)
             }
         )
         .cornerRadius(24)
         .overlay(
             RoundedRectangle(cornerRadius: 24)
-                .stroke(Color.somAccent.opacity(0.2), lineWidth: 1)
+                .stroke((insight.isImproving ? Color.somSafe : Color.somApnea).opacity(0.2), lineWidth: 1)
         )
     }
 }
