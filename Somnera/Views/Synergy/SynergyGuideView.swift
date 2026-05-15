@@ -40,17 +40,17 @@ struct SynergyGuideView: View {
                     
                     // SLIDE 2: TOPOGRAFÍA
                     PremiumGuideSlide(
-                        title: "Arquitectura Neural",
-                        subtitle: "PICOS Y VALLES DE CONSCIENCIA",
-                        description: "Los valles púrpuras son el 'Sueño Profundo' (recuperación física). Las elevaciones vibrantes son las zonas REM (actividad onírica), donde tu mente está más despierta y creativa.",
+                        title: "Topografía Biológica",
+                        subtitle: "CONSCIENCIA DATA-DRIVEN",
+                        description: "Este paisaje no es solo estético; las ondas se modulan en tiempo real con tus niveles de audio. Los picos representan la respuesta de tu arquitectura cerebral a ronquidos o ruidos externos detectados durante la noche.",
                         visual: AnyView(TopographyVisualDemo())
                     ).tag(1)
                     
                     // SLIDE 3: DESTELLOS
                     PremiumGuideSlide(
-                        title: "Destellos Dorados",
+                        title: "Estallido Estelar",
                         subtitle: "CONSOLIDACIÓN DE MEMORIA",
-                        description: "Cada chispa de oro sobre la malla representa un paquete de memoria que tu cerebro está guardando permanentemente. Entre más destellos veas, más nítido será tu enfoque al despertar.",
+                        description: "Cada destello de oro es un 'Stellar Burst' que cuantifica la fijación de recuerdos. La densidad de oro depende de tu eficiencia respiratoria; a mayor estabilidad, mayor es la consolidación neuronal.",
                         visual: AnyView(SparklesVisualDemo())
                     ).tag(2)
                 }
