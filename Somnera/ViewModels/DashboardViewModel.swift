@@ -32,7 +32,7 @@ final class DashboardViewModel: ObservableObject {
     struct ChartData: Identifiable {
         let id = UUID()
         let label: String
-        let score: Int
+        let score: Int? // Opcional para distinguir de "Sin datos"
         let apneaCount: Int
     }
 
@@ -43,23 +43,21 @@ final class DashboardViewModel: ObservableObject {
         
         let today = calendarWithSundayStart.startOfDay(for: Date())
         
-        // Encontrar el inicio de la semana (Domingo)
         let components = calendarWithSundayStart.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)
         guard let startOfWeek = calendarWithSundayStart.date(from: components) else { return [] }
         
         let dayFormatter = DateFormatter()
         dayFormatter.locale = Locale(identifier: "es_ES")
-        dayFormatter.dateFormat = "EEEEE" // Una letra (D, L, M, X...)
+        dayFormatter.dateFormat = "EEEEE"
         
         return (0..<7).map { dayOffset in
             let day = calendarWithSundayStart.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
             
-            // Buscar sesiones en este día específico
             let sessionsOnDay = sessions.filter {
                 calendarWithSundayStart.isDate($0.startDate, inSameDayAs: day)
             }
             
-            let score = sessionsOnDay.isEmpty ? 0 :
+            let score = sessionsOnDay.isEmpty ? nil :
                 sessionsOnDay.map { $0.snoreScore }.reduce(0, +) / sessionsOnDay.count
             
             let apneaCount = sessionsOnDay.isEmpty ? 0 :

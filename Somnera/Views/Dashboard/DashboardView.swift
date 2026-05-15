@@ -331,7 +331,6 @@ struct WeeklyChartView: View {
 
     private let chartHeight: CGFloat = 100
     private let safeThreshold: Int = 70
-    private let warningThreshold: Int = 40
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -340,7 +339,7 @@ struct WeeklyChartView: View {
                     Text("Tendencia Semanal")
                         .font(.system(size: 14, weight: .black))
                         .foregroundColor(.white)
-                    Text("Ronquido vs Apneas")
+                    Text("Puntos de Salud Respiratoria")
                         .font(.system(size: 8, weight: .bold))
                         .foregroundColor(.somTextSecondary)
                         .tracking(1)
@@ -349,7 +348,7 @@ struct WeeklyChartView: View {
                 Spacer()
                 
                 HStack(spacing: 12) {
-                    legend(label: "Ronquido", color: .somAccent)
+                    legend(label: "Sinergia", color: .somSafe)
                     legend(label: "Apnea", color: .somApnea)
                 }
             }
@@ -358,25 +357,22 @@ struct WeeklyChartView: View {
                 // 1. Background Zones
                 GeometryReader { geo in
                     VStack(spacing: 0) {
-                        Color.somSafe.opacity(0.03).frame(height: geo.size.height * 0.3)    // 70-100
-                        Color.somWarning.opacity(0.03).frame(height: geo.size.height * 0.3) // 40-70
-                        Color.somApnea.opacity(0.03).frame(height: geo.size.height * 0.4)   // 0-40
+                        Color.somSafe.opacity(0.05).frame(height: geo.size.height * 0.3)
+                        Color.somWarning.opacity(0.05).frame(height: geo.size.height * 0.3)
+                        Color.somApnea.opacity(0.05).frame(height: geo.size.height * 0.4)
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
                 
                 // 2. Apnea Spikes (Background)
                 GeometryReader { geo in
-                    let width = geo.size.width
-                    let stepX = width / CGFloat(max(1, data.count - 1))
-                    
+                    let stepX = geo.size.width / CGFloat(max(1, data.count - 1))
                     Path { path in
                         for i in 0..<data.count {
-                            let x = CGFloat(i) * stepX
                             let count = data[i].apneaCount
                             if count > 0 {
-                                // Spike height based on apnea count
-                                let h = min(CGFloat(count) * 10, chartHeight)
+                                let x = CGFloat(i) * stepX
+                                let h = min(CGFloat(count) * 15, chartHeight)
                                 path.move(to: CGPoint(x: x, y: chartHeight))
                                 path.addLine(to: CGPoint(x: x, y: chartHeight - h))
                             }
@@ -385,51 +381,70 @@ struct WeeklyChartView: View {
                     .stroke(Color.somApnea.opacity(0.4), style: StrokeStyle(lineWidth: 4, lineCap: .round))
                 }
                 
-                // 3. Reference Line
-                Path { path in
-                    let y = yPosition(for: safeThreshold)
-                    path.move(to: CGPoint(x: 0, y: y))
-                    path.addLine(to: CGPoint(x: 350, y: y))
-                }
-                .stroke(Color.somSafe.opacity(0.2), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
-                
+                // 3. The Trend Line (Smoothed)
                 GeometryReader { geo in
                     let width = geo.size.width
                     let stepX = width / CGFloat(max(1, data.count - 1))
-                    
-                    // 4. Area under the curve
-                    Path { path in
-                        path.move(to: CGPoint(x: 0, y: chartHeight))
-                        for i in 0..<data.count {
-                            let x = CGFloat(i) * stepX
-                            let y = yPosition(for: data[i].score)
-                            path.addLine(to: CGPoint(x: x, y: y))
-                        }
-                        path.addLine(to: CGPoint(x: width, y: chartHeight))
-                        path.closeSubpath()
+                    let validPoints = data.enumerated().compactMap { i, point -> (CGPoint, Int)? in
+                        guard let score = point.score else { return nil }
+                        return (CGPoint(x: CGFloat(i) * stepX, y: yPosition(for: score)), i)
                     }
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.somAccent.opacity(0.15), .clear],
-                            startPoint: .top, endPoint: .bottom
+                    
+                    if !validPoints.isEmpty {
+                        // Area Fill
+                        Path { path in
+                            if let first = validPoints.first {
+                                path.move(to: CGPoint(x: first.0.x, y: chartHeight))
+                                path.addLine(to: first.0)
+                                
+                                for j in 1..<validPoints.count {
+                                    let current = validPoints[j].0
+                                    let previous = validPoints[j-1].0
+                                    let midX = (previous.x + current.x) / 2
+                                    path.addCurve(to: current, control1: CGPoint(x: midX, y: previous.y), control2: CGPoint(x: midX, y: current.y))
+                                }
+                                
+                                if let last = validPoints.last {
+                                    path.addLine(to: CGPoint(x: last.0.x, y: chartHeight))
+                                }
+                                path.closeSubpath()
+                            }
+                        }
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.somSafe.opacity(0.15), .clear],
+                                startPoint: .top, endPoint: .bottom
+                            )
                         )
-                    )
-                    
-                    // 5. The Glow Line
-                    Path { path in
-                        for i in 0..<data.count {
-                            let x = CGFloat(i) * stepX
-                            let y = yPosition(for: data[i].score)
-                            if i == 0 { path.move(to: CGPoint(x: x, y: y)) }
-                            else { path.addLine(to: CGPoint(x: x, y: y)) }
+
+                        // Main Glow Line
+                        Path { path in
+                            if let first = validPoints.first {
+                                path.move(to: first.0)
+                                for j in 1..<validPoints.count {
+                                    let current = validPoints[j].0
+                                    let previous = validPoints[j-1].0
+                                    let midX = (previous.x + current.x) / 2
+                                    path.addCurve(to: current, control1: CGPoint(x: midX, y: previous.y), control2: CGPoint(x: midX, y: current.y))
+                                }
+                            }
+                        }
+                        .trim(from: 0, to: appear ? 1 : 0)
+                        .stroke(
+                            LinearGradient(colors: [.somApnea, .somWarning, .somSafe], startPoint: .bottom, endPoint: .top),
+                            style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
+                        )
+                        .shadow(color: .somSafe.opacity(0.4), radius: 6)
+
+                        // Data Points
+                        ForEach(validPoints, id: \.1) { point, _ in
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 4, height: 4)
+                                .position(point)
+                                .opacity(appear ? 1 : 0)
                         }
                     }
-                    .trim(from: 0, to: appear ? 1 : 0)
-                    .stroke(
-                        LinearGradient(colors: [.somSafe, .somWarning, .somApnea], startPoint: .bottom, endPoint: .top),
-                        style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
-                    )
-                    .shadow(color: .somAccent.opacity(0.4), radius: 6)
                 }
                 .frame(height: chartHeight)
             }
@@ -439,13 +454,12 @@ struct WeeklyChartView: View {
                 ForEach(data) { point in
                     Text(point.label)
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(.somTextSecondary)
+                        .foregroundColor(point.score != nil ? .white : .somTextSecondary.opacity(0.5))
                         .frame(maxWidth: .infinity)
                 }
             }
             .padding(.bottom, 8)
             
-            // 6. Anatomical Insight Card
             anatomicalInsight(analysis: analysis)
         }
         .padding(24)
@@ -454,8 +468,6 @@ struct WeeklyChartView: View {
             withAnimation(.easeOut(duration: 1.2)) { appear = true }
         }
     }
-
-    // Removed the simulated private property
 
     private func anatomicalInsight(analysis: (type: String, description: String, icon: String)) -> some View {
         HStack(spacing: 12) {
@@ -494,6 +506,7 @@ struct WeeklyChartView: View {
         return chartHeight - (normalizedScore / 100 * chartHeight)
     }
 }
+
 
 
 #Preview {
