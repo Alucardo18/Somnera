@@ -65,7 +65,7 @@ struct SleepTopographyView: View {
             NeuralInsightCard(dragX: dragX, totalWidth: totalWidth, session: session)
                 .padding(.horizontal)
             
-            // Cápsulas y Stats DInámicas
+            // Cápsulas y Stats Dinámicas
             VStack(alignment: .leading, spacing: 12) {
                 Text("Arquitectura de Sueño").font(.system(size: 10, weight: .bold)).foregroundColor(.somTextSecondary).tracking(2).textCase(.uppercase)
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -95,29 +95,60 @@ struct SleepTopographyView: View {
         return h > 0 ? "\(h)h \(m)m" : "\(m)m"
     }
     
-    // MARK: - Neural & Physics Engine (Sin cambios en lógica visual)
+    // MARK: - Neural & Physics Engine
     
-    private func getWaveY(at x: CGFloat, size: CGSize) -> CGFloat {
+    private func getWaveY(at x: CGFloat, size: CGSize, time: Double) -> CGFloat {
         let colWidth = size.width / CGFloat(timePoints - 1)
         let col = max(0, min(Int(x / colWidth), timePoints - 1))
         let centerY = size.height / 2
-        let remIntensity = (col > 15 && col < 25) ? (sin(CGFloat(col) * 0.5) * 0.5 + 0.5) : 0
-        let sleepDepth = sin(CGFloat(col) * 0.2) * 0.5 + 0.5
-        let zValue = (remIntensity * 0.2) - sleepDepth
+        
+        let zValue = calculateZValue(col: col, time: time)
         return centerY - (zValue * 80)
+    }
+    
+    private func calculateZValue(col: Int, time: Double) -> CGFloat {
+        let t = time * 0.4
+        let progress = Double(col) / Double(timePoints)
+        
+        // 1. Modulación por datos reales de audio (si existen)
+        var audioBias: Double = 0
+        if let timeline = session?.decibelTimeline, !timeline.isEmpty {
+            let index = (col * timeline.count) / timePoints
+            let db = timeline[max(0, min(index, timeline.count - 1))]
+            audioBias = Double(max(0, db - 30) / 60.0) * 0.3 // Inyectamos picos reales
+        }
+        
+        // 2. Arquitectura de Fases Dinámica
+        // Sueño Profundo: Dominante al principio (ondas lentas, baja frecuencia)
+        let deepIntensity = exp(-pow(progress - 0.2, 2) / 0.05)
+        let deepWave = sin(Double(col) * 0.15 + t) * deepIntensity
+        
+        // REM: Dominante al final (ondas rápidas, alta frecuencia)
+        let remIntensity = exp(-pow(progress - 0.8, 2) / 0.1)
+        let remWave = sin(Double(col) * 0.6 + t * 2.0) * remIntensity
+        
+        // 3. Ruido de base (Vigilia/Ligero)
+        let baseWave = sin(Double(col) * 0.3 + t) * 0.2
+        
+        return CGFloat(deepWave + remWave + baseWave + audioBias)
     }
     
     private func getSparkPos(id: Int, time: Double, size: CGSize) -> (x: CGFloat, y: CGFloat, opacity: Double, lifecycle: Double) {
         let speed = 0.2 
         let lifecycle = (time * speed + Double(id) * 0.731).truncatingRemainder(dividingBy: 1.0)
         let opacity = sin(lifecycle * .pi)
-        let zoneStart: CGFloat = totalWidth * 0.35
-        let zoneEnd: CGFloat = totalWidth * 0.65
+        
+        // Spawneamos donde haya intensidad REM o Deep (basado en el ID)
+        let zoneStart: CGFloat = totalWidth * 0.1
+        let zoneEnd: CGFloat = totalWidth * 0.9
         let range = zoneEnd - zoneStart
+        
         let cycleId = floor(time * speed + Double(id) * 0.731)
         let xSeed = sin(cycleId * 987.654 + Double(id) * 123.456)
         let xPos = zoneStart + range * (abs(xSeed))
-        let waveY = getWaveY(at: xPos, size: size)
+        
+        let waveY = getWaveY(at: xPos, size: size, time: time)
+        
         let v0: CGFloat = -90.0
         let gravity: CGFloat = 80.0
         let t = CGFloat(lifecycle)
@@ -137,22 +168,25 @@ struct SleepTopographyView: View {
     private func drawNeuralMap(in context: GraphicsContext, size: CGSize, time: Double) {
         let colWidth = size.width / CGFloat(timePoints - 1)
         let centerY = size.height / 2
+        
         for row in 0..<depthPoints {
             var path = Path()
             let zOffset = CGFloat(row) * 10.0
             let rowOpacity = 1.0 - (Double(row) / Double(depthPoints))
+            
             for col in 0..<timePoints {
                 let xBase = CGFloat(col) * colWidth
-                let remIntensity = (col > 15 && col < 25) ? (sin(CGFloat(col) * 0.5) * 0.5 + 0.5) : 0
-                let sleepDepth = sin(CGFloat(col) * 0.2) * 0.5 + 0.5
-                let zValue = (remIntensity * 0.2) - sleepDepth
+                let zValue = calculateZValue(col: col, time: time + Double(row) * 0.1)
+                
                 let px = xBase + (zOffset * 0.5)
-                let py = centerY + (zOffset * 0.8) - (zValue * 80)
+                let py = centerY + (zOffset * 0.8) - (zValue * 60)
+                
                 if col == 0 { path.move(to: CGPoint(x: px, y: py)) }
                 else { path.addLine(to: CGPoint(x: px, y: py)) }
             }
             context.stroke(path, with: .linearGradient(Gradient(colors: [dreamColor.opacity(rowOpacity * 0.4), deepColor.opacity(rowOpacity * 0.4)]), startPoint: .zero, endPoint: CGPoint(x: size.width, y: 0)), lineWidth: 1.0)
         }
+        
         for i in 0..<10 {
             let spark = getSparkPos(id: i, time: time, size: size)
             if spark.opacity > 0 {
@@ -206,7 +240,6 @@ struct SleepDataCapsule: View {
 
 struct NeuralInsightCard: View {
     let dragX: CGFloat?; let totalWidth: CGFloat; let session: SleepSession?
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if let dx = dragX {
@@ -235,17 +268,19 @@ struct NeuralInsightCard: View {
         let duration = session?.duration ?? 28800
         let startTime = session?.startDate ?? Date().addingTimeInterval(-28800)
         let currentTime = startTime.addingTimeInterval(duration * Double(progress))
-        
         let formatter = DateFormatter()
         formatter.dateFormat = "hh:mm a"
         let timeString = formatter.string(from: currentTime)
         
-        if progress > 0.35 && progress < 0.65 {
+        if progress > 0.6 {
             let pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.15)
-            return NeuralData(time: timeString, state: "Sueño REM", icon: "sparkles", memoryFragments: "\(pqt) pqt", insight: "Consolidación de memoria activa. Los fragmentos brotan de las ondas neuronales dominantes.")
+            return NeuralData(time: timeString, state: "Sueño REM", icon: "sparkles", memoryFragments: "\(pqt) pqt", insight: "Consolidación emocional activa. Detectamos alta actividad talamocortical en esta fase.")
+        } else if progress < 0.3 {
+            let pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.08)
+            return NeuralData(time: timeString, state: "Sueño Profundo", icon: "brain.fill", memoryFragments: "\(pqt) pqt", insight: "Recuperación física y limpieza glinfática. Ondas delta dominantes.")
         } else {
-            let pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.05)
-            return NeuralData(time: timeString, state: "Sueño Profundo", icon: "brain.fill", memoryFragments: "\(pqt) pqt", insight: "Recuperación cognitiva. Estabilidad en las ondas de frecuencia baja.")
+            let pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.03)
+            return NeuralData(time: timeString, state: "Sueño Ligero", icon: "moon.fill", memoryFragments: "\(pqt) pqt", insight: "Transición neuronal. Procesamiento de información periférica.")
         }
     }
 }
