@@ -113,22 +113,27 @@ struct SynergyView: View {
                 
                 // Topografía de la Conciencia
                 VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Text("Topografía de la Conciencia")
-                            .font(.headline)
-                        Button {
-                            alertTitle = "Topografía de la Conciencia"
-                            alertMessage = "Mapea las fases del sueño y la actividad cerebral para cuantificar la consolidación de la memoria y la intensidad de los sueños, transformando los ciclos REM en métricas de recuperación cognitiva."
-                            showAlert = true
-                        } label: {
-                            Image(systemName: "info.circle")
-                                .foregroundColor(.somAccent)
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text("Topografía de la Conciencia")
+                                .font(.headline)
+                            Button {
+                                alertTitle = "Topografía de la Conciencia"
+                                alertMessage = "Mapea las fases del sueño y la actividad cerebral para cuantificar la consolidación de la memoria y la intensidad de los sueños, transformando los ciclos REM en métricas de recuperación cognitiva."
+                                showAlert = true
+                            } label: {
+                                Image(systemName: "info.circle")
+                                    .foregroundColor(.somAccent)
+                            }
                         }
+                        Text("Simulación bio-estocástica de consolidación de memoria y actividad neuronal.")
+                            .font(.caption)
+                            .foregroundColor(.somTextSecondary)
                     }
                     .padding(.horizontal)
                     .foregroundColor(.white)
                     
-                    SleepTopographyView()
+                    SleepTopographyView(session: viewModel.lastSession)
                 }
                 
                 // Hélice de Sinergia (NUEVO)

@@ -151,6 +151,27 @@ final class SleepSession: Identifiable {
             .sorted { $0.offsetSeconds < $1.offsetSeconds }
     }
 
+    var memoryPacketsCount: Int {
+        let totalMinutes = duration / 60
+        guard totalMinutes > 0 else { return 0 }
+        
+        // Estimación biológica estándar
+        let remMinutes = totalMinutes * 0.25
+        let deepMinutes = totalMinutes * 0.20
+        
+        // Paquetes por minuto
+        let remPackets = remMinutes * 7.0
+        let deepPackets = deepMinutes * 3.0
+        
+        let totalBasePackets = remPackets + deepPackets
+        
+        // Factor de calidad Somnera (a menor snoreScore, menor eficiencia de consolidación)
+        let qualityFactor = Double(snoreScore) / 100.0
+        let finalCount = totalBasePackets * qualityFactor
+        
+        return Int(finalCount.isFinite ? finalCount : 0)
+    }
+
     var insightSummary: String {
         let seed = abs(id.hashValue)
         func pick(_ options: [String]) -> String { options[seed % options.count] }
