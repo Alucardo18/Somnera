@@ -18,7 +18,7 @@ struct SleepTopographyView: View {
     @State private var hapticTrigger = false
     
     // Colores
-    let goldColor = Color(red: 1.0, green: 0.84, blue: 0.0)
+    let goldColor = Color(red: 1.0, green: 0.84, blue: 0.0) // Oro Real
     let dreamColor = Color.purple
     let deepColor = Color.indigo
     
@@ -46,13 +46,10 @@ struct SleepTopographyView: View {
                     DragGesture(minimumDistance: 0)
                         .onChanged { value in
                             let newX = max(0, min(value.location.x, totalWidth))
-                            
-                            // DETECCIÓN DE COLISIÓN HÁPTICA (Sincronizada con el Motor de Entropía)
                             let now = Date().timeIntervalSinceReferenceDate
                             if checkSparkCollision(at: newX, time: now) {
                                 hapticTrigger.toggle()
                             }
-                            
                             dragX = newX
                         }
                         .onEnded { _ in dragX = nil }
@@ -74,7 +71,7 @@ struct SleepTopographyView: View {
             NeuralInsightCard(dragX: dragX, totalWidth: totalWidth)
                 .padding(.horizontal)
             
-            // Cápsulas y Stats (Manteniendo el layout)
+            // Cápsulas y Stats
             VStack(alignment: .leading, spacing: 12) {
                 Text("Arquitectura de Sueño").font(.system(size: 10, weight: .bold)).foregroundColor(.somTextSecondary).tracking(2).textCase(.uppercase)
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -96,43 +93,47 @@ struct SleepTopographyView: View {
         .padding(.vertical).background(Color.somBackground)
     }
     
-    // MARK: - Entropy Engine Logic
+    // MARK: - Neural & Physics Engine
     
-    private func getSparkPos(id: Int, time: Double) -> (x: CGFloat, yProgress: CGFloat, opacity: Double) {
-        // Fórmula de Entropía para Spawn Points
-        // Usamos una combinación de ruido basada en tiempo e ID para que sea impredecible pero consistente por frame
-        let speed = 0.4
+    private func getWaveY(at x: CGFloat, size: CGSize) -> CGFloat {
+        let colWidth = size.width / CGFloat(timePoints - 1)
+        let col = max(0, min(Int(x / colWidth), timePoints - 1))
+        let centerY = size.height / 2
+        let remIntensity = (col > 15 && col < 25) ? (sin(CGFloat(col) * 0.5) * 0.5 + 0.5) : 0
+        let sleepDepth = sin(CGFloat(col) * 0.2) * 0.5 + 0.5
+        let zValue = (remIntensity * 0.2) - sleepDepth
+        return centerY - (zValue * 80)
+    }
+    
+    private func getSparkPos(id: Int, time: Double, size: CGSize) -> (x: CGFloat, y: CGFloat, opacity: Double, lifecycle: Double) {
+        let speed = 0.2 // Vida mucho más larga
         let lifecycle = (time * speed + Double(id) * 0.731).truncatingRemainder(dividingBy: 1.0)
         let opacity = sin(lifecycle * .pi)
         
-        // Solo spawneamos en la zona central de consolidación (40% al 60% del ancho)
         let zoneStart: CGFloat = totalWidth * 0.35
         let zoneEnd: CGFloat = totalWidth * 0.65
         let range = zoneEnd - zoneStart
         
-        // Posición X basada en una semilla de entropía que cambia cada ciclo
         let cycleId = floor(time * speed + Double(id) * 0.731)
         let xSeed = sin(cycleId * 987.654 + Double(id) * 123.456)
         let xPos = zoneStart + range * (abs(xSeed))
         
-        // Variación vertical (yProgress)
-        let ySeed = cos(cycleId * 456.789 + Double(id) * 321.654)
-        let yProgress = 0.5 + ySeed * 0.2
+        let waveY = getWaveY(at: xPos, size: size)
         
-        // Destello suave al final
-        var expansion: CGFloat = 0
-        if lifecycle > 0.8 {
-            expansion = CGFloat(sin((lifecycle - 0.8) / 0.2 * .pi)) * 2.5
-        }
+        // Física optimizada para el arco completo
+        let v0: CGFloat = -90.0
+        let gravity: CGFloat = 80.0
+        let t = CGFloat(lifecycle)
+        let yDisplacement = (v0 * t) + (0.5 * gravity * t * t)
         
-        return (xPos + expansion*0.1, yProgress, opacity)
+        return (xPos, waveY + yDisplacement, opacity, lifecycle)
     }
     
     private func checkSparkCollision(at x: CGFloat, time: Double) -> Bool {
-        // Comprobar colisión con cualquiera de los 15 fragmentos activos por entropía
-        for i in 0..<15 {
-            let spark = getSparkPos(id: i, time: time)
-            if spark.opacity > 0.5 && abs(x - spark.x) < 3 {
+        let dummySize = CGSize(width: totalWidth, height: 220)
+        for i in 0..<10 { // Reducido a 10
+            let spark = getSparkPos(id: i, time: time, size: dummySize)
+            if spark.opacity > 0.3 && abs(x - spark.x) < 3 {
                 return true
             }
         }
@@ -143,7 +144,7 @@ struct SleepTopographyView: View {
         let colWidth = size.width / CGFloat(timePoints - 1)
         let centerY = size.height / 2
         
-        // 1. Dibujar Ondas Neuronales (Fondo)
+        // 1. Dibujar Ondas Neuronales
         for row in 0..<depthPoints {
             var path = Path()
             let zOffset = CGFloat(row) * 10.0
@@ -151,8 +152,8 @@ struct SleepTopographyView: View {
             
             for col in 0..<timePoints {
                 let xBase = CGFloat(col) * colWidth
-                let sleepDepth = sin(CGFloat(col) * 0.2) * 0.5 + 0.5
                 let remIntensity = (col > 15 && col < 25) ? (sin(CGFloat(col) * 0.5) * 0.5 + 0.5) : 0
+                let sleepDepth = sin(CGFloat(col) * 0.2) * 0.5 + 0.5
                 let zValue = (remIntensity * 0.2) - sleepDepth
                 let px = xBase + (zOffset * 0.5)
                 let py = centerY + (zOffset * 0.8) - (zValue * 80)
@@ -160,33 +161,40 @@ struct SleepTopographyView: View {
                 if col == 0 { path.move(to: CGPoint(x: px, y: py)) }
                 else { path.addLine(to: CGPoint(x: px, y: py)) }
             }
-            context.stroke(path, with: .linearGradient(Gradient(colors: [dreamColor.opacity(rowOpacity * 0.6), deepColor.opacity(rowOpacity * 0.6)]), startPoint: .zero, endPoint: CGPoint(x: size.width, y: 0)), lineWidth: 1.0)
+            context.stroke(path, with: .linearGradient(Gradient(colors: [dreamColor.opacity(rowOpacity * 0.4), deepColor.opacity(rowOpacity * 0.4)]), startPoint: .zero, endPoint: CGPoint(x: size.width, y: 0)), lineWidth: 1.0)
         }
         
-        // 2. Dibujar Fragmentos de Oro (Motor de Entropía + High Glow Style)
-        for i in 0..<15 {
-            let sparkData = getSparkPos(id: i, time: time)
-            if sparkData.opacity > 0 {
-                let py = centerY - (sparkData.yProgress * 40)
+        // 2. Dibujar Fragmentos de Oro (STELLAR BURST STYLE)
+        for i in 0..<10 { // Reducido a 10
+            let spark = getSparkPos(id: i, time: time, size: size)
+            if spark.opacity > 0 {
+                let opacity = spark.opacity
+                let lifecycle = spark.lifecycle
+                let isBursting = lifecycle > 0.8
                 
-                // Parámetros de Brillo
-                let opacity = sparkData.opacity
-                let baseSize: CGFloat = 2.0
-                let bloomRadius = baseSize * 4.0
+                var baseSize: CGFloat = 2.0
+                var bloomRadius: CGFloat = 0
                 
-                // 1. Bloom Multicapa (Efecto Oro Efímero)
-                // Capa exterior ultra-suave
-                context.fill(Path(ellipseIn: CGRect(x: sparkData.x - bloomRadius, y: py - bloomRadius, width: bloomRadius*2, height: bloomRadius*2)), 
-                             with: .color(goldColor.opacity(opacity * 0.15)))
+                if isBursting {
+                    let burstProgress = (lifecycle - 0.8) / 0.2
+                    baseSize = 2.0 + (CGFloat(sin(burstProgress * .pi)) * 6.0)
+                    bloomRadius = baseSize * 2.5
+                }
                 
-                // Capa media de resplandor
-                let midGlow = bloomRadius * 0.6
-                context.fill(Path(ellipseIn: CGRect(x: sparkData.x - midGlow, y: py - midGlow, width: midGlow*2, height: midGlow*2)), 
-                             with: .color(goldColor.opacity(opacity * 0.3)))
+                // 1. Bloom Burst
+                if isBursting {
+                    context.fill(Path(ellipseIn: CGRect(x: spark.x - bloomRadius, y: spark.y - bloomRadius, width: bloomRadius*2, height: bloomRadius*2)), 
+                                 with: .color(goldColor.opacity(opacity * 0.25)))
+                    
+                    let midGlow = bloomRadius * 0.6
+                    context.fill(Path(ellipseIn: CGRect(x: spark.x - midGlow, y: spark.y - midGlow, width: midGlow*2, height: midGlow*2)), 
+                                 with: .color(goldColor.opacity(opacity * 0.4)))
+                }
                 
-                // 2. Núcleo Sólido de Oro
-                let coreRect = CGRect(x: sparkData.x - baseSize/2, y: py - baseSize/2, width: baseSize, height: baseSize)
-                context.fill(Path(ellipseIn: coreRect), with: .color(goldColor.opacity(opacity)))
+                // 2. Núcleo Sólido
+                let coreSize = isBursting ? baseSize * 0.5 : baseSize
+                context.fill(Path(ellipseIn: CGRect(x: spark.x - coreSize/2, y: spark.y - coreSize/2, width: coreSize, height: coreSize)), 
+                             with: .color(goldColor.opacity(opacity)))
             }
         }
     }
@@ -206,7 +214,7 @@ struct SleepTopographyView: View {
     }
 }
 
-// MARK: - Supporting Views (Identical to before to maintain consistency)
+// MARK: - Subviews
 
 struct SleepDataCapsule: View {
     let label: String; let value: String; let color: Color
@@ -246,9 +254,9 @@ struct NeuralInsightCard: View {
     private func calculateNeuralData(for x: CGFloat) -> NeuralData {
         let progress = x / totalWidth
         if progress > 0.4 && progress < 0.6 {
-            return NeuralData(time: "03:45 AM", state: "Sueño REM", icon: "sparkles", memoryFragments: "120 pqt", insight: "Consolidación activa de fragmentos de memoria efímera detectada.")
+            return NeuralData(time: "03:45 AM", state: "Sueño REM", icon: "sparkles", memoryFragments: "120 pqt", insight: "Consolidación de memoria activa. Los fragmentos brotan de las ondas neuronales dominantes.")
         } else {
-            return NeuralData(time: "04:20 AM", state: "Sueño Profundo", icon: "brain.fill", memoryFragments: "45 pqt", insight: "Recuperación cognitiva profunda. Estabilidad neuronal máxima.")
+            return NeuralData(time: "04:20 AM", state: "Sueño Profundo", icon: "brain.fill", memoryFragments: "45 pqt", insight: "Recuperación cognitiva. Estabilidad en las ondas de frecuencia baja.")
         }
     }
 }
