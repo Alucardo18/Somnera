@@ -318,28 +318,28 @@ struct NeuralInsightCard: View {
                 switch sample.value {
                 case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
                     pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.08)
-                    state = "Profundo (Health)"
+                    state = "Profundo (Watch)"
                     icon = "brain.fill"
                     insight = "Recuperación física y limpieza glinfática. Ondas delta."
                 case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
                     pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.15)
-                    state = "REM (Health)"
+                    state = "REM (Watch)"
                     icon = "sparkles"
                     insight = "Consolidación emocional activa. Alta actividad talamocortical."
                 case HKCategoryValueSleepAnalysis.awake.rawValue:
                     pqt = 0
-                    state = "Despierto (Health)"
+                    state = "Despierto (Watch)"
                     icon = "eye.fill"
-                    insight = "Interrupción del sueño detectada por HealthKit."
+                    insight = "Interrupción del sueño detectada por Apple Watch."
                 default:
                     pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.03)
-                    state = "Ligero (Health)"
+                    state = "Ligero (Watch)"
                     icon = "moon.fill"
                     insight = "Transición neuronal. Procesamiento periférico."
                 }
             } else {
                 pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.03)
-                state = "Sueño (Sin Datos Health)"
+                state = "Sueño (Sin Datos Watch)"
                 icon = "moon.fill"
                 insight = "No hay datos exactos en este minuto."
             }
