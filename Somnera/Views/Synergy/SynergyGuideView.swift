@@ -54,24 +54,36 @@ struct SynergyGuideView: View {
                         visual: AnyView(HelixVisualDemo())
                     ).tag(2)
                     
-                    // SLIDE 4: DIAGNÓSTICO
+                    // SLIDE 4: HOMEOSTASIS (NUEVO)
+                    PremiumGuideSlide(
+                        title: "Homeostasis",
+                        subtitle: "EL BALANCE VITAL",
+                        description: "Tu puntuación no es solo silencio, es un equilibrio médico estricto. La Biosfera 3D evalúa tu duración de sueño (40%) y la calidad de tus signos vitales (60%). Si duermes poco, o hay estrés respiratorio, la esfera se fractura indicando deuda de sueño.",
+                        visual: AnyView(
+                            Image(systemName: "circle.hexagonpath.fill")
+                                .font(.system(size: 80))
+                                .foregroundStyle(Color.somAccent.gradient)
+                        )
+                    ).tag(3)
+                    
+                    // SLIDE 5: DIAGNÓSTICO
                     PremiumGuideSlide(
                         title: "Calidad vs Cantidad",
                         subtitle: "PUNTUACIÓN HONESTA",
-                        description: "Medimos salud, no cantidad. Un 100% significa silencio absoluto. Si falta un sensor, la hélice se adapta automáticamente para darte un puntaje justo basado solo en lo medido.",
+                        description: "Medimos salud de forma dinámica y justa. Si falta un sensor como el Apple Watch, el algoritmo se recalibra automáticamente para evaluarte con máxima rigurosidad solo en base a los sensores activos.",
                         visual: AnyView(
                             Image(systemName: "checkmark.shield.fill")
                                 .font(.system(size: 80))
                                 .foregroundStyle(Color.somSafe.gradient)
                         )
-                    ).tag(3)
+                    ).tag(4)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 
                 // Footer con Indicadores y Botón
                 VStack(spacing: 20) {
                     HStack(spacing: 8) {
-                        ForEach(0..<4) { i in
+                        ForEach(0..<5) { i in
                             Circle()
                                 .fill(currentPage == i ? Color.somAccent : Color.white.opacity(0.2))
                                 .frame(width: 6, height: 6)
@@ -80,13 +92,13 @@ struct SynergyGuideView: View {
                     }
                     
                     Button {
-                        if currentPage < 3 {
+                        if currentPage < 4 {
                             withAnimation { currentPage += 1 }
                         } else {
                             dismiss()
                         }
                     } label: {
-                        Text(currentPage < 3 ? "CONTINUAR" : "COMENZAR")
+                        Text(currentPage < 4 ? "CONTINUAR" : "COMENZAR")
                             .font(.system(size: 14, weight: .black))
                             .tracking(2)
                             .foregroundColor(.somBackground)
