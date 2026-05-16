@@ -230,46 +230,51 @@ struct BiosphereVisualDemo: View {
     
     var body: some View {
         ZStack {
-            // Resplandor de fondo sutil
+            // Resplandor atmosférico de fondo
             Circle()
                 .fill(Color.somAccent.opacity(0.04))
                 .frame(width: 140, height: 140)
                 .blur(radius: 20)
             
-            // Órbita 1 (Eje Y)
-            Circle()
-                .stroke(
-                    LinearGradient(colors: [.cyan, .cyan.opacity(0.15)], startPoint: .top, endPoint: .bottom),
-                    lineWidth: 1.5
-                )
-                .frame(width: 110, height: 110)
-                .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 0, y: 1, z: 0))
-                .animation(.linear(duration: 5).repeatForever(autoreverses: false), value: isAnimating)
-            
-            // Órbita 2 (Eje X)
-            Circle()
-                .stroke(
-                    LinearGradient(colors: [.somAccent, .somAccent.opacity(0.15)], startPoint: .leading, endPoint: .trailing),
-                    lineWidth: 1.5
-                )
-                .frame(width: 110, height: 110)
-                .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 1, y: 0, z: 0))
-                .animation(.linear(duration: 7).repeatForever(autoreverses: false), value: isAnimating)
-            
-            // Órbita 3 (Eje Diagonal)
-            Circle()
-                .stroke(
-                    LinearGradient(colors: [.purple, .purple.opacity(0.15)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                    lineWidth: 1.5
-                )
-                .frame(width: 110, height: 110)
-                .rotation3DEffect(.degrees(isAnimating ? -360 : 0), axis: (x: 1, y: 1, z: 0))
-                .animation(.linear(duration: 9).repeatForever(autoreverses: false), value: isAnimating)
+            // Estructura Esférica del Globo (Biosfera Holográfica)
+            ZStack {
+                // 1. Meridianos
+                ForEach(0..<4) { i in
+                    Circle()
+                        .stroke(
+                            LinearGradient(colors: [.cyan.opacity(0.4), .cyan.opacity(0.05)], startPoint: .top, endPoint: .bottom),
+                            lineWidth: 0.8
+                        )
+                        .frame(width: 110, height: 110)
+                        .rotation3DEffect(.degrees(Double(i) * 45), axis: (x: 0, y: 1, z: 0))
+                }
+                
+                // 2. Ecuador
+                Circle()
+                    .stroke(Color.cyan.opacity(0.35), lineWidth: 1.0)
+                    .frame(width: 110, height: 110)
+                    .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
+                
+                // 3. Trópicos
+                Circle()
+                    .stroke(Color.cyan.opacity(0.18), lineWidth: 0.7)
+                    .frame(width: 95, height: 95)
+                    .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
+                    .offset(y: -28)
+                
+                Circle()
+                    .stroke(Color.cyan.opacity(0.18), lineWidth: 0.7)
+                    .frame(width: 95, height: 95)
+                    .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
+                    .offset(y: 28)
+            }
+            .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 0.2, y: 1, z: 0.1))
+            .animation(.linear(duration: 16).repeatForever(autoreverses: false), value: isAnimating)
             
             // Núcleo
             Circle()
                 .fill(Color.somAccent.gradient)
-                .frame(width: 20, height: 20)
+                .frame(width: 18, height: 18)
                 .scaleEffect(isAnimating ? 1.15 : 0.85)
                 .shadow(color: .somAccent.opacity(0.5), radius: 8)
                 .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isAnimating)

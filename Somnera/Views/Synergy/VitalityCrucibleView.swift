@@ -8,48 +8,86 @@ struct VitalityCrucibleView: View {
     
     var body: some View {
         VStack(spacing: 25) {
-            // Biosfera de Homeostasis: Giroscopio 3D Vectorial (Ligero, Rápido y GPU-Acelerado)
+            // Biosfera de Homeostasis: Globo Aramado 3D Vectorial (Nítido, Ultra-rápido y GPU-Acelerado)
             ZStack {
-                // Resplandor de fondo sutil
+                // Resplandor atmosférico de fondo
                 Circle()
-                    .fill(Color.somAccent.opacity(0.03))
+                    .fill(Color.somAccent.opacity(0.04))
                     .frame(width: 180, height: 180)
                     .blur(radius: 25)
                 
-                // Órbita Ecuatorial (Eje Y) - Salud Respiratoria / Cian
-                Circle()
-                    .stroke(
-                        LinearGradient(colors: [.cyan, .cyan.opacity(0.15)], startPoint: .top, endPoint: .bottom),
-                        lineWidth: 1.5
-                    )
-                    .frame(width: 150, height: 150)
-                    .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 0, y: 1, z: 0))
-                    .animation(.linear(duration: 6).repeatForever(autoreverses: false), value: isAnimating)
+                // Estructura Esférica del Globo (Biosfera Holográfica)
+                ZStack {
+                    // 1. Meridianos (Líneas longitudinales verticales)
+                    ForEach(0..<4) { i in
+                        Circle()
+                            .stroke(
+                                LinearGradient(colors: [.cyan.opacity(0.4), .cyan.opacity(0.05)], startPoint: .top, endPoint: .bottom),
+                                lineWidth: 1.0
+                            )
+                            .frame(width: 150, height: 150)
+                            .rotation3DEffect(.degrees(Double(i) * 45), axis: (x: 0, y: 1, z: 0))
+                    }
+                    
+                    // 2. Ecuador (Línea latitudinal central)
+                    Circle()
+                        .stroke(Color.cyan.opacity(0.35), lineWidth: 1.2)
+                        .frame(width: 150, height: 150)
+                        .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
+                    
+                    // 3. Trópicos (Latitudes intermedias)
+                    Circle()
+                        .stroke(Color.cyan.opacity(0.2), lineWidth: 0.8)
+                        .frame(width: 130, height: 130)
+                        .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
+                        .offset(y: -38)
+                    
+                    Circle()
+                        .stroke(Color.cyan.opacity(0.2), lineWidth: 0.8)
+                        .frame(width: 130, height: 130)
+                        .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
+                        .offset(y: 38)
+                    
+                    // 4. Círculos Polares (Latitudes extremas)
+                    Circle()
+                        .stroke(Color.cyan.opacity(0.12), lineWidth: 0.8)
+                        .frame(width: 90, height: 90)
+                        .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
+                        .offset(y: -60)
+                    
+                    Circle()
+                        .stroke(Color.cyan.opacity(0.12), lineWidth: 0.8)
+                        .frame(width: 90, height: 90)
+                        .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
+                        .offset(y: 60)
+                }
+                .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 0.2, y: 1, z: 0.1))
+                .animation(.linear(duration: 16).repeatForever(autoreverses: false), value: isAnimating)
                 
-                // Órbita Polar (Eje X) - Sinergia de Sueño / Naranja
-                Circle()
-                    .stroke(
-                        LinearGradient(colors: [.somAccent, .somAccent.opacity(0.15)], startPoint: .leading, endPoint: .trailing),
-                        lineWidth: 1.5
-                    )
-                    .frame(width: 150, height: 150)
-                    .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 1, y: 0, z: 0))
-                    .animation(.linear(duration: 9).repeatForever(autoreverses: false), value: isAnimating)
+                // Nodos Biosféricos Satélite (Partículas de oxígeno flotando en órbita)
+                ZStack {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 5, height: 5)
+                        .shadow(color: .cyan, radius: 4)
+                        .offset(x: 75)
+                        .rotationEffect(.degrees(isAnimating ? 360 : 0))
+                        .animation(.linear(duration: 5).repeatForever(autoreverses: false), value: isAnimating)
+                    
+                    Circle()
+                        .fill(Color.somAccent)
+                        .frame(width: 4, height: 4)
+                        .shadow(color: .somAccent, radius: 4)
+                        .offset(x: -65)
+                        .rotationEffect(.degrees(isAnimating ? -360 : 0))
+                        .animation(.linear(duration: 7).repeatForever(autoreverses: false), value: isAnimating)
+                }
+                .rotation3DEffect(.degrees(30), axis: (x: 1, y: 0, z: 0))
                 
-                // Órbita Diagonal (Eje Inclinado) - Ritmo Cardíaco / Púrpura
-                Circle()
-                    .stroke(
-                        LinearGradient(colors: [.purple, .purple.opacity(0.15)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                        lineWidth: 1.5
-                    )
-                    .frame(width: 150, height: 150)
-                    .rotation3DEffect(.degrees(isAnimating ? -360 : 0), axis: (x: 1, y: 1, z: 0))
-                    .animation(.linear(duration: 12).repeatForever(autoreverses: false), value: isAnimating)
-                
-                // Núcleo de Energía Pulsante (Homeostasis Activa)
+                // Núcleo de Homeostasis Celular (Corazón del ecosistema)
                 Circle()
                     .fill(Color.somAccent.gradient)
-                    .frame(width: 28, height: 28)
+                    .frame(width: 26, height: 26)
                     .scaleEffect(isAnimating ? 1.15 : 0.85)
                     .shadow(color: .somAccent.opacity(0.5), radius: 12)
                     .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isAnimating)
