@@ -159,8 +159,9 @@ struct SleepTopographyView: View {
     }
     
     private func updatePhysics(now: Double, size: CGSize) {
+        let ranges = getValidConsolidationRanges()
         physicsEngine.particleCache = (0..<10).map { 
-            getSparkPos(id: $0, time: now, size: size) 
+            getSparkPos(id: $0, time: now, size: size, ranges: ranges) 
         }
         if let dx = dragX {
             physicsEngine.checkCollision(at: dx, time: now, totalWidth: totalWidth)
@@ -235,10 +236,52 @@ struct SleepTopographyView: View {
         return CGFloat(deepWave + remWave + baseWave + audioBias)
     }
     
-    private func getSparkPos(id: Int, time: Double, size: CGSize) -> (x: CGFloat, y: CGFloat, opacity: Double, lifecycle: Double) {
+    private func getValidConsolidationRanges() -> [ClosedRange<Double>] {
+        var validRanges: [ClosedRange<Double>] = []
+        let totalTime = session?.duration ?? 28800
+        let sessionStart = session?.startDate ?? Date().addingTimeInterval(-28800)
+        
+        if !healthSleepSamples.isEmpty {
+            for sample in healthSleepSamples {
+                let val = sample.value
+                if val == HKCategoryValueSleepAnalysis.asleepDeep.rawValue || val == HKCategoryValueSleepAnalysis.asleepREM.rawValue {
+                    let start = max(sessionStart, sample.startDate)
+                    let end = min(sessionStart.addingTimeInterval(totalTime), sample.endDate)
+                    if start < end {
+                        let p1 = start.timeIntervalSince(sessionStart) / totalTime
+                        let p2 = end.timeIntervalSince(sessionStart) / totalTime
+                        validRanges.append(p1...p2)
+                    }
+                }
+            }
+        } else {
+            validRanges = [0.1...0.3, 0.6...0.85]
+        }
+        
+        return validRanges.isEmpty ? [0.1...0.9] : validRanges
+    }
+    
+    private func getSparkPos(id: Int, time: Double, size: CGSize, ranges: [ClosedRange<Double>]) -> (x: CGFloat, y: CGFloat, opacity: Double, lifecycle: Double) {
         let speed = 0.2 ; let lifecycle = (time * speed + Double(id) * 0.731).truncatingRemainder(dividingBy: 1.0)
-        let opacity = sin(lifecycle * .pi); let zoneStart: CGFloat = totalWidth * 0.1; let zoneEnd: CGFloat = totalWidth * 0.9; let range = zoneEnd - zoneStart
-        let cycleId = floor(time * speed + Double(id) * 0.731); let xSeed = sin(cycleId * 987.654 + Double(id) * 123.456); let xPos = zoneStart + range * (abs(xSeed))
+        let opacity = sin(lifecycle * .pi)
+        
+        let cycleId = floor(time * speed + Double(id) * 0.731)
+        let rawSeed = abs(sin(cycleId * 987.654 + Double(id) * 123.456)).truncatingRemainder(dividingBy: 1.0)
+        
+        let totalLength = ranges.reduce(0) { $0 + ($1.upperBound - $1.lowerBound) }
+        var mappedProgress: Double = ranges.first?.lowerBound ?? 0.5
+        var targetValue = rawSeed * totalLength
+        
+        for r in ranges {
+            let length = r.upperBound - r.lowerBound
+            if targetValue <= length {
+                mappedProgress = r.lowerBound + targetValue
+                break
+            }
+            targetValue -= length
+        }
+        
+        let xPos = CGFloat(mappedProgress) * totalWidth
         let waveY = getWaveY(at: xPos, size: size, time: time); let v0: CGFloat = -90.0; let gravity: CGFloat = 80.0; let t = CGFloat(lifecycle); let yDisplacement = (v0 * t) + (0.5 * gravity * t * t)
         return (xPos, waveY + yDisplacement, opacity, lifecycle)
     }
