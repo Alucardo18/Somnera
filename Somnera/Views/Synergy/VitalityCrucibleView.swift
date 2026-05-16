@@ -5,7 +5,7 @@ struct VitalityCrucibleView: View {
     let session: SleepSession?
     @State private var metrics: SynergyMetrics?
     
-    @State private var particles: [CrucibleParticle] = (0..<150).map { _ in CrucibleParticle() }
+    @State private var particles: [CrucibleParticle] = (0..<200).map { _ in CrucibleParticle() }
     
     var body: some View {
         VStack(spacing: 25) {
@@ -28,8 +28,12 @@ struct VitalityCrucibleView: View {
                     
                     // 2. Dibujar Resplandor de Fondo (Aura)
                     let auraColor = synergy > 0.7 ? Color.somSafe : (synergy > 0.4 ? Color.somAccent : Color.red)
-                    context.addFilter(.blur(radius: 30))
-                    context.fill(Path(ellipseIn: CGRect(x: center.x - coreRadius, y: center.y - coreRadius, width: coreRadius*2, height: coreRadius*2)), with: .color(auraColor.opacity(0.15)))
+                    context.addFilter(.blur(radius: 12))
+                    context.fill(Path(ellipseIn: CGRect(x: center.x - coreRadius, y: center.y - coreRadius, width: coreRadius*2, height: coreRadius*2)), with: .color(auraColor.opacity(0.12)))
+                    
+                    // 2b. Anillo de Plasma (Definición Sharp)
+                    let ringPath = Path(ellipseIn: CGRect(x: center.x - coreRadius, y: center.y - coreRadius, width: coreRadius*2, height: coreRadius*2))
+                    context.stroke(ringPath, with: .color(auraColor.opacity(0.3)), lineWidth: 1)
                     
                     // 3. Dibujar Partículas del Crisol
                     context.addFilter(.blur(radius: 0))
@@ -67,9 +71,9 @@ struct VitalityCrucibleView: View {
                     }
                     
                     // 4. El Núcleo de Consciencia
-                    let innerRect = CGRect(x: center.x - 10, y: center.y - 10, width: 20, height: 20)
-                    context.addFilter(.blur(radius: 5))
-                    context.fill(Path(ellipseIn: innerRect), with: .color(.white.opacity(0.8)))
+                    let innerRect = CGRect(x: center.x - 12, y: center.y - 12, width: 24, height: 24)
+                    context.addFilter(.blur(radius: 2))
+                    context.fill(Path(ellipseIn: innerRect), with: .color(.white.opacity(0.9)))
                 }
             }
             .frame(height: 280)
@@ -153,7 +157,7 @@ struct CrucibleParticle: Identifiable {
     let baseAngle: Double = .random(in: 0...(.pi * 2))
     let orbitOffset: CGFloat = .random(in: -20...20)
     let speed: Double = .random(in: 0.2...0.8)
-    let size: CGFloat = .random(in: 1...3)
+    let size: CGFloat = .random(in: 2...4)
 }
 
 struct CrucibleBadge: View {
