@@ -110,7 +110,6 @@ struct VitalityCrucibleView: View {
                 
                 HStack {
                     CrucibleBadge(label: "Homeostasis", value: "\(Int(calculateHomeostasis()))%", icon: "circle.hexagonpath.fill")
-                    CrucibleBadge(label: "SpO2", value: metrics?.spO2 != nil ? "\(Int((metrics?.spO2 ?? 1.0) * 100))%" : "--", icon: "waveform.path.ecg")
                 }
             }
             .padding(25)
@@ -162,15 +161,48 @@ struct VitalityCrucibleView: View {
     }
     
     private func calculateHomeostasis() -> Double {
+        var totalWeight = 0.0
+        var scoreAcc = 0.0
+        
+        // 1. Duración del Sueño (Siempre presente, penalización estricta)
         let durationHours = (session?.duration ?? 28800) / 3600.0
-        // 8 horas es el 100%. Max 100%.
-        let durationScore = min(100.0, (durationHours / 8.0) * 100.0)
+        var durationScore = 0.0
+        if durationHours >= 7.5 && durationHours <= 9.0 { durationScore = 100.0 }
+        else if durationHours >= 6.0 { durationScore = 80.0 }
+        else if durationHours >= 5.0 { durationScore = 50.0 }
+        else { durationScore = 30.0 }
         
-        // Sinergia biométrica (Pulso, Respiración, Oxígeno, Ronquido)
-        let bioScore = metrics?.synergyScore ?? Double(session?.snoreScore ?? 100)
+        scoreAcc += durationScore * 0.40
+        totalWeight += 0.40
         
-        // 40% Cantidad (Horas), 60% Calidad (Sinergia Biométrica)
-        return (durationScore * 0.40) + (bioScore * 0.60)
+        // 2. Salud Acústica / Ronquido (Siempre presente)
+        let snoreScore = Double(session?.snoreScore ?? 100)
+        scoreAcc += snoreScore * 0.30
+        totalWeight += 0.30
+        
+        // 3. Frecuencia Cardíaca (Opcional)
+        if let hr = metrics?.heartRate {
+            var hrScore = 0.0
+            if hr >= 40 && hr <= 65 { hrScore = 100.0 } // Reposo profundo
+            else if hr > 65 && hr <= 75 { hrScore = 75.0 }
+            else { hrScore = 40.0 }
+            scoreAcc += hrScore * 0.15
+            totalWeight += 0.15
+        }
+        
+        // 4. Oxigenación SpO2 (Opcional, penalización severa por hipoxia)
+        if let spo2 = metrics?.spO2 {
+            let val = spo2 > 1.0 ? spo2 : spo2 * 100.0
+            var o2Score = 0.0
+            if val >= 95 { o2Score = 100.0 }
+            else if val >= 92 { o2Score = 60.0 }
+            else { o2Score = 30.0 }
+            scoreAcc += o2Score * 0.15
+            totalWeight += 0.15
+        }
+        
+        // Cálculo adaptativo basado en sensores disponibles
+        return totalWeight > 0 ? (scoreAcc / totalWeight) : snoreScore
     }
     
     private func generateAISummary() -> String {
