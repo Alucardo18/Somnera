@@ -110,7 +110,8 @@ struct SleepTopographyView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     legendItem(color: .indigo, label: "Profundo")
                     legendItem(color: .purple, label: "REM")
-                    legendItem(color: .somAccent, label: "Vigilia/Ligero")
+                    legendItem(color: .cyan, label: "Vigilia / Ligero")
+                    legendItem(color: goldColor, label: "Memoria Consolidada")
                 }
                 .padding(10)
                 .background(Color.somSurface.opacity(0.8))
@@ -126,7 +127,7 @@ struct SleepTopographyView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         let duration = session?.duration ?? 28800
-                        SleepDataCapsule(label: "Despierto", value: formatMinutes(duration * 0.1), color: .somAccent)
+                        SleepDataCapsule(label: "Despierto", value: formatMinutes(duration * 0.1), color: .teal)
                         SleepDataCapsule(label: "REM", value: formatMinutes(duration * 0.25), color: .purple)
                         SleepDataCapsule(label: "Ligero", value: formatMinutes(duration * 0.45), color: .cyan)
                         SleepDataCapsule(label: "Profundo", value: formatMinutes(duration * 0.20), color: .indigo)
