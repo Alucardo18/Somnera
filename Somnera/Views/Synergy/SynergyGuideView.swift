@@ -226,86 +226,58 @@ struct SparklesVisualDemo: View {
 }
 
 struct BiosphereVisualDemo: View {
-    @State private var particles: [Particle3D] = []
+    @State private var isAnimating = false
     
     var body: some View {
-        TimelineView(.animation) { timeline in
-            Canvas { context, size in
-                let now = timeline.date.timeIntervalSinceReferenceDate
-                let center = CGPoint(x: size.width / 2, y: size.height / 2)
-                
-                let sphereRadius = 60.0 + sin(now * 3.0) * 3.0 // Pulsante
-                let rotY = now * 0.5
-                let rotX = sin(now * 0.2) * 0.3
-                
-                var projected: [ProjectedParticle] = particles.map { p in
-                    let lat = asin(p.y)
-                    let ripple = sin(lat * 5.0 + now * 4.0) * 0.05
-                    let r = 1.0 + ripple
-                    
-                    let px = p.x * r
-                    let py = p.y * r
-                    let pz = p.z * r
-                    
-                    let x1 = px * cos(rotY) - pz * sin(rotY)
-                    let z1 = px * sin(rotY) + pz * cos(rotY)
-                    
-                    let y1 = py * cos(rotX) - z1 * sin(rotX)
-                    let z2 = py * sin(rotX) + z1 * cos(rotX)
-                    
-                    let d = 2.5
-                    let scaleFactor = d / (d + z2)
-                    
-                    let screenX = center.x + CGFloat(x1 * sphereRadius * scaleFactor)
-                    let screenY = center.y + CGFloat(y1 * sphereRadius * scaleFactor)
-                    
-                    return ProjectedParticle(
-                        x: screenX,
-                        y: screenY,
-                        z: z2,
-                        scale: scaleFactor,
-                        colorIndex: p.colorIndex
-                    )
-                }
-                
-                projected.sort { $0.z > $1.z }
-                
-                for p in projected {
-                    let baseColor = Color.cyan
-                    let opacity = max(0.2, min(0.9, (1.2 - p.z) / 2.0))
-                    let size = max(1.5, min(5.0, 3.5 * p.scale))
-                    
-                    let rect = CGRect(x: p.x - size/2, y: p.y - size/2, width: size, height: size)
-                    context.fill(Path(ellipseIn: rect), with: .color(baseColor.opacity(opacity)))
-                    
-                    if p.z < -0.2 && p.colorIndex % 10 == 0 {
-                        let glowRect = rect.insetBy(dx: -1.0, dy: -1.0)
-                        context.stroke(Path(ellipseIn: glowRect), with: .color(.white.opacity(0.4)), lineWidth: 0.5)
-                    }
-                }
-            }
+        ZStack {
+            // Resplandor de fondo sutil
+            Circle()
+                .fill(Color.somAccent.opacity(0.04))
+                .frame(width: 140, height: 140)
+                .blur(radius: 20)
+            
+            // Órbita 1 (Eje Y)
+            Circle()
+                .stroke(
+                    LinearGradient(colors: [.cyan, .cyan.opacity(0.15)], startPoint: .top, endPoint: .bottom),
+                    lineWidth: 1.5
+                )
+                .frame(width: 110, height: 110)
+                .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 0, y: 1, z: 0))
+                .animation(.linear(duration: 5).repeatForever(autoreverses: false), value: isAnimating)
+            
+            // Órbita 2 (Eje X)
+            Circle()
+                .stroke(
+                    LinearGradient(colors: [.somAccent, .somAccent.opacity(0.15)], startPoint: .leading, endPoint: .trailing),
+                    lineWidth: 1.5
+                )
+                .frame(width: 110, height: 110)
+                .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 1, y: 0, z: 0))
+                .animation(.linear(duration: 7).repeatForever(autoreverses: false), value: isAnimating)
+            
+            // Órbita 3 (Eje Diagonal)
+            Circle()
+                .stroke(
+                    LinearGradient(colors: [.purple, .purple.opacity(0.15)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                    lineWidth: 1.5
+                )
+                .frame(width: 110, height: 110)
+                .rotation3DEffect(.degrees(isAnimating ? -360 : 0), axis: (x: 1, y: 1, z: 0))
+                .animation(.linear(duration: 9).repeatForever(autoreverses: false), value: isAnimating)
+            
+            // Núcleo
+            Circle()
+                .fill(Color.somAccent.gradient)
+                .frame(width: 20, height: 20)
+                .scaleEffect(isAnimating ? 1.15 : 0.85)
+                .shadow(color: .somAccent.opacity(0.5), radius: 8)
+                .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isAnimating)
         }
+        .frame(height: 160)
         .onAppear {
-            generateBaseParticles()
+            isAnimating = true
         }
-    }
-    
-    private func generateBaseParticles() {
-        var temp: [Particle3D] = []
-        let N = 100 // Compact and fast for guide
-        let goldenRatio = (1.0 + sqrt(5.0)) / 2.0
-        
-        for i in 0..<N {
-            let y = 1.0 - (Double(i) / Double(N - 1)) * 2.0
-            let radius = sqrt(1.0 - y * y)
-            let theta = 2.0 * Double.pi * Double(i) / goldenRatio
-            
-            let x = cos(theta) * radius
-            let z = sin(theta) * radius
-            
-            temp.append(Particle3D(x: x, y: y, z: z, colorIndex: i))
-        }
-        self.particles = temp
     }
 }
 

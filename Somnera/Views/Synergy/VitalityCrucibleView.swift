@@ -4,90 +4,61 @@ import HealthKit
 struct VitalityCrucibleView: View {
     let session: SleepSession?
     @State private var metrics: SynergyMetrics?
-    
-    // Lista de partículas pre-calculadas en 3D
-    @State private var baseParticles: [Particle3D] = []
+    @State private var isAnimating = false
     
     var body: some View {
         VStack(spacing: 25) {
-            // Biosfera de Homeostasis: Esfera Holográfica 3D (Alta Precisión)
-            TimelineView(.animation) { timeline in
-                Canvas { context, size in
-                    let now = timeline.date.timeIntervalSinceReferenceDate
-                    let center = CGPoint(x: size.width / 2, y: size.height / 2)
-                    
-                    // 1. Cargar datos reales
-                    let synergy = Double(session?.snoreScore ?? 100) / 100.0
-                    let o2 = (metrics?.spO2 ?? 1.0)
-                    let hr = metrics?.heartRate ?? 60.0
-                    let durationHours = (session?.duration ?? 28800) / 3600.0
-                    
-                    // Escala base por duración y pulso
-                    let baseScale = min(1.2, max(0.5, durationHours / 8.0))
-                    let pulse = sin(now * (hr / 60.0) * Double.pi * 2.0) * 4.0
-                    let sphereRadius = (70.0 * baseScale) + pulse
-                    
-                    // Frecuencia de onda según respiración
-                    let waveFreq = 4.0 + (metrics?.respiratoryRate ?? 15.0) / 5.0
-                    let waveAmp = (1.0 - synergy) * 0.2
-                    
-                    // Ángulos de rotación continua
-                    let rotY = now * 0.4
-                    let rotX = sin(now * 0.1) * 0.2
-                    
-                    // 2. Transformar, Deformar y Proyectar Partículas
-                    var projected: [ProjectedParticle] = baseParticles.map { p in
-                        let lat = asin(p.y)
-                        let ripple = sin(lat * waveFreq + now * 3.0) * waveAmp
-                        let r = 1.0 + ripple
-                        
-                        let px = p.x * r
-                        let py = p.y * r
-                        let pz = p.z * r
-                        
-                        let x1 = px * cos(rotY) - pz * sin(rotY)
-                        let z1 = px * sin(rotY) + pz * cos(rotY)
-                        
-                        let y1 = py * cos(rotX) - z1 * sin(rotX)
-                        let z2 = py * sin(rotX) + z1 * cos(rotX)
-                        
-                        let d = 2.5
-                        let scaleFactor = d / (d + z2)
-                        
-                        let screenX = center.x + CGFloat(x1 * sphereRadius * scaleFactor)
-                        let screenY = center.y + CGFloat(y1 * sphereRadius * scaleFactor)
-                        
-                        return ProjectedParticle(
-                            x: screenX,
-                            y: screenY,
-                            z: z2,
-                            scale: scaleFactor,
-                            colorIndex: p.colorIndex
-                        )
-                    }
-                    
-                    // 3. Z-Sorting
-                    projected.sort { $0.z > $1.z }
-                    
-                    // 4. Dibujar
-                    for p in projected {
-                        let baseColor = o2 > 0.94 ? Color.cyan : (o2 > 0.90 ? Color.somAccent : Color.orange)
-                        let opacity = max(0.15, min(0.9, (1.2 - p.z) / 2.0))
-                        let size = max(1.5, min(5.0, 3.5 * p.scale))
-                        
-                        let rect = CGRect(x: p.x - size/2, y: p.y - size/2, width: size, height: size)
-                        context.fill(Path(ellipseIn: rect), with: .color(baseColor.opacity(opacity)))
-                        
-                        if synergy > 0.75 && p.z < -0.2 && p.colorIndex % 12 == 0 {
-                            let glowRect = rect.insetBy(dx: -1.5, dy: -1.5)
-                            context.stroke(Path(ellipseIn: glowRect), with: .color(.white.opacity(0.3)), lineWidth: 0.5)
-                        }
-                    }
-                }
+            // Biosfera de Homeostasis: Giroscopio 3D Vectorial (Ligero, Rápido y GPU-Acelerado)
+            ZStack {
+                // Resplandor de fondo sutil
+                Circle()
+                    .fill(Color.somAccent.opacity(0.03))
+                    .frame(width: 180, height: 180)
+                    .blur(radius: 25)
+                
+                // Órbita Ecuatorial (Eje Y) - Salud Respiratoria / Cian
+                Circle()
+                    .stroke(
+                        LinearGradient(colors: [.cyan, .cyan.opacity(0.15)], startPoint: .top, endPoint: .bottom),
+                        lineWidth: 1.5
+                    )
+                    .frame(width: 150, height: 150)
+                    .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 0, y: 1, z: 0))
+                    .animation(.linear(duration: 6).repeatForever(autoreverses: false), value: isAnimating)
+                
+                // Órbita Polar (Eje X) - Sinergia de Sueño / Naranja
+                Circle()
+                    .stroke(
+                        LinearGradient(colors: [.somAccent, .somAccent.opacity(0.15)], startPoint: .leading, endPoint: .trailing),
+                        lineWidth: 1.5
+                    )
+                    .frame(width: 150, height: 150)
+                    .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 1, y: 0, z: 0))
+                    .animation(.linear(duration: 9).repeatForever(autoreverses: false), value: isAnimating)
+                
+                // Órbita Diagonal (Eje Inclinado) - Ritmo Cardíaco / Púrpura
+                Circle()
+                    .stroke(
+                        LinearGradient(colors: [.purple, .purple.opacity(0.15)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                        lineWidth: 1.5
+                    )
+                    .frame(width: 150, height: 150)
+                    .rotation3DEffect(.degrees(isAnimating ? -360 : 0), axis: (x: 1, y: 1, z: 0))
+                    .animation(.linear(duration: 12).repeatForever(autoreverses: false), value: isAnimating)
+                
+                // Núcleo de Energía Pulsante (Homeostasis Activa)
+                Circle()
+                    .fill(Color.somAccent.gradient)
+                    .frame(width: 28, height: 28)
+                    .scaleEffect(isAnimating ? 1.15 : 0.85)
+                    .shadow(color: .somAccent.opacity(0.5), radius: 12)
+                    .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isAnimating)
             }
-            .frame(height: 280)
+            .frame(height: 220)
+            .onAppear {
+                isAnimating = true
+            }
             .task {
-                generateBaseParticles()
                 await fetchMetrics()
             }
             
@@ -125,24 +96,6 @@ struct VitalityCrucibleView: View {
         }
     }
     
-    private func generateBaseParticles() {
-        var temp: [Particle3D] = []
-        let N = 200
-        let goldenRatio = (1.0 + sqrt(5.0)) / 2.0
-        
-        for i in 0..<N {
-            let y = 1.0 - (Double(i) / Double(N - 1)) * 2.0
-            let radius = sqrt(1.0 - y * y)
-            let theta = 2.0 * Double.pi * Double(i) / goldenRatio
-            
-            let x = cos(theta) * radius
-            let z = sin(theta) * radius
-            
-            temp.append(Particle3D(x: x, y: y, z: z, colorIndex: i))
-        }
-        self.baseParticles = temp
-    }
-    
     private func fetchMetrics() async {
         guard let session = session else { return }
         let snoreScore = Double(session.snoreScore)
@@ -164,7 +117,7 @@ struct VitalityCrucibleView: View {
         var totalWeight = 0.0
         var scoreAcc = 0.0
         
-        // 1. Duración del Sueño (Siempre presente, penalización estricta)
+        // 1. Duración del Sueño (Siempre presente)
         let durationHours = (session?.duration ?? 28800) / 3600.0
         var durationScore = 0.0
         if durationHours >= 7.5 && durationHours <= 9.0 { durationScore = 100.0 }
@@ -183,14 +136,14 @@ struct VitalityCrucibleView: View {
         // 3. Frecuencia Cardíaca (Opcional)
         if let hr = metrics?.heartRate {
             var hrScore = 0.0
-            if hr >= 40 && hr <= 65 { hrScore = 100.0 } // Reposo profundo
+            if hr >= 40 && hr <= 65 { hrScore = 100.0 }
             else if hr > 65 && hr <= 75 { hrScore = 75.0 }
             else { hrScore = 40.0 }
             scoreAcc += hrScore * 0.15
             totalWeight += 0.15
         }
         
-        // 4. Oxigenación SpO2 (Opcional, penalización severa por hipoxia)
+        // 4. Oxigenación SpO2 (Opcional)
         if let spo2 = metrics?.spO2 {
             let val = spo2 > 1.0 ? spo2 : spo2 * 100.0
             var o2Score = 0.0
@@ -201,7 +154,6 @@ struct VitalityCrucibleView: View {
             totalWeight += 0.15
         }
         
-        // Cálculo adaptativo basado en sensores disponibles
         return totalWeight > 0 ? (scoreAcc / totalWeight) : snoreScore
     }
     
@@ -224,21 +176,6 @@ struct VitalityCrucibleView: View {
             return "Estabilidad fisiológica parcial. La biosfera mantiene su cohesión estructural, aunque la carga alostática sugiere que un ciclo extra de sueño optimizaría la homeostasis."
         }
     }
-}
-
-struct Particle3D {
-    let x: Double
-    let y: Double
-    let z: Double
-    let colorIndex: Int
-}
-
-struct ProjectedParticle {
-    let x: CGFloat
-    let y: CGFloat
-    let z: Double
-    let scale: Double
-    let colorIndex: Int
 }
 
 struct CrucibleBadge: View {
