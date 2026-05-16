@@ -70,14 +70,14 @@ struct SynergyHelixView: View {
             // Grid de Estadísticas (Ahora 4)
             VStack(spacing: 8) {
                 HStack(spacing: 8) {
-                    HelixStat(label: "Ronquido", value: "\(session?.snoreScore ?? 0)%", color: .somAccent, icon: "waveform")
-                    HelixStat(label: "Pulso", value: "\(Int(metrics?.heartRate ?? 0)) LPM", color: .somSafe, icon: "heart.fill")
+                    HelixStat(label: "Salud Resp.", value: "\(session?.snoreScore ?? 0)%", color: .somAccent, icon: "waveform")
+                    HelixStat(label: "Pulso", value: metrics?.heartRate != nil ? "\(Int(metrics?.heartRate ?? 0)) LPM" : "--", color: .somSafe, icon: "heart.fill")
                 }
                 HStack(spacing: 8) {
                     let o2 = (metrics?.spO2 ?? 0)
                     let o2Val = o2 > 1.0 ? Int(o2) : Int(o2 * 100)
-                    HelixStat(label: "Oxígeno", value: "\(o2Val)%", color: .cyan, icon: "drop.fill")
-                    HelixStat(label: "Resp.", value: "\(Int(metrics?.respiratoryRate ?? 0)) RPM", color: .purple, icon: "wind")
+                    HelixStat(label: "Oxígeno", value: metrics?.spO2 != nil ? "\(o2Val)%" : "--", color: .cyan, icon: "drop.fill")
+                    HelixStat(label: "Respiración", value: metrics?.respiratoryRate != nil ? "\(Int(metrics?.respiratoryRate ?? 0)) RPM" : "--", color: .purple, icon: "wind")
                 }
             }
             .padding(.horizontal)
@@ -113,46 +113,90 @@ struct SynergyHelixView: View {
         healthLevel > 0.7 ? .somSafe : (healthLevel > 0.4 ? .somAccent : .red)
     }
     
+    private struct ActiveStrand {
+        let color: Color
+        let phase: Double
+        let radius: CGFloat
+        let isMain: Bool
+    }
+    
+    private var activeStrands: [ActiveStrand] {
+        var base: [ActiveStrand] = []
+        
+        // 1. Salud Resp (Siempre presente)
+        base.append(ActiveStrand(color: .somAccent, phase: 0, radius: 45, isMain: true))
+        
+        // 2. Pulso
+        if metrics?.heartRate != nil {
+            base.append(ActiveStrand(color: healthLevel < 0.5 ? .red : .somSafe, phase: 0, radius: 35, isMain: false))
+        }
+        
+        // 3. Oxígeno
+        if metrics?.spO2 != nil {
+            base.append(ActiveStrand(color: .cyan, phase: 0, radius: 45, isMain: false))
+        }
+        
+        // 4. Respiración
+        if metrics?.respiratoryRate != nil {
+            base.append(ActiveStrand(color: .purple, phase: 0, radius: 35, isMain: false))
+        }
+        
+        // Re-distribuir fases para simetría perfecta
+        let count = base.count
+        return base.enumerated().map { index, strand in
+            let dynamicPhase = (Double(index) * (2.0 * .pi / Double(count)))
+            return ActiveStrand(
+                color: strand.color,
+                phase: dynamicPhase,
+                radius: strand.radius,
+                isMain: strand.isMain
+            )
+        }
+    }
+    
     private func drawHelix(in context: GraphicsContext, size: CGSize, now: Double) {
         let centerY = size.height / 2
         let width = size.width
         let step = width / CGFloat(points - 1)
+        let currentStrands = activeStrands
         
         for i in 0..<points {
             let x = CGFloat(i) * step
             let progress = Double(i) / Double(points)
-            let angle = (progress * .pi * 4) + (now * rotationSpeed)
             
             // Calculamos entropía basada en el nivel de salud
             let chaos = (1.0 - healthLevel) * 30.0
             let noise = sin(Double(i) * 1.5 + now * 2.0) * chaos
             
-            // Calculamos 4 offsets para las 4 hebras (Fase desplazada 90 grados entre cada una)
-            let y1 = centerY + sin(angle) * 45 + noise
-            let y2 = centerY + sin(angle + .pi / 2.0) * 35 - noise
-            let y3 = centerY + sin(angle + .pi) * 45 + noise * 0.5
-            let y4 = centerY + sin(angle + (3.0 * .pi / 2.0)) * 35 - noise * 0.5
+            // 1. Dibujar Conexiones Estructurales (Peldaños)
+            if currentStrands.count > 1 {
+                for j in 0..<currentStrands.count {
+                    let s1 = currentStrands[j]
+                    let s2 = currentStrands[(j + 1) % currentStrands.count]
+                    
+                    let a1 = (progress * .pi * 4) + (now * rotationSpeed) + s1.phase
+                    let a2 = (progress * .pi * 4) + (now * rotationSpeed) + s2.phase
+                    
+                    let y1 = centerY + sin(a1) * s1.radius + (s1.isMain ? noise : -noise)
+                    let y2 = centerY + sin(a2) * s2.radius + (s2.isMain ? noise : -noise)
+                    
+                    let op = (cos(a1) + 1.0) / 2.0
+                    
+                    var p = Path()
+                    p.move(to: CGPoint(x: x, y: y1))
+                    p.addLine(to: CGPoint(x: x, y: y2))
+                    context.stroke(p, with: .color(healthColor.opacity(op * 0.1)), lineWidth: 0.5)
+                }
+            }
             
-            let opacity = (cos(angle) + 1.0) / 2.0
-            
-            // Conexiones estructurales (Peldaños cruzados)
-            var p1 = Path(); p1.move(to: CGPoint(x: x, y: y1)); p1.addLine(to: CGPoint(x: x, y: y3))
-            var p2 = Path(); p2.move(to: CGPoint(x: x, y: y2)); p2.addLine(to: CGPoint(x: x, y: y4))
-            
-            context.stroke(p1, with: .color(healthColor.opacity(opacity * 0.05)), lineWidth: 0.5)
-            context.stroke(p2, with: .color(healthColor.opacity(opacity * 0.05)), lineWidth: 0.5)
-            
-            // Hebra 1: Audio (Accent)
-            drawNode(in: context, at: CGPoint(x: x, y: y1), color: .somAccent, opacity: opacity, isSynergy: i % 20 == 0)
-            
-            // Hebra 2: Pulso (Safe)
-            drawNode(in: context, at: CGPoint(x: x, y: y2), color: healthLevel < 0.5 ? .red : .somSafe, opacity: 1.0 - opacity, isSynergy: false)
-            
-            // Hebra 3: Oxígeno (Cian)
-            drawNode(in: context, at: CGPoint(x: x, y: y3), color: .cyan, opacity: opacity, isSynergy: false)
-            
-            // Hebra 4: Respiración (Púrpura)
-            drawNode(in: context, at: CGPoint(x: x, y: y4), color: .purple, opacity: 1.0 - opacity, isSynergy: false)
+            // 2. Dibujar Hebras y Nodos
+            for s in currentStrands {
+                let angle = (progress * .pi * 4) + (now * rotationSpeed) + s.phase
+                let y = centerY + sin(angle) * s.radius + (s.isMain ? noise : -noise)
+                let opacity = (cos(angle) + 1.0) / 2.0
+                
+                drawNode(in: context, at: CGPoint(x: x, y: y), color: s.color, opacity: opacity, isSynergy: s.isMain && i % 20 == 0)
+            }
         }
     }
     
