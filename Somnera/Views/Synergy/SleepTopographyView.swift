@@ -281,7 +281,7 @@ struct SleepTopographyView: View {
         }
         
         let xPos = CGFloat(mappedProgress) * totalWidth
-        let waveY = getWaveY(at: xPos, size: size, time: time); let v0: CGFloat = -90.0; let gravity: CGFloat = 80.0; let t = CGFloat(lifecycle); let yDisplacement = (v0 * t) + (0.5 * gravity * t * t)
+        let waveY = getWaveY(at: xPos, size: size, time: time); let v0: CGFloat = -45.0; let gravity: CGFloat = 40.0; let t = CGFloat(lifecycle); let yDisplacement = (v0 * t) + (0.5 * gravity * t * t)
         return (xPos, waveY + yDisplacement, opacity, lifecycle)
     }
     
