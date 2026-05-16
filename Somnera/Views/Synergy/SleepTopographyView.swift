@@ -198,7 +198,7 @@ struct SleepTopographyView: View {
         if !healthSleepSamples.isEmpty, let session = session {
             // Apple Health como prioritario
             let timeAtCol = session.startDate.addingTimeInterval(session.duration * progress)
-            if let sample = healthSleepSamples.first(where: { timeAtCol >= $0.startDate && timeAtCol <= $0.endDate }) {
+            if let sample = getBestSleepSample(at: timeAtCol, from: healthSleepSamples) {
                 switch sample.value {
                 case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
                     deepIntensity = 1.0
@@ -298,14 +298,14 @@ struct SleepTopographyView: View {
         
         var stops: [Gradient.Stop] = []
         let totalTime = session.duration
-        let samplesCount = 10
+        let samplesCount = 50
         
         for i in 0...samplesCount {
             let progress = Double(i) / Double(samplesCount)
             let timeAtCol = session.startDate.addingTimeInterval(totalTime * progress)
             var stopColor = Color.cyan
             
-            if let sample = healthSleepSamples.first(where: { timeAtCol >= $0.startDate && timeAtCol <= $0.endDate }) {
+            if let sample = getBestSleepSample(at: timeAtCol, from: healthSleepSamples) {
                 switch sample.value {
                 case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
                     stopColor = deepColor
@@ -334,6 +334,23 @@ struct SleepTopographyView: View {
             Circle().fill(color).frame(width: 6, height: 6)
             Text(label).font(.system(size: 9, weight: .bold)).foregroundColor(.somTextSecondary).textCase(.uppercase)
         }
+    }
+}
+
+fileprivate func getBestSleepSample(at time: Date, from samples: [HKCategorySample]) -> HKCategorySample? {
+    let overlapping = samples.filter { time >= $0.startDate && time <= $0.endDate }
+    return overlapping.max(by: { samplePriority($0.value) < samplePriority($1.value) })
+}
+
+fileprivate func samplePriority(_ value: Int) -> Int {
+    switch value {
+    case HKCategoryValueSleepAnalysis.awake.rawValue: return 5
+    case HKCategoryValueSleepAnalysis.asleepDeep.rawValue: return 4
+    case HKCategoryValueSleepAnalysis.asleepREM.rawValue: return 3
+    case HKCategoryValueSleepAnalysis.asleepCore.rawValue: return 2
+    case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue: return 1
+    case HKCategoryValueSleepAnalysis.inBed.rawValue: return 0
+    default: return -1
     }
 }
 
@@ -386,7 +403,7 @@ struct NeuralInsightCard: View {
         let insight: String
         
         if !healthSamples.isEmpty {
-            if let sample = healthSamples.first(where: { currentTime >= $0.startDate && currentTime <= $0.endDate }) {
+            if let sample = getBestSleepSample(at: currentTime, from: healthSamples) {
                 switch sample.value {
                 case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
                     pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.08)
