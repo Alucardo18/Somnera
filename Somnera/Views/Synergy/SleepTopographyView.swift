@@ -253,7 +253,7 @@ struct SleepTopographyView: View {
                 if col == 0 { path.move(to: CGPoint(x: px, y: py)) }
                 else { path.addLine(to: CGPoint(x: px, y: py)) }
             }
-            context.stroke(path, with: .linearGradient(Gradient(colors: [dreamColor.opacity(rowOpacity * 0.4), deepColor.opacity(rowOpacity * 0.4)]), startPoint: .zero, endPoint: CGPoint(x: size.width, y: 0)), lineWidth: 1.0)
+            context.stroke(path, with: .linearGradient(dynamicGradient(rowOpacity: rowOpacity), startPoint: .zero, endPoint: CGPoint(x: size.width, y: 0)), lineWidth: 1.0)
         }
         
         // Usamos las partículas del cache para dibujar
@@ -285,6 +285,42 @@ struct SleepTopographyView: View {
             Text(label).font(.system(size: 8, weight: .bold)).foregroundColor(.somTextSecondary).textCase(.uppercase)
             Text(value).font(.system(size: 16, weight: .black, design: .rounded)).foregroundColor(color)
         }.padding(10).background(color.opacity(0.1)).cornerRadius(12)
+    }
+    
+    private func dynamicGradient(rowOpacity: Double) -> Gradient {
+        guard let session = session, !healthSleepSamples.isEmpty else {
+            return Gradient(stops: [
+                Gradient.Stop(color: Color.cyan.opacity(rowOpacity * 0.4), location: 0.0),
+                Gradient.Stop(color: dreamColor.opacity(rowOpacity * 0.4), location: 0.5),
+                Gradient.Stop(color: deepColor.opacity(rowOpacity * 0.4), location: 1.0)
+            ])
+        }
+        
+        var stops: [Gradient.Stop] = []
+        let totalTime = session.duration
+        let samplesCount = 10
+        
+        for i in 0...samplesCount {
+            let progress = Double(i) / Double(samplesCount)
+            let timeAtCol = session.startDate.addingTimeInterval(totalTime * progress)
+            var stopColor = Color.cyan
+            
+            if let sample = healthSleepSamples.first(where: { timeAtCol >= $0.startDate && timeAtCol <= $0.endDate }) {
+                switch sample.value {
+                case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
+                    stopColor = deepColor
+                case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+                    stopColor = dreamColor
+                case HKCategoryValueSleepAnalysis.awake.rawValue:
+                    stopColor = .cyan
+                default: // asleepCore, asleepUnspecified
+                    stopColor = .cyan
+                }
+            }
+            
+            stops.append(Gradient.Stop(color: stopColor.opacity(rowOpacity * 0.4), location: CGFloat(progress)))
+        }
+        return Gradient(stops: stops)
     }
     
     private func formatTime(_ date: Date) -> String {
