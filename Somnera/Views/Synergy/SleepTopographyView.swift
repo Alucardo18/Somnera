@@ -1,4 +1,6 @@
 import SwiftUI
+import AudioToolbox
+import HealthKit
 
 struct NeuralData {
     let time: String
@@ -8,49 +10,90 @@ struct NeuralData {
     let insight: String
 }
 
+// Motor de colisiones ultra-rápido sin dependencia de estado
+class TopographyPhysicsEngine {
+    var lastPlayedCycles: [Int: Double] = [:]
+    var particleCache: [(x: CGFloat, y: CGFloat, opacity: Double, lifecycle: Double)] = []
+    private let hapticGenerator = UIImpactFeedbackGenerator(style: .heavy)
+    
+    init() { hapticGenerator.prepare() }
+    
+    func checkCollision(at x: CGFloat, time: Double, totalWidth: CGFloat) {
+        for i in 0..<particleCache.count {
+            let spark = particleCache[i]
+            
+            // Verificamos colisión con el tooltip
+            if abs(x - spark.x) < 6 {
+                // TRIGGER: Solo si la partícula está en fase de ESTALLIDO (Stellar Burst)
+                if spark.lifecycle > 0.8 && spark.opacity > 0.1 {
+                    let speed = 0.2
+                    let currentCycle = floor(time * speed + Double(i) * 0.731)
+                    
+                    if (lastPlayedCycles[i] ?? -1) != currentCycle {
+                        let pan = Float((spark.x / totalWidth) * 2.0 - 1.0)
+                        
+                        // Feedback Inmediato Asíncrono
+                        DispatchQueue.main.async {
+                            self.hapticGenerator.impactOccurred(intensity: 1.0)
+                            ConsciousnessSoundManager.shared.playSparkle(pan: pan)
+                        }
+                        lastPlayedCycles[i] = currentCycle
+                    }
+                }
+            }
+        }
+    }
+}
+
 struct SleepTopographyView: View {
     let session: SleepSession?
-    
-    // Parámetros
     let timePoints = 40 
     let depthPoints = 12 
     let totalWidth: CGFloat = 350
     
     @State private var dragX: CGFloat? = nil
-    @State private var hapticTrigger = false
+    @State private var physicsEngine = TopographyPhysicsEngine()
+    @State private var healthSleepSamples: [HKCategorySample] = []
     
-    // Colores
-    let goldColor = Color(red: 1.0, green: 0.84, blue: 0.0) // Oro Real
+    let goldColor = Color(red: 1.0, green: 0.84, blue: 0.0)
     let dreamColor = Color.purple
     let deepColor = Color.indigo
+    
+    // Pre-cálculo de intensidades para inferencia acústica
+    private static let deepIntensities: [CGFloat] = (0..<40).map { col in
+        let progress = Double(col) / 40.0
+        return CGFloat(exp(-pow(progress - 0.2, 2) / 0.05))
+    }
+    private static let remIntensities: [CGFloat] = (0..<40).map { col in
+        let progress = Double(col) / 40.0
+        return CGFloat(exp(-pow(progress - 0.8, 2) / 0.1))
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             ZStack(alignment: .bottom) {
                 Color.somSurface.opacity(0.3).cornerRadius(24)
-                
                 TimelineView(.animation) { timeline in
+                    let now = timeline.date.timeIntervalSinceReferenceDate
+                    let size = CGSize(width: totalWidth, height: 220)
+                    
+                    // Pre-calculamos fuera del Canvas
+                    let _ = updatePhysics(now: now, size: size)
+                    
                     Canvas { context, size in
-                        let now = timeline.date.timeIntervalSinceReferenceDate
                         drawNeuralMap(in: context, size: size, time: now)
-                        if let dx = dragX { drawScanner(in: context, size: size, x: dx) }
+                        if let dx = dragX { 
+                            drawScanner(in: context, size: size, x: dx)
+                        }
                     }
                 }
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { value in
-                            let newX = max(0, min(value.location.x, totalWidth))
-                            let now = Date().timeIntervalSinceReferenceDate
-                            if checkSparkCollision(at: newX, time: now) {
-                                hapticTrigger.toggle()
-                            }
-                            dragX = newX
+                            dragX = max(0, min(value.location.x, totalWidth))
                         }
                         .onEnded { _ in dragX = nil }
                 )
-                .sensoryFeedback(.impact(weight: .light, intensity: 0.4), trigger: hapticTrigger)
-                
-                // Timeline
                 HStack {
                     Text("Vigilia").font(.system(size: 8, weight: .bold)).foregroundColor(.somAccent)
                     Spacer()
@@ -61,11 +104,7 @@ struct SleepTopographyView: View {
                 .padding(.horizontal, 30).padding(.bottom, 12)
             }
             .frame(height: 220).padding(.horizontal)
-            
-            NeuralInsightCard(dragX: dragX, totalWidth: totalWidth, session: session)
-                .padding(.horizontal)
-            
-            // Cápsulas y Stats Dinámicas
+            NeuralInsightCard(dragX: dragX, totalWidth: totalWidth, session: session, healthSamples: healthSleepSamples).padding(.horizontal)
             VStack(alignment: .leading, spacing: 12) {
                 Text("Arquitectura de Sueño").font(.system(size: 10, weight: .bold)).foregroundColor(.somTextSecondary).tracking(2).textCase(.uppercase)
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -78,7 +117,6 @@ struct SleepTopographyView: View {
                     }
                 }
             }.padding(.horizontal)
-            
             HStack(spacing: 15) {
                 statItem(label: "Consolidación", value: "\(session?.snoreScore ?? 88)%", color: .purple)
                 statItem(label: "Memoria", value: "\(session?.memoryPacketsCount ?? 420) pqt", color: .somAccent)
@@ -86,119 +124,122 @@ struct SleepTopographyView: View {
             }.padding(.horizontal)
         }
         .padding(.vertical).background(Color.somBackground)
+        .task {
+            await fetchHealthData()
+        }
+    }
+    
+    private func fetchHealthData() async {
+        guard let session = session else { return }
+        do {
+            let samples = try await HealthKitService.shared.fetchSleepStages(start: session.startDate, end: session.endDate)
+            DispatchQueue.main.async {
+                self.healthSleepSamples = samples
+            }
+        } catch {
+            print("[Topography] Error fetching health data: \(error)")
+        }
+    }
+    
+    private func updatePhysics(now: Double, size: CGSize) {
+        physicsEngine.particleCache = (0..<10).map { 
+            getSparkPos(id: $0, time: now, size: size) 
+        }
+        if let dx = dragX {
+            physicsEngine.checkCollision(at: dx, time: now, totalWidth: totalWidth)
+        }
     }
     
     private func formatMinutes(_ seconds: Double) -> String {
-        let mins = Int(seconds / 60)
-        let h = mins / 60
-        let m = mins % 60
+        let mins = Int(seconds / 60); let h = mins / 60; let m = mins % 60
         return h > 0 ? "\(h)h \(m)m" : "\(m)m"
     }
     
-    // MARK: - Neural & Physics Engine
-    
     private func getWaveY(at x: CGFloat, size: CGSize, time: Double) -> CGFloat {
-        let colWidth = size.width / CGFloat(timePoints - 1)
-        let col = max(0, min(Int(x / colWidth), timePoints - 1))
-        let centerY = size.height / 2
-        
-        let zValue = calculateZValue(col: col, time: time)
+        let colWidth = size.width / CGFloat(timePoints - 1); let col = max(0, min(Int(x / colWidth), timePoints - 1))
+        let centerY = size.height / 2; let zValue = calculateZValue(col: col, time: time)
         return centerY - (zValue * 80)
     }
     
     private func calculateZValue(col: Int, time: Double) -> CGFloat {
         let t = time * 0.4
         let progress = Double(col) / Double(timePoints)
-        
-        // 1. Modulación por datos reales de audio (si existen)
         var audioBias: Double = 0
+        
+        // El algoritmo acústico como reforzamiento siempre aporta si hay datos
         if let timeline = session?.decibelTimeline, !timeline.isEmpty {
             let index = (col * timeline.count) / timePoints
             let db = timeline[max(0, min(index, timeline.count - 1))]
-            audioBias = Double(max(0, db - 30) / 60.0) * 0.3 // Inyectamos picos reales
+            audioBias = Double(max(0, db - 30) / 60.0) * 0.3
         }
         
-        // 2. Arquitectura de Fases Dinámica
-        // Sueño Profundo: Dominante al principio (ondas lentas, baja frecuencia)
-        let deepIntensity = exp(-pow(progress - 0.2, 2) / 0.05)
+        let colIdx = max(0, min(col, 39))
+        var deepIntensity: Double = 0
+        var remIntensity: Double = 0
+        var baseIntensity: Double = 0.2
+        
+        if !healthSleepSamples.isEmpty, let session = session {
+            // Apple Health como prioritario
+            let timeAtCol = session.startDate.addingTimeInterval(session.duration * progress)
+            if let sample = healthSleepSamples.first(where: { timeAtCol >= $0.startDate && timeAtCol <= $0.endDate }) {
+                switch sample.value {
+                case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
+                    deepIntensity = 1.0
+                    baseIntensity = 0.1
+                case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+                    remIntensity = 1.0
+                    baseIntensity = 0.1
+                case HKCategoryValueSleepAnalysis.awake.rawValue:
+                    deepIntensity = 0
+                    remIntensity = 0
+                    baseIntensity = 0.05
+                default: // asleepCore, asleepUnspecified
+                    baseIntensity = 0.5
+                }
+            } else {
+                baseIntensity = 0.2
+            }
+        } else {
+            // Algoritmo acústico (Inferido) si no hay Apple Health
+            deepIntensity = Double(Self.deepIntensities[colIdx])
+            remIntensity = Double(Self.remIntensities[colIdx])
+        }
+        
         let deepWave = sin(Double(col) * 0.15 + t) * deepIntensity
-        
-        // REM: Dominante al final (ondas rápidas, alta frecuencia)
-        let remIntensity = exp(-pow(progress - 0.8, 2) / 0.1)
         let remWave = sin(Double(col) * 0.6 + t * 2.0) * remIntensity
-        
-        // 3. Ruido de base (Vigilia/Ligero)
-        let baseWave = sin(Double(col) * 0.3 + t) * 0.2
+        let baseWave = sin(Double(col) * 0.3 + t) * baseIntensity
         
         return CGFloat(deepWave + remWave + baseWave + audioBias)
     }
     
     private func getSparkPos(id: Int, time: Double, size: CGSize) -> (x: CGFloat, y: CGFloat, opacity: Double, lifecycle: Double) {
-        let speed = 0.2 
-        let lifecycle = (time * speed + Double(id) * 0.731).truncatingRemainder(dividingBy: 1.0)
-        let opacity = sin(lifecycle * .pi)
-        
-        // Spawneamos donde haya intensidad REM o Deep (basado en el ID)
-        let zoneStart: CGFloat = totalWidth * 0.1
-        let zoneEnd: CGFloat = totalWidth * 0.9
-        let range = zoneEnd - zoneStart
-        
-        let cycleId = floor(time * speed + Double(id) * 0.731)
-        let xSeed = sin(cycleId * 987.654 + Double(id) * 123.456)
-        let xPos = zoneStart + range * (abs(xSeed))
-        
-        let waveY = getWaveY(at: xPos, size: size, time: time)
-        
-        let v0: CGFloat = -90.0
-        let gravity: CGFloat = 80.0
-        let t = CGFloat(lifecycle)
-        let yDisplacement = (v0 * t) + (0.5 * gravity * t * t)
+        let speed = 0.2 ; let lifecycle = (time * speed + Double(id) * 0.731).truncatingRemainder(dividingBy: 1.0)
+        let opacity = sin(lifecycle * .pi); let zoneStart: CGFloat = totalWidth * 0.1; let zoneEnd: CGFloat = totalWidth * 0.9; let range = zoneEnd - zoneStart
+        let cycleId = floor(time * speed + Double(id) * 0.731); let xSeed = sin(cycleId * 987.654 + Double(id) * 123.456); let xPos = zoneStart + range * (abs(xSeed))
+        let waveY = getWaveY(at: xPos, size: size, time: time); let v0: CGFloat = -90.0; let gravity: CGFloat = 80.0; let t = CGFloat(lifecycle); let yDisplacement = (v0 * t) + (0.5 * gravity * t * t)
         return (xPos, waveY + yDisplacement, opacity, lifecycle)
     }
     
-    private func checkSparkCollision(at x: CGFloat, time: Double) -> Bool {
-        let dummySize = CGSize(width: totalWidth, height: 220)
-        for i in 0..<10 {
-            let spark = getSparkPos(id: i, time: time, size: dummySize)
-            if spark.opacity > 0.3 && abs(x - spark.x) < 3 { return true }
-        }
-        return false
-    }
-    
     private func drawNeuralMap(in context: GraphicsContext, size: CGSize, time: Double) {
-        let colWidth = size.width / CGFloat(timePoints - 1)
-        let centerY = size.height / 2
-        
+        let colWidth = size.width / CGFloat(timePoints - 1); let centerY = size.height / 2
         for row in 0..<depthPoints {
-            var path = Path()
-            let zOffset = CGFloat(row) * 10.0
-            let rowOpacity = 1.0 - (Double(row) / Double(depthPoints))
-            
+            var path = Path(); let zOffset = CGFloat(row) * 10.0; let rowOpacity = 1.0 - (Double(row) / Double(depthPoints))
             for col in 0..<timePoints {
-                let xBase = CGFloat(col) * colWidth
-                let zValue = calculateZValue(col: col, time: time + Double(row) * 0.1)
-                
-                let px = xBase + (zOffset * 0.5)
-                let py = centerY + (zOffset * 0.8) - (zValue * 60)
-                
+                let xBase = CGFloat(col) * colWidth; let zValue = calculateZValue(col: col, time: time + Double(row) * 0.1)
+                let px = xBase + (zOffset * 0.5); let py = centerY + (zOffset * 0.8) - (zValue * 60)
                 if col == 0 { path.move(to: CGPoint(x: px, y: py)) }
                 else { path.addLine(to: CGPoint(x: px, y: py)) }
             }
             context.stroke(path, with: .linearGradient(Gradient(colors: [dreamColor.opacity(rowOpacity * 0.4), deepColor.opacity(rowOpacity * 0.4)]), startPoint: .zero, endPoint: CGPoint(x: size.width, y: 0)), lineWidth: 1.0)
         }
         
-        for i in 0..<10 {
-            let spark = getSparkPos(id: i, time: time, size: size)
+        // Usamos las partículas del cache para dibujar
+        for i in 0..<physicsEngine.particleCache.count {
+            let spark = physicsEngine.particleCache[i]
             if spark.opacity > 0 {
-                let opacity = spark.opacity
-                let lifecycle = spark.lifecycle
-                let isBursting = lifecycle > 0.8
-                var baseSize: CGFloat = 2.0
-                var bloomRadius: CGFloat = 0
+                let opacity = spark.opacity; let lifecycle = spark.lifecycle; let isBursting = lifecycle > 0.8; var baseSize: CGFloat = 2.0; var bloomRadius: CGFloat = 0
                 if isBursting {
-                    let burstProgress = (lifecycle - 0.8) / 0.2
-                    baseSize = 2.0 + (CGFloat(sin(burstProgress * .pi)) * 6.0)
-                    bloomRadius = baseSize * 2.5
+                    let burstProgress = (lifecycle - 0.8) / 0.2; baseSize = 2.0 + (CGFloat(sin(burstProgress * .pi)) * 6.0); bloomRadius = baseSize * 2.5
                 }
                 if isBursting {
                     context.fill(Path(ellipseIn: CGRect(x: spark.x - bloomRadius, y: spark.y - bloomRadius, width: bloomRadius*2, height: bloomRadius*2)), with: .color(goldColor.opacity(opacity * 0.25)))
@@ -212,9 +253,7 @@ struct SleepTopographyView: View {
     }
     
     private func drawScanner(in context: GraphicsContext, size: CGSize, x: CGFloat) {
-        var path = Path()
-        path.move(to: CGPoint(x: x, y: 20))
-        path.addLine(to: CGPoint(x: x, y: size.height - 30))
+        var path = Path(); path.move(to: CGPoint(x: x, y: 20)); path.addLine(to: CGPoint(x: x, y: size.height - 30))
         context.stroke(path, with: .color(.white.opacity(0.8)), lineWidth: 1.2)
     }
     
@@ -225,8 +264,6 @@ struct SleepTopographyView: View {
         }.padding(10).background(color.opacity(0.1)).cornerRadius(12)
     }
 }
-
-// MARK: - Subviews
 
 struct SleepDataCapsule: View {
     let label: String; let value: String; let color: Color
@@ -239,7 +276,11 @@ struct SleepDataCapsule: View {
 }
 
 struct NeuralInsightCard: View {
-    let dragX: CGFloat?; let totalWidth: CGFloat; let session: SleepSession?
+    let dragX: CGFloat?
+    let totalWidth: CGFloat
+    let session: SleepSession?
+    let healthSamples: [HKCategorySample]
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if let dx = dragX {
@@ -264,24 +305,65 @@ struct NeuralInsightCard: View {
     }
     
     private func calculateNeuralData(for x: CGFloat) -> NeuralData {
-        let progress = x / totalWidth
-        let duration = session?.duration ?? 28800
-        let startTime = session?.startDate ?? Date().addingTimeInterval(-28800)
-        let currentTime = startTime.addingTimeInterval(duration * Double(progress))
-        let formatter = DateFormatter()
-        formatter.dateFormat = "hh:mm a"
-        let timeString = formatter.string(from: currentTime)
+        let progress = x / totalWidth; let duration = session?.duration ?? 28800; let startTime = session?.startDate ?? Date().addingTimeInterval(-28800); let currentTime = startTime.addingTimeInterval(duration * Double(progress))
+        let formatter = DateFormatter(); formatter.dateFormat = "hh:mm a"; let timeString = formatter.string(from: currentTime)
         
-        if progress > 0.6 {
-            let pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.15)
-            return NeuralData(time: timeString, state: "Sueño REM", icon: "sparkles", memoryFragments: "\(pqt) pqt", insight: "Consolidación emocional activa. Detectamos alta actividad talamocortical en esta fase.")
-        } else if progress < 0.3 {
-            let pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.08)
-            return NeuralData(time: timeString, state: "Sueño Profundo", icon: "brain.fill", memoryFragments: "\(pqt) pqt", insight: "Recuperación física y limpieza glinfática. Ondas delta dominantes.")
+        let pqt: Int
+        let state: String
+        let icon: String
+        let insight: String
+        
+        if !healthSamples.isEmpty {
+            if let sample = healthSamples.first(where: { currentTime >= $0.startDate && currentTime <= $0.endDate }) {
+                switch sample.value {
+                case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
+                    pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.08)
+                    state = "Profundo (Health)"
+                    icon = "brain.fill"
+                    insight = "Recuperación física y limpieza glinfática. Ondas delta."
+                case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+                    pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.15)
+                    state = "REM (Health)"
+                    icon = "sparkles"
+                    insight = "Consolidación emocional activa. Alta actividad talamocortical."
+                case HKCategoryValueSleepAnalysis.awake.rawValue:
+                    pqt = 0
+                    state = "Despierto (Health)"
+                    icon = "eye.fill"
+                    insight = "Interrupción del sueño detectada por HealthKit."
+                default:
+                    pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.03)
+                    state = "Ligero (Health)"
+                    icon = "moon.fill"
+                    insight = "Transición neuronal. Procesamiento periférico."
+                }
+            } else {
+                pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.03)
+                state = "Sueño (Sin Datos Health)"
+                icon = "moon.fill"
+                insight = "No hay datos exactos en este minuto."
+            }
         } else {
-            let pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.03)
-            return NeuralData(time: timeString, state: "Sueño Ligero", icon: "moon.fill", memoryFragments: "\(pqt) pqt", insight: "Transición neuronal. Procesamiento de información periférica.")
+            // Inferred logic
+            if progress > 0.6 {
+                pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.15)
+                state = "Sueño REM (Inferido)"
+                icon = "sparkles"
+                insight = "Consolidación emocional activa. Detectamos alta actividad talamocortical en esta fase."
+            } else if progress < 0.3 {
+                pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.08)
+                state = "Sueño Profundo (Inferido)"
+                icon = "brain.fill"
+                insight = "Recuperación física y limpieza glinfática. Ondas delta dominantes."
+            } else {
+                pqt = Int(Double(session?.memoryPacketsCount ?? 420) * 0.03)
+                state = "Sueño Ligero (Inferido)"
+                icon = "moon.fill"
+                insight = "Transición neuronal. Procesamiento de información periférica."
+            }
         }
+        
+        return NeuralData(time: timeString, state: state, icon: icon, memoryFragments: "\(pqt) pqt", insight: insight)
     }
 }
 

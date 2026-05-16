@@ -81,4 +81,28 @@ final class HealthKitService {
         try await healthStore.save(sample)
         print("[Somnera] ✅ Evento de apnea guardado en HealthKit")
     }
+    
+    // MARK: - Reading Data
+    
+    func fetchSleepStages(start: Date, end: Date) async throws -> [HKCategorySample] {
+        guard isAvailable else { return [] }
+        
+        let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+        // Utilizamos un predicado que encuentre cualquier muestra que se solape con el periodo (options: [])
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: [])
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { _, samples, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else if let sleepSamples = samples as? [HKCategorySample] {
+                    continuation.resume(returning: sleepSamples)
+                } else {
+                    continuation.resume(returning: [])
+                }
+            }
+            self.healthStore.execute(query)
+        }
+    }
 }
