@@ -30,27 +30,27 @@ struct SynergyGuideView: View {
                 .padding(.top, 20)
                 
                 TabView(selection: $currentPage) {
-                    // SLIDE 1: HÉLICE
-                    PremiumGuideSlide(
-                        title: "Hélice de Sinergia",
-                        subtitle: "EL ENTRELAZAMIENTO VITAL",
-                        description: "Cuando las hebras bailan en azul y verde de forma paralela, tu pulso y respiración están en perfecta sinergia. Si las cuerdas se cruzan o tornan rojas, tu cuerpo está bajo estrés por falta de aire.",
-                        visual: AnyView(HelixVisualDemo())
-                    ).tag(0)
-                    
-                    // SLIDE 2: TOPOGRAFÍA
+                    // SLIDE 1: TOPOGRAFÍA
                     PremiumGuideSlide(
                         title: "Topografía Biológica",
                         subtitle: "CONSCIENCIA DATA-DRIVEN",
-                        description: "Este paisaje no es solo estético; las ondas se modulan en tiempo real con tus niveles de audio. Los picos representan la respuesta de tu arquitectura cerebral a ronquidos o ruidos externos detectados durante la noche.",
+                        description: "Este mapa representa tu arquitectura neuronal. Los picos y valles se modulan con el ruido de tu entorno y las fases de sueño. Los destellos de oro indican los momentos exactos de consolidación de memoria.",
                         visual: AnyView(TopographyVisualDemo())
+                    ).tag(0)
+                    
+                    // SLIDE 2: HÉLICE DINÁMICA
+                    PremiumGuideSlide(
+                        title: "Hélice de Sinergia",
+                        subtitle: "EL ADN DE TU DESCANSO",
+                        description: "Una visualización adaptativa que se ajusta a tus sensores. Si usas Apple Watch, verás cómo tu pulso y oxígeno se entrelazan. A mayor sincronía y paralelismo entre las hebras, mejor es tu recuperación biológica.",
+                        visual: AnyView(HelixVisualDemo())
                     ).tag(1)
                     
-                    // SLIDE 3: DESTELLOS
+                    // SLIDE 3: INTERPRETACIÓN
                     PremiumGuideSlide(
-                        title: "Estallido Estelar",
-                        subtitle: "CONSOLIDACIÓN DE MEMORIA",
-                        description: "Cada destello de oro es un 'Stellar Burst' que cuantifica la fijación de recuerdos. La densidad de oro depende de tu eficiencia respiratoria; a mayor estabilidad, mayor es la consolidación neuronal.",
+                        title: "Calidad vs Cantidad",
+                        subtitle: "DIAGNÓSTICO HONESTO",
+                        description: "Medimos 'Salud', no cantidad. Un 100% en Salud Respiratoria significa silencio absoluto. Si un sensor no tiene datos, la hélice se ajusta automáticamente para darte un puntaje justo basado solo en lo medido.",
                         visual: AnyView(SparklesVisualDemo())
                     ).tag(2)
                 }
@@ -74,7 +74,7 @@ struct SynergyGuideView: View {
                             dismiss()
                         }
                     } label: {
-                        Text(currentPage < 2 ? "CONTINUAR" : "COMENZAR ANÁLISIS")
+                        Text(currentPage < 2 ? "CONTINUAR" : "ENTENDIDO")
                             .font(.system(size: 14, weight: .black))
                             .tracking(2)
                             .foregroundColor(.somBackground)
