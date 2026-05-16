@@ -33,8 +33,8 @@ struct SynergyGuideView: View {
                     // SLIDE 1: TOPOGRAFÍA
                     PremiumGuideSlide(
                         title: "Topografía Biológica",
-                        subtitle: "CONSCIENCIA DATA-DRIVEN",
-                        description: "Este mapa representa tu arquitectura neuronal. Los picos y valles se modulan con el ruido de tu entorno y las fases de sueño. Los destellos de oro indican los momentos exactos de consolidación de memoria.",
+                        subtitle: "CONSOLIDACIÓN DE MEMORIA",
+                        description: "Este mapa traza tu actividad cerebral. Los destellos dorados son 'Stellar Bursts' que ocurren solo en sueño profundo y REM, representando la fijación de recuerdos. A mayor estabilidad respiratoria, mayor es la densidad de destellos y la eficiencia de tu recuperación cognitiva.",
                         visual: AnyView(TopographyVisualDemo())
                     ).tag(0)
                     
