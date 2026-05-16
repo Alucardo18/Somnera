@@ -71,7 +71,7 @@ struct SleepTopographyView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            ZStack(alignment: .bottom) {
+            ZStack {
                 Color.somSurface.opacity(0.3).cornerRadius(24)
                 TimelineView(.animation) { timeline in
                     let now = timeline.date.timeIntervalSinceReferenceDate
@@ -94,14 +94,30 @@ struct SleepTopographyView: View {
                         }
                         .onEnded { _ in dragX = nil }
                 )
+                // Eje de Tiempo Real (Abajo)
                 HStack {
-                    Text("Vigilia").font(.system(size: 8, weight: .bold)).foregroundColor(.somAccent)
+                    Text(formatTime(session?.startDate ?? Date().addingTimeInterval(-28800)))
                     Spacer()
-                    Text("Rem").font(.system(size: 8, weight: .bold)).foregroundColor(.purple)
-                    Spacer()
-                    Text("Profundo").font(.system(size: 8, weight: .bold)).foregroundColor(.indigo)
+                    Text(formatTime(session?.endDate ?? Date()))
                 }
-                .padding(.horizontal, 30).padding(.bottom, 12)
+                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                .foregroundColor(.somTextSecondary.opacity(0.6))
+                .padding(.horizontal, 20)
+                .padding(.bottom, 12)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                
+                // Leyenda de Fases (Arriba Derecha)
+                VStack(alignment: .leading, spacing: 6) {
+                    legendItem(color: .indigo, label: "Profundo")
+                    legendItem(color: .purple, label: "REM")
+                    legendItem(color: .somAccent, label: "Vigilia/Ligero")
+                }
+                .padding(10)
+                .background(Color.somSurface.opacity(0.8))
+                .cornerRadius(12)
+                .padding(.top, 16)
+                .padding(.trailing, 16)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             }
             .frame(height: 220).padding(.horizontal)
             NeuralInsightCard(dragX: dragX, totalWidth: totalWidth, session: session, healthSamples: healthSleepSamples).padding(.horizontal)
@@ -262,6 +278,19 @@ struct SleepTopographyView: View {
             Text(label).font(.system(size: 8, weight: .bold)).foregroundColor(.somTextSecondary).textCase(.uppercase)
             Text(value).font(.system(size: 16, weight: .black, design: .rounded)).foregroundColor(color)
         }.padding(10).background(color.opacity(0.1)).cornerRadius(12)
+    }
+    
+    private func formatTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "hh:mm a"
+        return formatter.string(from: date)
+    }
+    
+    private func legendItem(color: Color, label: String) -> some View {
+        HStack(spacing: 6) {
+            Circle().fill(color).frame(width: 6, height: 6)
+            Text(label).font(.system(size: 9, weight: .bold)).foregroundColor(.somTextSecondary).textCase(.uppercase)
+        }
     }
 }
 
