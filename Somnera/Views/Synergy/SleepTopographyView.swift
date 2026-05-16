@@ -71,13 +71,6 @@ struct SleepTopographyView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            HStack(spacing: 10) {
-                let duration = session?.duration ?? 28800
-                SleepDataCapsule(label: "Ligero", value: formatMinutes(duration * 0.55), color: .cyan)
-                SleepDataCapsule(label: "REM", value: formatMinutes(duration * 0.25), color: .purple)
-                SleepDataCapsule(label: "Profundo", value: formatMinutes(duration * 0.20), color: .indigo)
-            }.padding(.horizontal)
-            
             ZStack {
                 Color.somSurface.opacity(0.3).cornerRadius(24)
                 TimelineView(.animation) { timeline in
@@ -113,22 +106,33 @@ struct SleepTopographyView: View {
                 .padding(.bottom, 12)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                 
-                // Leyenda de Fases (Arriba Derecha)
-                VStack(alignment: .leading, spacing: 6) {
+                // Leyenda de Fases (Arriba)
+                HStack(spacing: 16) {
                     legendItem(color: .indigo, label: "Profundo")
                     legendItem(color: .purple, label: "REM")
-                    legendItem(color: .cyan, label: "Vigilia / Ligero")
-                    legendItem(color: goldColor, label: "Memoria Consolidada")
+                    legendItem(color: .cyan, label: "Ligero")
+                    legendItem(color: goldColor, label: "Memoria")
                 }
-                .padding(10)
+                .padding(.horizontal, 16).padding(.vertical, 8)
                 .background(Color.somSurface.opacity(0.8))
-                .cornerRadius(12)
+                .cornerRadius(20)
                 .padding(.top, 16)
-                .padding(.trailing, 16)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
             .frame(height: 220).padding(.horizontal)
             NeuralInsightCard(dragX: dragX, totalWidth: totalWidth, session: session, healthSamples: healthSleepSamples).padding(.horizontal)
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Arquitectura de Sueño").font(.system(size: 10, weight: .bold)).foregroundColor(.somTextSecondary).tracking(2).textCase(.uppercase)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        let duration = session?.duration ?? 28800
+                        SleepDataCapsule(label: "Despierto", value: formatMinutes(duration * 0.1), color: .teal)
+                        SleepDataCapsule(label: "REM", value: formatMinutes(duration * 0.25), color: .purple)
+                        SleepDataCapsule(label: "Ligero", value: formatMinutes(duration * 0.45), color: .cyan)
+                        SleepDataCapsule(label: "Profundo", value: formatMinutes(duration * 0.20), color: .indigo)
+                    }
+                }
+            }.padding(.horizontal)
             HStack(spacing: 15) {
                 statItem(label: "Consolidación", value: "\(session?.snoreScore ?? 88)%", color: .purple)
                 statItem(label: "Memoria", value: "\(session?.memoryPacketsCount ?? 420) pqt", color: .somAccent)
@@ -398,9 +402,7 @@ struct SleepDataCapsule: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label).font(.system(size: 9, weight: .bold)).foregroundColor(.somTextSecondary)
             Text(value).font(.system(size: 14, weight: .black, design: .rounded)).foregroundColor(.white)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 12).padding(.vertical, 10).background(RoundedRectangle(cornerRadius: 16).fill(Color.somSurface)).overlay(RoundedRectangle(cornerRadius: 16).stroke(color.opacity(0.3), lineWidth: 1))
+        }.padding(.horizontal, 16).padding(.vertical, 10).background(RoundedRectangle(cornerRadius: 16).fill(Color.somSurface)).overlay(RoundedRectangle(cornerRadius: 16).stroke(color.opacity(0.3), lineWidth: 1))
     }
 }
 
