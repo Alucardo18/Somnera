@@ -109,8 +109,8 @@ struct VitalityCrucibleView: View {
                     .fixedSize(horizontal: false, vertical: true)
                 
                 HStack {
-                    CrucibleBadge(label: "Estabilidad 3D", value: "\(Int((session?.snoreScore ?? 100)))%", icon: "leaf.fill")
-                    CrucibleBadge(label: "Saturación", value: metrics?.spO2 != nil ? "\(Int((metrics?.spO2 ?? 1.0) * 100))%" : "N/A", icon: "waveform.path.ecg")
+                    CrucibleBadge(label: "Homeostasis", value: "\(Int(calculateHomeostasis()))%", icon: "circle.hexagonpath.fill")
+                    CrucibleBadge(label: "SpO2", value: metrics?.spO2 != nil ? "\(Int((metrics?.spO2 ?? 1.0) * 100))%" : "--", icon: "waveform.path.ecg")
                 }
             }
             .padding(25)
@@ -161,21 +161,35 @@ struct VitalityCrucibleView: View {
         }
     }
     
+    private func calculateHomeostasis() -> Double {
+        let durationHours = (session?.duration ?? 28800) / 3600.0
+        // 8 horas es el 100%. Max 100%.
+        let durationScore = min(100.0, (durationHours / 8.0) * 100.0)
+        
+        // Sinergia biométrica (Pulso, Respiración, Oxígeno, Ronquido)
+        let bioScore = metrics?.synergyScore ?? Double(session?.snoreScore ?? 100)
+        
+        // 40% Cantidad (Horas), 60% Calidad (Sinergia Biométrica)
+        return (durationScore * 0.40) + (bioScore * 0.60)
+    }
+    
     private func generateAISummary() -> String {
         guard let session = session else { return "Mapeando geometría cuántica..." }
         
-        let snore = session.snoreScore
-        let hours = session.duration / 3600.0
+        let homeostasis = calculateHomeostasis()
         let o2 = metrics?.spO2 ?? 1.0
+        let hours = session.duration / 3600.0
         
-        if snore > 90 && hours > 7 {
-            return "Biosfera en balance perfecto. La homeostasis del sueño se ha mantenido intacta, indicando una recuperación fisiológica y celular óptima."
+        if homeostasis > 90 {
+            return "Biosfera en balance perfecto. La homeostasis del sueño se ha mantenido intacta, indicando una recuperación fisiológica óptima."
+        } else if hours < 6.0 {
+            return "Contracción esférica. La biosfera no alcanzó su diámetro máximo debido a una severa falta de horas de descanso (\(String(format: "%.1f", hours))h), generando una deuda de sueño."
         } else if o2 < 0.92 {
-            return "El polo de la biosfera muestra distorsión térmica. La reducción sostenida de oxígeno ha generado estrés cardiovascular, alterando la homeostasis."
-        } else if snore < 60 {
-            return "Biosfera fragmentada. La inestabilidad acústica de los eventos respiratorios ha roto la contención simétrica, interrumpiendo el ciclo reparador."
+            return "El polo de la biosfera muestra distorsión térmica. La reducción sostenida de oxígeno ha generado estrés cardiovascular, alterando el equilibrio."
+        } else if homeostasis < 70 {
+            return "Biosfera fragmentada. La inestabilidad de los eventos respiratorios ha roto la contención simétrica, interrumpiendo el ciclo reparador."
         } else {
-            return "Estabilidad fisiológica lograda. La biosfera mantiene su cohesión estructural, aunque la carga alostática sugiere que un ciclo extra de sueño habría sido beneficioso."
+            return "Estabilidad fisiológica parcial. La biosfera mantiene su cohesión estructural, aunque la carga alostática sugiere que un ciclo extra de sueño optimizaría la homeostasis."
         }
     }
 }
