@@ -5,120 +5,98 @@ struct VitalityCrucibleView: View {
     let session: SleepSession?
     @State private var metrics: SynergyMetrics?
     
-    // Nodos de energía rápidos
-    @State private var energyNodes: [EnergyNode] = (0..<12).map { _ in EnergyNode() }
+    // Lista de partículas pre-calculadas en 3D
+    @State private var baseParticles: [Particle3D] = []
     
     var body: some View {
         VStack(spacing: 25) {
-            // El Reactor de Fusión Gráfico (Alta Definición)
+            // El Crisol: Esfera Holográfica 3D (Alta Precisión)
             TimelineView(.animation) { timeline in
                 Canvas { context, size in
                     let now = timeline.date.timeIntervalSinceReferenceDate
                     let center = CGPoint(x: size.width / 2, y: size.height / 2)
                     
-                    // 1. Obtener Datos Reales
+                    // 1. Cargar datos reales
                     let synergy = Double(session?.snoreScore ?? 100) / 100.0
                     let o2 = (metrics?.spO2 ?? 1.0)
                     let hr = metrics?.heartRate ?? 60.0
                     let durationHours = (session?.duration ?? 28800) / 3600.0
                     
-                    // Escala base según horas
+                    // Escala base por duración y pulso
                     let baseScale = min(1.2, max(0.5, durationHours / 8.0))
                     let pulse = sin(now * (hr / 60.0) * Double.pi * 2.0) * 4.0
-                    let R = (50 * baseScale) + pulse
+                    let sphereRadius = (70.0 * baseScale) + pulse
                     
-                    // Colores de Alta Definición
-                    let coreColor = synergy > 0.7 ? Color.somSafe : (synergy > 0.4 ? Color.somAccent : Color.red)
-                    let plasmaColor = o2 > 0.94 ? Color.cyan : (o2 > 0.90 ? Color.somAccent : Color.orange)
+                    // Frecuencia de onda según respiración
+                    let waveFreq = 4.0 + (metrics?.respiratoryRate ?? 15.0) / 5.0
+                    let waveAmp = (1.0 - synergy) * 0.2
                     
-                    // 2. Aura de Fondo (Sutil, muy controlada)
-                    context.addFilter(.blur(radius: 15))
-                    context.fill(Path(ellipseIn: CGRect(x: center.x - R, y: center.y - R, width: R*2, height: R*2)), with: .color(coreColor.opacity(0.1)))
-                    context.addFilter(.blur(radius: 0)) // Limpiar filtro para dibujo sharp
+                    // Ángulos de rotación continua
+                    let rotY = now * 0.4
+                    let rotX = sin(now * 0.1) * 0.2
                     
-                    // 3. Dibujar Líneas de Campo Magnético (Bucles Polares)
-                    let fieldSpans = 5
-                    let chaos = (1.0 - synergy) * 25.0
-                    
-                    for j in 0..<fieldSpans {
-                        let expansion = 45.0 + sin(now * 3.0 + Double(j)) * (5.0 + chaos)
+                    // 2. Transformar, Deformar y Proyectar Partículas
+                    var projected: [ProjectedParticle] = baseParticles.map { p in
+                        let lat = asin(p.y)
+                        let ripple = sin(lat * waveFreq + now * 3.0) * waveAmp
+                        let r = 1.0 + ripple
                         
-                        var pLeft = Path()
-                        pLeft.move(to: CGPoint(x: center.x, y: center.y - R))
-                        pLeft.addCurve(
-                            to: CGPoint(x: center.x, y: center.y + R),
-                            control1: CGPoint(x: center.x - expansion, y: center.y - R/2),
-                            control2: CGPoint(x: center.x - expansion, y: center.y + R/2)
+                        let px = p.x * r
+                        let py = p.y * r
+                        let pz = p.z * r
+                        
+                        let x1 = px * cos(rotY) - pz * sin(rotY)
+                        let z1 = px * sin(rotY) + pz * cos(rotY)
+                        
+                        let y1 = py * cos(rotX) - z1 * sin(rotX)
+                        let z2 = py * sin(rotX) + z1 * cos(rotX)
+                        
+                        let d = 2.5
+                        let scaleFactor = d / (d + z2)
+                        
+                        let screenX = center.x + CGFloat(x1 * sphereRadius * scaleFactor)
+                        let screenY = center.y + CGFloat(y1 * sphereRadius * scaleFactor)
+                        
+                        return ProjectedParticle(
+                            x: screenX,
+                            y: screenY,
+                            z: z2,
+                            scale: scaleFactor,
+                            colorIndex: p.colorIndex
                         )
-                        
-                        var pRight = Path()
-                        pRight.move(to: CGPoint(x: center.x, y: center.y - R))
-                        pRight.addCurve(
-                            to: CGPoint(x: center.x, y: center.y + R),
-                            control1: CGPoint(x: center.x + expansion, y: center.y - R/2),
-                            control2: CGPoint(x: center.x + expansion, y: center.y + R/2)
-                        )
-                        
-                        context.stroke(pLeft, with: .color(coreColor.opacity(0.12)), lineWidth: 1.0)
-                        context.stroke(pRight, with: .color(coreColor.opacity(0.12)), lineWidth: 1.0)
                     }
                     
-                    // 4. Anillos Orbitales Sólidos (Simulación de 3 Ejes Rotativos)
-                    let axes = [
-                        (angle: 0.0, a: 110.0, b: 35.0, color: plasmaColor),      // Ring Ecuatorial (O2)
-                        (angle: Double.pi / 3.0, a: 95.0, b: 30.0, color: coreColor),  // Ring 1 (Sinergia)
-                        (angle: -Double.pi / 3.0, a: 95.0, b: 30.0, color: .purple)    // Ring 2 (Respiración)
-                    ]
+                    // 3. Z-Sorting
+                    projected.sort { $0.z > $1.z }
                     
-                    for (index, axis) in axes.enumerated() {
-                        let path = Path { p in
-                            for step in 0...100 {
-                                let t = (Double(step) / 100.0) * 2.0 * Double.pi
-                                let rx = axis.a * cos(t)
-                                let ry = axis.b * sin(t)
-                                
-                                let x = center.x + rx * cos(axis.angle) - ry * sin(axis.angle)
-                                let y = center.y + rx * sin(axis.angle) + ry * cos(axis.angle)
-                                
-                                if step == 0 { p.move(to: CGPoint(x: x, y: y)) }
-                                else { p.addLine(to: CGPoint(x: x, y: y)) }
-                            }
+                    // 4. Dibujar
+                    for p in projected {
+                        let baseColor = o2 > 0.94 ? Color.cyan : (o2 > 0.90 ? Color.somAccent : Color.orange)
+                        let opacity = max(0.15, min(0.9, (1.2 - p.z) / 2.0))
+                        let size = max(1.5, min(5.0, 3.5 * p.scale))
+                        
+                        let rect = CGRect(x: p.x - size/2, y: p.y - size/2, width: size, height: size)
+                        context.fill(Path(ellipseIn: rect), with: .color(baseColor.opacity(opacity)))
+                        
+                        if synergy > 0.75 && p.z < -0.2 && p.colorIndex % 12 == 0 {
+                            let glowRect = rect.insetBy(dx: -1.5, dy: -1.5)
+                            context.stroke(Path(ellipseIn: glowRect), with: .color(.white.opacity(0.3)), lineWidth: 0.5)
                         }
-                        context.stroke(path, with: .color(axis.color.opacity(0.25)), lineWidth: 1.5)
-                        
-                        // 5. Nodos de Energía Rápidos
-                        let node = energyNodes[index]
-                        let tNode = node.baseOffset + (now * node.speed)
-                        
-                        let nx = center.x + axis.a * cos(tNode) * cos(axis.angle) - axis.b * sin(tNode) * sin(axis.angle)
-                        let ny = center.y + axis.a * cos(tNode) * sin(axis.angle) + axis.b * sin(tNode) * cos(axis.angle)
-                        
-                        let size: CGFloat = 6.0
-                        let rect = CGRect(x: nx - size/2, y: ny - size/2, width: size, height: size)
-                        context.fill(Path(ellipseIn: rect), with: .color(.white))
-                        context.stroke(Path(ellipseIn: rect.insetBy(dx: -2, dy: -2)), with: .color(axis.color), lineWidth: 1.5)
                     }
-                    
-                    // 6. Núcleo Sólido (Horizonte de Singularidad)
-                    let coreRect = CGRect(x: center.x - R/2.5, y: center.y - R/2.5, width: (R/2.5)*2, height: (R/2.5)*2)
-                    context.fill(Path(ellipseIn: coreRect), with: .color(.black))
-                    context.stroke(Path(ellipseIn: coreRect), with: .color(.white.opacity(0.8)), lineWidth: 2.0)
-                    
-                    let activeRect = CGRect(x: center.x - R/4, y: center.y - R/4, width: (R/4)*2, height: (R/4)*2)
-                    context.fill(Path(ellipseIn: activeRect), with: .color(coreColor))
                 }
             }
             .frame(height: 280)
             .task {
+                generateBaseParticles()
                 await fetchMetrics()
             }
             
             // IA Insight Card
             VStack(alignment: .leading, spacing: 15) {
                 HStack {
-                    Image(systemName: "bolt.shield.fill")
+                    Image(systemName: "circle.hexagonpath")
                         .foregroundColor(.somAccent)
-                    Text("MONITOR DE FUSIÓN BIOMÉTRICA")
+                    Text("MONITOR CUÁNTICO 3D")
                         .font(.system(size: 10, weight: .bold))
                         .tracking(2)
                         .foregroundColor(.white.opacity(0.6))
@@ -131,7 +109,7 @@ struct VitalityCrucibleView: View {
                     .fixedSize(horizontal: false, vertical: true)
                 
                 HStack {
-                    CrucibleBadge(label: "Estabilidad Fusión", value: "\(Int((session?.snoreScore ?? 100)))%", icon: "leaf.fill")
+                    CrucibleBadge(label: "Estabilidad 3D", value: "\(Int((session?.snoreScore ?? 100)))%", icon: "leaf.fill")
                     CrucibleBadge(label: "Saturación", value: metrics?.spO2 != nil ? "\(Int((metrics?.spO2 ?? 1.0) * 100))%" : "N/A", icon: "waveform.path.ecg")
                 }
             }
@@ -146,6 +124,24 @@ struct VitalityCrucibleView: View {
             )
             .padding(.horizontal)
         }
+    }
+    
+    private func generateBaseParticles() {
+        var temp: [Particle3D] = []
+        let N = 200
+        let goldenRatio = (1.0 + sqrt(5.0)) / 2.0
+        
+        for i in 0..<N {
+            let y = 1.0 - (Double(i) / Double(N - 1)) * 2.0
+            let radius = sqrt(1.0 - y * y)
+            let theta = 2.0 * Double.pi * Double(i) / goldenRatio
+            
+            let x = cos(theta) * radius
+            let z = sin(theta) * radius
+            
+            temp.append(Particle3D(x: x, y: y, z: z, colorIndex: i))
+        }
+        self.baseParticles = temp
     }
     
     private func fetchMetrics() async {
@@ -166,28 +162,37 @@ struct VitalityCrucibleView: View {
     }
     
     private func generateAISummary() -> String {
-        guard let session = session else { return "Inicializando reactores..." }
+        guard let session = session else { return "Mapeando geometría cuántica..." }
         
         let snore = session.snoreScore
         let hours = session.duration / 3600.0
         let o2 = metrics?.spO2 ?? 1.0
         
         if snore > 90 && hours > 7 {
-            return "Reactor estable. Las órbitas biométricas muestran una sincronía perfecta. Has alcanzado el nivel óptimo de consolidación celular y respiratoria."
+            return "Holograma en balance perfecto. La rotación 3D y la simetría esférica indican un estado óptimo de regeneración celular profunda."
         } else if o2 < 0.92 {
-            return "Fluctuación en el núcleo. La caída del anillo de oxígeno ha inducido resistencia magnética, forzando un esfuerzo cardíaco compensatorio."
+            return "El polo cuántico muestra distorsión en la frecuencia. La reducción de oxígeno ha generado una deformación magnética en la superficie."
         } else if snore < 60 {
-            return "Corte de contención. La inestabilidad respiratoria y la turbulencia acústica fragmentaron el flujo magnético de consolidación cerebral."
+            return "Esfera fragmentada. La inestabilidad acústica de los ronquidos ha roto la contención simétrica, provocando ondas de choque en la red neuronal."
         } else {
-            return "Reactor en equilibrio. La contención magnética es firme, aunque la energía acumulada sugiere que una órbita de sueño más larga habría completado la carga vital."
+            return "Geometría estable. La esfera mantiene su cohesión molecular, aunque la carga vital del núcleo habría sido superior con un ciclo extra de descanso."
         }
     }
 }
 
-struct EnergyNode: Identifiable {
-    let id = UUID()
-    let baseOffset: Double = .random(in: 0...(Double.pi * 2))
-    let speed: Double = .random(in: 1.5...3.0)
+struct Particle3D {
+    let x: Double
+    let y: Double
+    let z: Double
+    let colorIndex: Int
+}
+
+struct ProjectedParticle {
+    let x: CGFloat
+    let y: CGFloat
+    let z: Double
+    let scale: Double
+    let colorIndex: Int
 }
 
 struct CrucibleBadge: View {
