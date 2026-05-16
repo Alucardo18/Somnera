@@ -1,15 +1,18 @@
 import SwiftUI
 
 struct SynergyHelixView: View {
+    var session: SleepSession?
+    
     // Parámetros de la hélice
     let points = 60
     let rotationSpeed: Double = 0.5
     
     @State private var dragOffset: CGFloat = 0
     @State private var isDragging = false
-    @State private var synergyIndex: Int = 94
+    @State private var synergyIndex: Int = 100
     @State private var healthLevel: Double = 1.0
     @State private var hapticTrigger: Int = 0
+    @State private var metrics: SynergyMetrics?
     
     var body: some View {
         VStack(spacing: 20) {
@@ -41,8 +44,13 @@ struct SynergyHelixView: View {
                             withAnimation(.spring()) {
                                 isDragging = false
                                 dragOffset = 0
-                                healthLevel = 1.0
-                                synergyIndex = 94
+                                if let m = metrics {
+                                    healthLevel = m.synergyScore / 100.0
+                                    synergyIndex = Int(m.synergyScore)
+                                } else {
+                                    healthLevel = 1.0
+                                    synergyIndex = 100
+                                }
                             }
                         }
                 )
@@ -81,6 +89,36 @@ struct SynergyHelixView: View {
             .padding(.horizontal)
         }
         .padding()
+        .task {
+            await fetchMetrics()
+        }
+    }
+    
+    private func fetchMetrics() async {
+        guard let session = session else { return }
+        let snoreScore = Double(session.snoreScore)
+        var m = SynergyMetrics(snoreScore: snoreScore)
+        
+        do {
+            if let hr = try await HealthKitService.shared.fetchAverageQuantity(for: .heartRate, start: session.startDate, end: session.endDate, unit: .count().unitDivided(by: .minute())) {
+                m.heartRate = hr
+            }
+            if let spo2 = try await HealthKitService.shared.fetchAverageQuantity(for: .oxygenSaturation, start: session.startDate, end: session.endDate, unit: .percent()) {
+                m.spO2 = spo2
+            }
+            if let rr = try await HealthKitService.shared.fetchAverageQuantity(for: .respiratoryRate, start: session.startDate, end: session.endDate, unit: .count().unitDivided(by: .minute())) {
+                m.respiratoryRate = rr
+            }
+        } catch {
+            print("[Synergy] Error fetching health data: \(error)")
+        }
+        
+        await MainActor.run {
+            self.metrics = m
+            let finalScore = m.synergyScore
+            self.synergyIndex = Int(finalScore)
+            self.healthLevel = finalScore / 100.0
+        }
     }
     
     private func updateStatsForDrag(offset: CGFloat) {
@@ -108,11 +146,15 @@ struct SynergyHelixView: View {
             let progress = Double(i) / Double(points)
             let angle = (progress * .pi * 4) + (now * rotationSpeed)
             
+            // Calculamos entropía basada en el nivel de salud
+            let chaos = (1.0 - healthLevel) * 30.0
+            let noise = sin(Double(i) * 1.5 + now * 2.0) * chaos
+            
             // Calculamos 4 offsets para las 4 hebras (Fase desplazada 90 grados entre cada una)
-            let y1 = centerY + sin(angle) * 45
-            let y2 = centerY + sin(angle + .pi / 2.0) * 35
-            let y3 = centerY + sin(angle + .pi) * 45
-            let y4 = centerY + sin(angle + (3.0 * .pi / 2.0)) * 35
+            let y1 = centerY + sin(angle) * 45 + noise
+            let y2 = centerY + sin(angle + .pi / 2.0) * 35 - noise
+            let y3 = centerY + sin(angle + .pi) * 45 + noise * 0.5
+            let y4 = centerY + sin(angle + (3.0 * .pi / 2.0)) * 35 - noise * 0.5
             
             let opacity = (cos(angle) + 1.0) / 2.0
             
@@ -251,8 +293,54 @@ struct InsightData {
 }
 
 #Preview {
-    ZStack {
-        Color.somBackground.ignoresSafeArea()
-        SynergyHelixView()
+    ZStack { Color.somBackground.ignoresSafeArea(); SynergyHelixView(session: SleepSession.mock) }
+}
+
+struct SynergyMetrics {
+    var spO2: Double?
+    var heartRate: Double?
+    var respiratoryRate: Double?
+    var snoreScore: Double
+    
+    var synergyScore: Double {
+        var score: Double = 0
+        var totalWeight: Double = 0
+        
+        // SpO2 (Weight: 40%)
+        if let spo2 = spO2 {
+            let val = spo2 > 1.0 ? spo2 : spo2 * 100
+            var o2Score: Double = 0
+            if val >= 95 { o2Score = 100 }
+            else if val >= 90 { o2Score = 80 - (94 - val) * 5 }
+            else { o2Score = max(0, 40 - (89 - val) * 10) }
+            score += o2Score * 0.40
+            totalWeight += 0.40
+        }
+        
+        // Snore/Apnea (Weight: 30%)
+        score += snoreScore * 0.30
+        totalWeight += 0.30
+        
+        // Heart Rate (Weight: 15%)
+        if let hr = heartRate {
+            var hrScore: Double = 0
+            if hr >= 40 && hr <= 70 { hrScore = 100 }
+            else if hr > 70 && hr <= 85 { hrScore = 80 }
+            else { hrScore = 50 }
+            score += hrScore * 0.15
+            totalWeight += 0.15
+        }
+        
+        // Respiratory Rate (Weight: 15%)
+        if let rr = respiratoryRate {
+            var rrScore: Double = 0
+            if rr >= 12 && rr <= 20 { rrScore = 100 }
+            else if (rr >= 10 && rr < 12) || (rr > 20 && rr <= 24) { rrScore = 80 }
+            else { rrScore = 50 }
+            score += rrScore * 0.15
+            totalWeight += 0.15
+        }
+        
+        return totalWeight > 0 ? (score / totalWeight) : snoreScore
     }
 }

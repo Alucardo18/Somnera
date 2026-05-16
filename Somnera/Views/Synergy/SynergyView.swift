@@ -153,7 +153,7 @@ struct SynergyView: View {
                     .padding(.horizontal)
                     .foregroundColor(.white)
                     
-                    SynergyHelixView()
+                    SynergyHelixView(session: viewModel.lastSession)
                 }
                 
                 // Info Card (Entry point to details)

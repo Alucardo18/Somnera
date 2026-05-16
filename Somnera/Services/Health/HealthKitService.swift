@@ -19,7 +19,8 @@ final class HealthKitService {
         let readTypes: Set<HKObjectType> = [
             HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!,
             HKObjectType.quantityType(forIdentifier: .heartRate)!,
-            HKObjectType.quantityType(forIdentifier: .oxygenSaturation)!
+            HKObjectType.quantityType(forIdentifier: .oxygenSaturation)!,
+            HKObjectType.quantityType(forIdentifier: .respiratoryRate)!
         ]
         
         // Tipos de datos que queremos ESCRIBIR (Write)
@@ -100,6 +101,27 @@ final class HealthKitService {
                     continuation.resume(returning: sleepSamples)
                 } else {
                     continuation.resume(returning: [])
+                }
+            }
+            self.healthStore.execute(query)
+        }
+    }
+    
+    func fetchAverageQuantity(for typeIdentifier: HKQuantityTypeIdentifier, start: Date, end: Date, unit: HKUnit) async throws -> Double? {
+        guard isAvailable else { return nil }
+        guard let quantityType = HKObjectType.quantityType(forIdentifier: typeIdentifier) else { return nil }
+        
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: .strictStartDate)
+        let statisticsOptions: HKStatisticsOptions = .discreteAverage
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKStatisticsQuery(quantityType: quantityType, quantitySamplePredicate: predicate, options: statisticsOptions) { _, result, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else if let avg = result?.averageQuantity() {
+                    continuation.resume(returning: avg.doubleValue(for: unit))
+                } else {
+                    continuation.resume(returning: nil)
                 }
             }
             self.healthStore.execute(query)
