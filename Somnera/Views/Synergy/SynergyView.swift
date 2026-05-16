@@ -136,14 +136,14 @@ struct SynergyView: View {
                     SleepTopographyView(session: viewModel.lastSession)
                 }
                 
-                // Hélice de Sinergia (NUEVO)
+                // Hélice de Sinergia
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Text("Hélice de Sinergia")
                             .font(.headline)
                         Button {
                             alertTitle = "Hélice de Sinergia"
-                            alertMessage = "Coteja y sincroniza de manera sinérgica los registros de audio con las métricas de HealthKit una vez finalizada la sesión, validando eventos respiratorios mediante el cruce de datos biométricos precisos para un diagnóstico profundo."
+                            alertMessage = "Coteja y sincroniza los registros de audio con las métricas de HealthKit, validando eventos respiratorios mediante el cruce de datos biométricos precisos."
                             showAlert = true
                         } label: {
                             Image(systemName: "info.circle")
@@ -154,6 +154,26 @@ struct SynergyView: View {
                     .foregroundColor(.white)
                     
                     SynergyHelixView(session: viewModel.lastSession)
+                }
+                
+                // Crisol de Vitalidad (NUEVO)
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Crisol de Vitalidad")
+                            .font(.headline)
+                        Button {
+                            alertTitle = "Crisol de Vitalidad"
+                            alertMessage = "Simulación generativa que unifica todas tus constantes vitales en un núcleo de energía. El tamaño representa la duración, la cohesión la salud respiratoria y el pulso tu frecuencia cardíaca."
+                            showAlert = true
+                        } label: {
+                            Image(systemName: "info.circle")
+                                .foregroundColor(.somAccent)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .foregroundColor(.white)
+                    
+                    VitalityCrucibleView(session: viewModel.lastSession)
                 }
                 
                 // Info Card (Entry point to details)
