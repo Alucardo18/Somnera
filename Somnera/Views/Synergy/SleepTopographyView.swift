@@ -202,18 +202,24 @@ struct SleepTopographyView: View {
                 switch sample.value {
                 case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
                     deepIntensity = 1.0
+                    remIntensity = 0.2
                     baseIntensity = 0.1
                 case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+                    deepIntensity = 0.2
                     remIntensity = 1.0
                     baseIntensity = 0.1
                 case HKCategoryValueSleepAnalysis.awake.rawValue:
-                    deepIntensity = 0
-                    remIntensity = 0
+                    deepIntensity = 0.1
+                    remIntensity = 0.1
                     baseIntensity = 0.05
-                default: // asleepCore, asleepUnspecified
+                default: // asleepCore, asleepUnspecified, inBed
+                    deepIntensity = 0.3
+                    remIntensity = 0.4
                     baseIntensity = 0.5
                 }
             } else {
+                deepIntensity = 0.1
+                remIntensity = 0.1
                 baseIntensity = 0.2
             }
         } else {
