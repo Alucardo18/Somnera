@@ -62,6 +62,7 @@ targets:
       backgroundModes:
         modes:
           - audio
+      healthKit: true
 
 schemes:
   Somnera:
