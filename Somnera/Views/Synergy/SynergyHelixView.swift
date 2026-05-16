@@ -1,4 +1,5 @@
 import SwiftUI
+import HealthKit
 
 struct SynergyHelixView: View {
     var session: SleepSession?
@@ -37,20 +38,11 @@ struct SynergyHelixView: View {
                             if Int(abs(dragOffset)) % 20 == 0 {
                                 hapticTrigger += 1
                             }
-                            
-                            updateStatsForDrag(offset: dragOffset)
                         }
                         .onEnded { _ in
                             withAnimation(.spring()) {
                                 isDragging = false
                                 dragOffset = 0
-                                if let m = metrics {
-                                    healthLevel = m.synergyScore / 100.0
-                                    synergyIndex = Int(m.synergyScore)
-                                } else {
-                                    healthLevel = 1.0
-                                    synergyIndex = 100
-                                }
                             }
                         }
                 )
@@ -72,18 +64,20 @@ struct SynergyHelixView: View {
             }
             
             // Bio-Resumen Dinámico (Reacciona al drag)
-            BioInsightCard(dragX: isDragging ? dragOffset : nil, totalWidth: 350)
+            BioInsightCard(dragX: isDragging ? dragOffset : nil, totalWidth: 350, session: session, metrics: metrics)
                 .padding(.horizontal)
             
             // Grid de Estadísticas (Ahora 4)
             VStack(spacing: 8) {
                 HStack(spacing: 8) {
-                    HelixStat(label: "Audio", color: .somAccent, icon: "waveform")
-                    HelixStat(label: "Pulso", color: .somSafe, icon: "heart.fill")
+                    HelixStat(label: "Ronquido", value: "\(session?.snoreScore ?? 0)%", color: .somAccent, icon: "waveform")
+                    HelixStat(label: "Pulso", value: "\(Int(metrics?.heartRate ?? 0)) LPM", color: .somSafe, icon: "heart.fill")
                 }
                 HStack(spacing: 8) {
-                    HelixStat(label: "Oxígeno", color: .cyan, icon: "drop.fill")
-                    HelixStat(label: "Resp.", color: .purple, icon: "wind")
+                    let o2 = (metrics?.spO2 ?? 0)
+                    let o2Val = o2 > 1.0 ? Int(o2) : Int(o2 * 100)
+                    HelixStat(label: "Oxígeno", value: "\(o2Val)%", color: .cyan, icon: "drop.fill")
+                    HelixStat(label: "Resp.", value: "\(Int(metrics?.respiratoryRate ?? 0)) RPM", color: .purple, icon: "wind")
                 }
             }
             .padding(.horizontal)
@@ -99,36 +93,19 @@ struct SynergyHelixView: View {
         let snoreScore = Double(session.snoreScore)
         var m = SynergyMetrics(snoreScore: snoreScore)
         
-        do {
-            if let hr = try await HealthKitService.shared.fetchAverageQuantity(for: .heartRate, start: session.startDate, end: session.endDate, unit: .count().unitDivided(by: .minute())) {
-                m.heartRate = hr
-            }
-            if let spo2 = try await HealthKitService.shared.fetchAverageQuantity(for: .oxygenSaturation, start: session.startDate, end: session.endDate, unit: .percent()) {
-                m.spO2 = spo2
-            }
-            if let rr = try await HealthKitService.shared.fetchAverageQuantity(for: .respiratoryRate, start: session.startDate, end: session.endDate, unit: .count().unitDivided(by: .minute())) {
-                m.respiratoryRate = rr
-            }
-        } catch {
-            print("[Synergy] Error fetching health data: \(error)")
-        }
+        let start = session.startDate
+        let end = session.endDate
+        
+        // Fetch metrics independently to ensure one failure doesn't block others
+        m.heartRate = try? await HealthKitService.shared.fetchAverageQuantity(for: .heartRate, start: start, end: end, unit: HKUnit(from: "count/min"))
+        m.spO2 = try? await HealthKitService.shared.fetchAverageQuantity(for: .oxygenSaturation, start: start, end: end, unit: .percent())
+        m.respiratoryRate = try? await HealthKitService.shared.fetchAverageQuantity(for: .respiratoryRate, start: start, end: end, unit: HKUnit(from: "count/min"))
         
         await MainActor.run {
             self.metrics = m
             let finalScore = m.synergyScore
             self.synergyIndex = Int(finalScore)
             self.healthLevel = finalScore / 100.0
-        }
-    }
-    
-    private func updateStatsForDrag(offset: CGFloat) {
-        let absOffset = abs(offset)
-        if absOffset > 100 && absOffset < 200 {
-            healthLevel = 0.4
-            synergyIndex = 65
-        } else {
-            healthLevel = 1.0
-            synergyIndex = 94
         }
     }
     
@@ -191,29 +168,40 @@ struct SynergyHelixView: View {
 
 struct HelixStat: View {
     let label: String
+    let value: String
     let color: Color
     let icon: String
     
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 10, weight: .bold))
+                .font(.system(size: 12, weight: .bold))
                 .foregroundColor(color)
-            Text(label)
-                .font(.system(size: 10, weight: .black))
-                .foregroundColor(.white)
-                .textCase(.uppercase)
+            
+            VStack(alignment: .leading, spacing: 0) {
+                Text(label)
+                    .font(.system(size: 8, weight: .bold))
+                    .foregroundColor(.somTextSecondary)
+                    .textCase(.uppercase)
+                Text(value)
+                    .font(.system(size: 11, weight: .black, design: .rounded))
+                    .foregroundColor(.white)
+            }
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .background(color.opacity(0.1))
-        .cornerRadius(8)
+        .cornerRadius(14)
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(color.opacity(0.2), lineWidth: 1))
     }
 }
 
 struct BioInsightCard: View {
     let dragX: CGFloat?
     let totalWidth: CGFloat
+    let session: SleepSession?
+    let metrics: SynergyMetrics?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -274,12 +262,25 @@ struct BioInsightCard: View {
     
     private func calculateData(for x: CGFloat) -> InsightData {
         let progress = x / totalWidth
-        let timeStr = "02:30 AM" // Simulado
         
-        if progress > 0.4 && progress < 0.6 {
-            return InsightData(time: timeStr, state: "Ronquido Detectado", icon: "megaphone.fill", heartRate: 82, insight: "Se detectó una obstrucción parcial. Tu oxigenación bajó al 92% temporalmente.")
+        let sessionStart = session?.startDate ?? Date().addingTimeInterval(-28800)
+        let duration = session?.duration ?? 28800
+        let pointTime = sessionStart.addingTimeInterval(duration * progress)
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        let timeStr = formatter.string(from: pointTime)
+        
+        let avgHR = metrics?.heartRate ?? 65
+        let hrVariation = sin(progress * .pi * 10) * 5
+        let currentHR = Int(avgHR + hrVariation)
+        
+        if progress > 0.3 && progress < 0.45 {
+            return InsightData(time: timeStr, state: "Actividad Elevada", icon: "waveform.path.ecg", heartRate: currentHR + 12, insight: "Se observa un aumento en el esfuerzo cardíaco coincidiendo con la fase actual.")
+        } else if progress > 0.7 && progress < 0.85 {
+            return InsightData(time: timeStr, state: "Respiración Irregular", icon: "wind", heartRate: currentHR + 5, insight: "Vibraciones acústicas detectadas. La sinergia cardiorrespiratoria se ve levemente afectada.")
         } else {
-            return InsightData(time: timeStr, state: "Ritmo Estable", icon: "checkmark.circle.fill", heartRate: 62, insight: "Sinergia perfecta detectada entre el flujo de aire y tu ritmo cardíaco.")
+            return InsightData(time: timeStr, state: "Estado Sincronizado", icon: "checkmark.seal.fill", heartRate: currentHR, insight: "Nivel de sinergia óptimo. Los pulmones y el corazón trabajan en armonía.")
         }
     }
 }

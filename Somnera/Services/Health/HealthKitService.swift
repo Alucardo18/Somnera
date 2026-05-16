@@ -111,7 +111,7 @@ final class HealthKitService {
         guard isAvailable else { return nil }
         guard let quantityType = HKObjectType.quantityType(forIdentifier: typeIdentifier) else { return nil }
         
-        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: .strictStartDate)
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: [])
         let statisticsOptions: HKStatisticsOptions = .discreteAverage
         
         return try await withCheckedThrowingContinuation { continuation in
