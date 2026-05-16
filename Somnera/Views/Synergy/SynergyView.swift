@@ -156,14 +156,14 @@ struct SynergyView: View {
                     SynergyHelixView(session: viewModel.lastSession)
                 }
                 
-                // Crisol de Vitalidad (NUEVO)
+                // Biosfera de Homeostasis (NUEVO)
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Text("Crisol de Vitalidad")
+                        Text("Biosfera de Homeostasis")
                             .font(.headline)
                         Button {
-                            alertTitle = "Crisol de Vitalidad"
-                            alertMessage = "Simulación generativa que unifica todas tus constantes vitales en un núcleo de energía. El tamaño representa la duración, la cohesión la salud respiratoria y el pulso tu frecuencia cardíaca."
+                            alertTitle = "Biosfera de Homeostasis"
+                            alertMessage = "Representación holográfica de tu balance fisiológico nocturno. El volumen de la esfera indica la carga de sueño, la simetría refleja la estabilidad respiratoria y la pulsación corresponde a tu frecuencia cardíaca real."
                             showAlert = true
                         } label: {
                             Image(systemName: "info.circle")

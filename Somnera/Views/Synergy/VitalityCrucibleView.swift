@@ -10,7 +10,7 @@ struct VitalityCrucibleView: View {
     
     var body: some View {
         VStack(spacing: 25) {
-            // El Crisol: Esfera Holográfica 3D (Alta Precisión)
+            // Biosfera de Homeostasis: Esfera Holográfica 3D (Alta Precisión)
             TimelineView(.animation) { timeline in
                 Canvas { context, size in
                     let now = timeline.date.timeIntervalSinceReferenceDate
@@ -96,7 +96,7 @@ struct VitalityCrucibleView: View {
                 HStack {
                     Image(systemName: "circle.hexagonpath")
                         .foregroundColor(.somAccent)
-                    Text("MONITOR CUÁNTICO 3D")
+                    Text("ANÁLISIS DE HOMEOSTASIS 3D")
                         .font(.system(size: 10, weight: .bold))
                         .tracking(2)
                         .foregroundColor(.white.opacity(0.6))
@@ -169,13 +169,13 @@ struct VitalityCrucibleView: View {
         let o2 = metrics?.spO2 ?? 1.0
         
         if snore > 90 && hours > 7 {
-            return "Holograma en balance perfecto. La rotación 3D y la simetría esférica indican un estado óptimo de regeneración celular profunda."
+            return "Biosfera en balance perfecto. La homeostasis del sueño se ha mantenido intacta, indicando una recuperación fisiológica y celular óptima."
         } else if o2 < 0.92 {
-            return "El polo cuántico muestra distorsión en la frecuencia. La reducción de oxígeno ha generado una deformación magnética en la superficie."
+            return "El polo de la biosfera muestra distorsión térmica. La reducción sostenida de oxígeno ha generado estrés cardiovascular, alterando la homeostasis."
         } else if snore < 60 {
-            return "Esfera fragmentada. La inestabilidad acústica de los ronquidos ha roto la contención simétrica, provocando ondas de choque en la red neuronal."
+            return "Biosfera fragmentada. La inestabilidad acústica de los eventos respiratorios ha roto la contención simétrica, interrumpiendo el ciclo reparador."
         } else {
-            return "Geometría estable. La esfera mantiene su cohesión molecular, aunque la carga vital del núcleo habría sido superior con un ciclo extra de descanso."
+            return "Estabilidad fisiológica lograda. La biosfera mantiene su cohesión estructural, aunque la carga alostática sugiere que un ciclo extra de sueño habría sido beneficioso."
         }
     }
 }
