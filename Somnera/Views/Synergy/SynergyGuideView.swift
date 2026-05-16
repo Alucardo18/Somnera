@@ -33,33 +33,45 @@ struct SynergyGuideView: View {
                     // SLIDE 1: TOPOGRAFÍA
                     PremiumGuideSlide(
                         title: "Topografía Biológica",
-                        subtitle: "CONSOLIDACIÓN DE MEMORIA",
-                        description: "Este mapa traza tu actividad cerebral. Los destellos dorados son 'Stellar Bursts' que ocurren solo en sueño profundo y REM, representando la fijación de recuerdos. A mayor estabilidad respiratoria, mayor es la densidad de destellos y la eficiencia de tu recuperación cognitiva.",
+                        subtitle: "PAISAJE DE LA CONSCIENCIA",
+                        description: "Este mapa traza tu actividad cerebral nocturna. Los picos y valles se modulan con el ruido de tu entorno y la profundidad de tu sueño, creando un relieve único de tu descanso.",
                         visual: AnyView(TopographyVisualDemo())
                     ).tag(0)
                     
-                    // SLIDE 2: HÉLICE DINÁMICA
+                    // SLIDE 2: MEMORIA
                     PremiumGuideSlide(
-                        title: "Hélice de Sinergia",
-                        subtitle: "EL ADN DE TU DESCANSO",
-                        description: "Una visualización adaptativa que se ajusta a tus sensores. Si usas Apple Watch, verás cómo tu pulso y oxígeno se entrelazan. A mayor sincronía y paralelismo entre las hebras, mejor es tu recuperación biológica.",
-                        visual: AnyView(HelixVisualDemo())
+                        title: "Consolidación Neural",
+                        subtitle: "STELLAR BURSTS",
+                        description: "Los destellos dorados ocurren solo en sueño profundo y REM. Representan la fijación de recuerdos; a mayor estabilidad respiratoria, mayor es la densidad de consolidación neuronal.",
+                        visual: AnyView(SparklesVisualDemo())
                     ).tag(1)
                     
-                    // SLIDE 3: INTERPRETACIÓN
+                    // SLIDE 3: HÉLICE
+                    PremiumGuideSlide(
+                        title: "Hélice de Sinergia",
+                        subtitle: "EL ADN DE TU SALUD",
+                        description: "Una visualización que entrelaza tus signos. Si usas Apple Watch, verás cómo tu pulso y oxígeno bailan en sincronía. El paralelismo entre las hebras indica una recuperación biológica óptima.",
+                        visual: AnyView(HelixVisualDemo())
+                    ).tag(2)
+                    
+                    // SLIDE 4: DIAGNÓSTICO
                     PremiumGuideSlide(
                         title: "Calidad vs Cantidad",
-                        subtitle: "DIAGNÓSTICO HONESTO",
-                        description: "Medimos 'Salud', no cantidad. Un 100% en Salud Respiratoria significa silencio absoluto. Si un sensor no tiene datos, la hélice se ajusta automáticamente para darte un puntaje justo basado solo en lo medido.",
-                        visual: AnyView(SparklesVisualDemo())
-                    ).tag(2)
+                        subtitle: "PUNTUACIÓN HONESTA",
+                        description: "Medimos salud, no cantidad. Un 100% significa silencio absoluto. Si falta un sensor, la hélice se adapta automáticamente para darte un puntaje justo basado solo en lo medido.",
+                        visual: AnyView(
+                            Image(systemName: "checkmark.shield.fill")
+                                .font(.system(size: 80))
+                                .foregroundStyle(Color.somSafe.gradient)
+                        )
+                    ).tag(3)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 
                 // Footer con Indicadores y Botón
                 VStack(spacing: 20) {
                     HStack(spacing: 8) {
-                        ForEach(0..<3) { i in
+                        ForEach(0..<4) { i in
                             Circle()
                                 .fill(currentPage == i ? Color.somAccent : Color.white.opacity(0.2))
                                 .frame(width: 6, height: 6)
@@ -68,13 +80,13 @@ struct SynergyGuideView: View {
                     }
                     
                     Button {
-                        if currentPage < 2 {
+                        if currentPage < 3 {
                             withAnimation { currentPage += 1 }
                         } else {
                             dismiss()
                         }
                     } label: {
-                        Text(currentPage < 2 ? "CONTINUAR" : "ENTENDIDO")
+                        Text(currentPage < 3 ? "CONTINUAR" : "COMENZAR")
                             .font(.system(size: 14, weight: .black))
                             .tracking(2)
                             .foregroundColor(.somBackground)
