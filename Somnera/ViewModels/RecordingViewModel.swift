@@ -228,6 +228,7 @@ final class RecordingViewModel: ObservableObject {
         let now = Date()
         sessionID = id
         sessionStart = now
+        lastUpdatedRemainingSecond = -1
         
         // Disable screen dimming
         UIApplication.shared.isIdleTimerDisabled = true
@@ -513,6 +514,7 @@ final class RecordingViewModel: ObservableObject {
     private var noiseFloorRMS: Float = 0.001
     private var lastPeakTime: Date = Date()
     private var peakIntervals: [TimeInterval] = []
+    private var lastUpdatedRemainingSecond: Int = -1
 
     private func processBuffer(_ buffer: AVAudioPCMBuffer, time: AVAudioTime) {
         autoreleasepool {
@@ -633,7 +635,8 @@ final class RecordingViewModel: ObservableObject {
                 } else {
                     // Mantener el contador sincronizado con el tiempo real de hardware
                     let remaining = max(0, Int(targetSeconds - elapsed))
-                    if remaining != countdownRemaining {
+                    if remaining != self.lastUpdatedRemainingSecond {
+                        self.lastUpdatedRemainingSecond = remaining
                         Task { @MainActor [weak self] in
                             self?.countdownRemaining = remaining
                         }
