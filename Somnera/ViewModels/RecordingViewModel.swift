@@ -243,6 +243,8 @@ final class RecordingViewModel: ObservableObject {
         if minutes > 0 {
             isWaiting = true
             countdownRemaining = minutes * 60
+            // The countdown task is now a visual-only helper to tick when in foreground,
+            // but is not responsible for the transition itself.
             startCountdownTask()
         }
     }
@@ -253,14 +255,90 @@ final class RecordingViewModel: ObservableObject {
             while countdownRemaining > 0 {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
                 await MainActor.run {
-                    self.countdownRemaining -= 1
+                    if self.isWaiting && self.countdownRemaining > 0 {
+                        self.countdownRemaining -= 1
+                    }
                 }
                 if Task.isCancelled { return }
             }
-            await MainActor.run {
-                self.isWaiting = false
+        }
+    }
+
+    @MainActor
+    private func transitionToActiveRecording(at now: Date) {
+        guard isWaiting else { return }
+        
+        isWaiting = false
+        countdownRemaining = 0
+        countdownTask?.cancel()
+        
+        // Safely reset all session variables
+        currentSnoreEvents = []
+        currentApneaEvents = []
+        decibelTimeline = []
+        sampleAccumulator = []
+        lastTimelineSampleTime = now
+        lastAutoSaveTime = now
+        peakDecibels = -100
+        sessionPeakDecibels = -100
+        elapsedSeconds = 0
+        snoreEventCount = 0
+        apneaEventCount = 0
+        isApneaActive = false
+        nasalSum = 0
+        palatalSum = 0
+        lingualSum = 0
+        spectralCount = 0
+        internalNasalIntensity = 0
+        internalPalatalIntensity = 0
+        internalLingualIntensity = 0
+        currentNasalIntensity = 0
+        currentPalatalIntensity = 0
+        currentLingualIntensity = 0
+        snrTimeline = []
+        stabilityTimeline = []
+        tiltTimeline = []
+        motionTimeline = []
+        
+        let multiplier = self.sensitivityMultiplier
+        sessionConfidenceThreshold = SomneraConstants.Snore.confidenceThreshold * multiplier
+        sessionDBThreshold = Float(35.0 * multiplier)
+        sessionCrestThreshold = Float(2.5 * multiplier)
+        sessionApneaThreshold = SomneraConstants.Apnea.silenceRMSThreshold * Float(multiplier)
+        
+        print("[Somnera] 🎯 Transición Hardware - Umbrales de sesión: dB > \(Int(sessionDBThreshold)), Crest > \(String(format: "%.1f", sessionCrestThreshold))")
+        
+        do {
+            try snoreDetector.setup(
+                format: audioCapture.outputFormat,
+                confidenceThreshold: sessionConfidenceThreshold
+            )
+            motionDetector.start()
+            
+            apneaDetector.silenceThreshold = sessionApneaThreshold
+            
+            let audioURL = audioFileService.audioURL(for: sessionID ?? UUID())
+            audioFile = try AVAudioFile(
+                forWriting: audioURL,
+                settings: audioFileService.recorderSettings,
+                commonFormat: .pcmFormatFloat32,
+                interleaved: false
+            )
+            
+            snoreDetector.startSession(at: now)
+            apneaDetector.startSession(at: now)
+            isRecording = true
+            startTimer()
+            
+            // Update stored start date to reflect actual active recording start
+            if let session = self.session {
+                session.startDate = now
+                sessionStorage.save(session)
             }
-            await startSession()
+            
+            print("[Somnera] 🎙️ Grabación física iniciada vía hardware con éxito.")
+        } catch {
+            print("[Somnera] ❌ Error en transición de hardware: \(error)")
         }
     }
 
@@ -541,12 +619,35 @@ final class RecordingViewModel: ObservableObject {
             spectralCount += 1
         }
 
-        // IF WAITING: We just return here but the engine keeps running!
-            // This is the trick to keep the app alive in background.
-            guard isRecording && !isWaiting else { return }
+        // --- 1. PROCESAMIENTO DEL RETARDADOR DE ESPERA (HARDWARE-DRIVEN) ---
+        if isWaiting {
+            if let start = sessionStart {
+                let elapsed = now.timeIntervalSince(start)
+                let targetSeconds = Double(selectedDelayMinutes * 60)
+                
+                if elapsed >= targetSeconds {
+                    // El retardo ha expirado. Transición inmediata e infalible vía hardware
+                    Task { @MainActor [weak self] in
+                        self?.transitionToActiveRecording(at: now)
+                    }
+                } else {
+                    // Mantener el contador sincronizado con el tiempo real de hardware
+                    let remaining = max(0, Int(targetSeconds - elapsed))
+                    if remaining != countdownRemaining {
+                        Task { @MainActor [weak self] in
+                            self?.countdownRemaining = remaining
+                        }
+                    }
+                }
+            }
+            return // Detener procesamiento mientras esperamos
+        }
 
-            let motion = motionDetector.lastIntensity
-            apneaDetector.update(rms: rms, motionIntensity: motion, at: Date())
+        // El flujo normal de grabación requiere estar grabando de verdad
+        guard isRecording else { return }
+
+        let motion = motionDetector.lastIntensity
+        apneaDetector.update(rms: rms, motionIntensity: motion, at: Date())
             
             // 2. Save amplified copy
             self.writeAmplifiedBuffer(buffer)
