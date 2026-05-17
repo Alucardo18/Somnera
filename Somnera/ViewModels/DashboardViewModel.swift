@@ -16,7 +16,24 @@ final class DashboardViewModel: ObservableObject {
 
     func load() {
         isLoading = true
-        sessions = storageService.fetchAll()
+        
+        // 1. Obtener todas las sesiones de la base de datos
+        let allSessions = storageService.fetchAll()
+        
+        // 2. Rutina de Autocuidado Homeostático (Depuración higiénica)
+        // Purga automáticamente sesiones vacías o accidentales menores a 15 segundos
+        var validSessions: [SleepSession] = []
+        for session in allSessions {
+            let duration = session.endDate.timeIntervalSince(session.startDate)
+            if duration < 15.0 {
+                print("[Somnera] 🧹 Autolimpieza: eliminando sesión inválida/fantasma (\(Int(duration))s): \(session.id.uuidString)")
+                storageService.delete(session)
+            } else {
+                validSessions.append(session)
+            }
+        }
+        
+        self.sessions = validSessions
         isLoading = false
     }
 
