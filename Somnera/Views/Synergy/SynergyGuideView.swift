@@ -68,9 +68,17 @@ struct SynergyGuideView: View {
                         subtitle: "PUNTUACIÓN HONESTA",
                         description: "Medimos salud de forma dinámica y justa. Si falta un sensor como el Apple Watch, el algoritmo se recalibra automáticamente para evaluarte con máxima rigurosidad solo en base a los sensores activos.",
                         visual: AnyView(
-                            Image(systemName: "checkmark.shield.fill")
-                                .font(.system(size: 80))
-                                .foregroundStyle(Color.somSafe.gradient)
+                            ZStack {
+                                Circle()
+                                    .fill(Color.somSafe.opacity(0.12))
+                                    .frame(width: 130, height: 130)
+                                    .blur(radius: 20)
+                                
+                                Image(systemName: "checkmark.shield.fill")
+                                    .font(.system(size: 70))
+                                    .foregroundStyle(Color.somSafe.gradient)
+                                    .shadow(color: .somSafe.opacity(0.4), radius: 15)
+                            }
                         )
                     ).tag(4)
                 }
@@ -162,23 +170,30 @@ struct PremiumGuideSlide: View {
 
 struct HelixVisualDemo: View {
     var body: some View {
-        ZStack {
-            // Un pequeño extracto de la hélice
-            TimelineView(.animation) { timeline in
-                Canvas { context, size in
-                    let now = timeline.date.timeIntervalSinceReferenceDate
-                    let centerY = size.height / 2
-                    for i in 0..<30 {
-                        let x = CGFloat(i) * 8 + 30
-                        let angle = (Double(i) * 0.3) + (now * 2)
-                        let y1 = centerY + sin(angle) * 30
-                        let y2 = centerY - sin(angle) * 30
-                        
-                        let color: Color = abs(sin(now * 0.5)) > 0.7 ? .red : .somSafe
-                        
-                        context.fill(Path(ellipseIn: CGRect(x: x, y: y1, width: 4, height: 4)), with: .color(.somAccent))
-                        context.fill(Path(ellipseIn: CGRect(x: x, y: y2, width: 4, height: 4)), with: .color(color))
-                    }
+        TimelineView(.animation) { timeline in
+            Canvas { context, size in
+                let now = timeline.date.timeIntervalSinceReferenceDate
+                let centerY = size.height / 2
+                let centerX = size.width / 2
+                
+                let numDots = 24
+                let spacing: CGFloat = 8
+                let totalWidth = CGFloat(numDots - 1) * spacing
+                let startX = centerX - totalWidth / 2
+                
+                for i in 0..<numDots {
+                    let x = startX + CGFloat(i) * spacing
+                    let angle = (Double(i) * 0.25) + (now * 2.5)
+                    let y1 = centerY + sin(angle) * 35
+                    let y2 = centerY - sin(angle) * 35
+                    
+                    // Draw hebra 1
+                    let rect1 = CGRect(x: x - 2, y: y1 - 2, width: 4, height: 4)
+                    context.fill(Path(ellipseIn: rect1), with: .color(.somAccent))
+                    
+                    // Draw hebra 2
+                    let rect2 = CGRect(x: x - 2, y: y2 - 2, width: 4, height: 4)
+                    context.fill(Path(ellipseIn: rect2), with: .color(.cyan))
                 }
             }
         }
@@ -188,17 +203,44 @@ struct HelixVisualDemo: View {
 struct TopographyVisualDemo: View {
     var body: some View {
         Canvas { context, size in
-            let centerY = size.height / 2 + 20
-            var path = Path()
-            path.move(to: CGPoint(x: 50, y: centerY))
-            path.addCurve(to: CGPoint(x: 150, y: centerY - 60), control1: CGPoint(x: 100, y: centerY), control2: CGPoint(x: 120, y: centerY - 60))
-            path.addCurve(to: CGPoint(x: 250, y: centerY + 40), control1: CGPoint(x: 180, y: centerY - 60), control2: CGPoint(x: 220, y: centerY + 40))
+            let centerY = size.height / 2
+            let centerX = size.width / 2
             
-            context.stroke(path, with: .linearGradient(Gradient(colors: [.purple, .indigo]), startPoint: .zero, endPoint: CGPoint(x: 300, y: 0)), lineWidth: 3)
+            var path = Path()
+            let width: CGFloat = 200
+            let startX = centerX - width / 2
+            
+            path.move(to: CGPoint(x: startX, y: centerY))
+            path.addCurve(
+                to: CGPoint(x: centerX, y: centerY - 40),
+                control1: CGPoint(x: startX + 50, y: centerY),
+                control2: CGPoint(x: startX + 50, y: centerY - 40)
+            )
+            path.addCurve(
+                to: CGPoint(x: centerX + width / 2, y: centerY + 40),
+                control1: CGPoint(x: centerX + 50, y: centerY - 40),
+                control2: CGPoint(x: centerX + 50, y: centerY + 40)
+            )
+            
+            context.stroke(
+                path,
+                with: .linearGradient(
+                    Gradient(colors: [.somAccent, .somMesh3]),
+                    startPoint: CGPoint(x: startX, y: centerY),
+                    endPoint: CGPoint(x: startX + width, y: centerY)
+                ),
+                lineWidth: 4
+            )
             
             // Labels explicativas en el demo
-            context.draw(Text("REM").font(.caption.bold()).foregroundColor(.purple), at: CGPoint(x: 150, y: centerY - 80))
-            context.draw(Text("PROFUNDO").font(.caption.bold()).foregroundColor(.indigo), at: CGPoint(x: 250, y: centerY + 60))
+            context.draw(
+                Text("REM").font(.system(size: 10, weight: .bold, design: .rounded)).foregroundColor(.somAccent),
+                at: CGPoint(x: centerX - 30, y: centerY - 65)
+            )
+            context.draw(
+                Text("SUEÑO PROFUNDO").font(.system(size: 10, weight: .bold, design: .rounded)).foregroundColor(.somMesh3),
+                at: CGPoint(x: centerX + 40, y: centerY + 65)
+            )
         }
     }
 }
@@ -207,19 +249,28 @@ struct SparklesVisualDemo: View {
     var body: some View {
         TimelineView(.animation) { timeline in
             ZStack {
-                ForEach(0..<15) { i in
+                Circle()
+                    .fill(Color.somAccent.opacity(0.12))
+                    .frame(width: 120, height: 120)
+                    .blur(radius: 20)
+                
+                ForEach(0..<12) { i in
+                    let angle = Double(i) * (2 * Double.pi / 12)
+                    let radius: CGFloat = 45 + sin(timeline.date.timeIntervalSinceReferenceDate * 2 + Double(i)) * 10
+                    let x = cos(angle) * radius
+                    let y = sin(angle) * radius
+                    
                     Circle()
-                        .fill(Color(red: 1.0, green: 0.8, blue: 0.2))
-                        .frame(width: CGFloat.random(in: 2...6))
-                        .offset(x: CGFloat.random(in: -100...100), y: CGFloat.random(in: -60...60))
-                        .opacity(abs(sin(timeline.date.timeIntervalSinceReferenceDate * 2 + Double(i))))
-                        .blur(radius: 1)
+                        .fill(Color.somAccent)
+                        .frame(width: 4)
+                        .offset(x: x, y: y)
+                        .blur(radius: 0.5)
                 }
                 
                 Image(systemName: "sparkles")
-                    .font(.system(size: 50))
-                    .foregroundColor(Color(red: 1.0, green: 0.8, blue: 0.2))
-                    .shadow(color: Color(red: 1.0, green: 0.8, blue: 0.2).opacity(0.5), radius: 20)
+                    .font(.system(size: 55))
+                    .foregroundColor(.somAccent)
+                    .shadow(color: .somAccent.opacity(0.4), radius: 10)
             }
         }
     }
@@ -234,7 +285,7 @@ struct BiosphereVisualDemo: View {
                 let now = timeline.date.timeIntervalSinceReferenceDate
                 let center = CGPoint(x: size.width / 2, y: size.height / 2)
                 
-                let sphereRadius = 50.0 + sin(now * 3.0) * 1.5
+                let sphereRadius = 55.0 + sin(now * 2.5) * 1.5
                 let rotY = now * 0.4
                 let rotX = sin(now * 0.2) * 0.3
                 
@@ -270,14 +321,13 @@ struct BiosphereVisualDemo: View {
                 for p in projected {
                     let opacity = max(0.15, min(0.9, (1.2 - p.z) / 2.0))
                     let size = max(1.5, min(5.0, 3.0 * p.scale))
-                    let color: Color = p.colorIndex % 3 == 0 ? .cyan : (p.colorIndex % 3 == 1 ? .somAccent : .purple)
+                    let color: Color = p.colorIndex % 3 == 0 ? .cyan : (p.colorIndex % 3 == 1 ? .somAccent : .somMesh3)
                     
                     let rect = CGRect(x: p.x - size/2, y: p.y - size/2, width: size, height: size)
                     context.fill(Path(ellipseIn: rect), with: .color(color.opacity(opacity)))
                 }
             }
         }
-        .frame(height: 160)
         .onAppear {
             generateParticles()
         }
@@ -285,7 +335,7 @@ struct BiosphereVisualDemo: View {
     
     private func generateParticles() {
         var temp: [Particle3D] = []
-        let N = 35 // Muy ligero para la guía
+        let N = 35
         let goldenRatio = (1.0 + sqrt(5.0)) / 2.0
         
         for i in 0..<N {
