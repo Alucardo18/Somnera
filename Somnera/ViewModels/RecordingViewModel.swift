@@ -504,6 +504,9 @@ final class RecordingViewModel: ObservableObject {
             }
         } else {
             print("[Somnera] 🗑️ Sesión descartada (cancelada durante el retardo/setup)")
+            if let sessionToDiscard = self.session {
+                sessionStorage.delete(sessionToDiscard)
+            }
             session = nil
         }
     }
