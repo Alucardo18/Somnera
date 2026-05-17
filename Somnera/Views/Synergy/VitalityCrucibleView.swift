@@ -261,23 +261,64 @@ struct VitalityCrucibleView: View {
     }
     
     private func generateAISummary() -> String {
-        guard let session = session else { return "Mapeando geometría cuántica..." }
+        guard let session = session else { return "Iniciando análisis biométrico..." }
         
         let homeostasis = calculateHomeostasis()
-        let o2 = metrics?.spO2 ?? 1.0
+        let snore = Double(session.snoreScore)
         let hours = session.duration / 3600.0
         
-        if homeostasis > 90 {
-            return "Biosfera en balance perfecto. La homeostasis del sueño se ha mantenido intacta, indicando una recuperación fisiológica óptima."
-        } else if hours < 6.0 {
-            return "Contracción esférica. La biosfera no alcanzó su diámetro máximo debido a una severa falta de horas de descanso (\(String(format: "%.1f", hours))h), generando una deuda de sueño."
-        } else if o2 < 0.92 {
-            return "El polo de la biosfera muestra distorsión térmica. La reducción sostenida de oxígeno ha generado estrés cardiovascular, alterando el equilibrio."
-        } else if homeostasis < 70 {
-            return "Biosfera fragmentada. La inestabilidad de los eventos respiratorios ha roto la contención simétrica, interrumpiendo el ciclo reparador."
+        // 1. Diagnóstico del Ecosistema (Homeostasis)
+        var statusMsg = ""
+        if homeostasis >= 90 {
+            statusMsg = "Biosfera en equilibrio óptimo. Su arquitectura celular refleja una sinergia perfecta de recuperación profunda."
+        } else if homeostasis >= 75 {
+            statusMsg = "Biosfera en estabilidad adecuada. Su estructura mantiene cohesión funcional, pero exhibe estrés alostático menor."
         } else {
-            return "Estabilidad fisiológica parcial. La biosfera mantiene su cohesión estructural, aunque la carga alostática sugiere que un ciclo extra de sueño optimizaría la homeostasis."
+            statusMsg = "Biosfera en estado crítico de desequilibrio. Ruptura de la homeostasis sistémica detectada debido a anomalías críticas."
         }
+        
+        // 2. Desglose Cuantitativo y Datos Duros
+        var telemetry = "\nDATOS DUROS REGISTRADOS:\n"
+        telemetry += String(format: "• Duración: %.1f horas (Meta ideal: 8.0h)\n", hours)
+        telemetry += String(format: "• Índice de Silencio: %d%% (Ausencia de ronquidos)\n", Int(snore))
+        
+        if let hr = metrics?.heartRate {
+            telemetry += String(format: "• Ritmo Cardíaco: %d lpm (Promedio profundo)\n", Int(hr))
+        } else {
+            telemetry += "• Ritmo Cardíaco: -- lpm (Sin sensor Apple Watch)\n"
+        }
+        
+        if let spo2 = metrics?.spO2 {
+            let val = spo2 > 1.0 ? spo2 : spo2 * 100.0
+            telemetry += String(format: "• Saturación SpO2: %d%% (Oxigenación)\n", Int(val))
+        } else {
+            telemetry += "• Saturación SpO2: --%% (Sin sensor Apple Watch)\n"
+        }
+        
+        // 3. Consejos accionables basados en el peor fallo
+        var recommendations = "\nPRESCRIPCIÓN DE HOMEOSTASIS:\n"
+        
+        let valSpO2 = metrics?.spO2 != nil ? (metrics!.spO2! > 1.0 ? metrics!.spO2! : metrics!.spO2! * 100.0) : 100.0
+        let valHR = metrics?.heartRate ?? 60.0
+        
+        if valSpO2 < 92 {
+            recommendations += "1. SOPORTE DE VENTILACIÓN: Considere elevar la cabecera de su cama 15 grados o dormir en posición lateral para mitigar colapsos obstructivos leves.\n"
+            recommendations += "2. HIGIENE RESPIRATORIA: Evite sedantes y alcohol al menos 3 horas antes de acostarse para mantener el tono muscular faríngeo."
+        } else if snore < 75 {
+            recommendations += "1. TERAPIA POSICIONAL: Evite el decúbito supino (dormir boca arriba), ya que favorece la obstrucción de la vía aérea.\n"
+            recommendations += "2. CONTROL DE HUMEDAD: Utilice un humidificador nasal antes de dormir para reducir la fricción y congestión tisular."
+        } else if hours < 6.0 {
+            recommendations += "1. REGULACIÓN CIRCADIANA: Establezca un horario estricto de acostarse y despertarse para pagar la deuda de sueño acumulada de \(String(format: "%.1f", 8.0 - hours)) horas.\n"
+            recommendations += "2. RITUAL DE APAGADO: Reduzca la exposición a pantallas 60 minutos antes de dormir para inducir el pico natural de melatonina."
+        } else if valHR > 75 {
+            recommendations += "1. DESCOMPRESIÓN ADRENÉRGICA: Realice 10 minutos de respiración box (inhalar 4s, retener 4s, exhalar 4s, retener 4s) antes de apagar las luces.\n"
+            recommendations += "2. METABOLISMO CERO: Evite comidas pesadas y ejercicio intenso en una ventana de 3 horas previas al descanso."
+        } else {
+            recommendations += "1. CONSOLIDACIÓN DE RACHA: Mantenga su consistencia horaria actual. Su sistema biológico se encuentra en un estado óptimo de adaptación.\n"
+            recommendations += "2. VENTILACIÓN DE HABITACIÓN: Duerma con una temperatura ambiente templada (18-20°C) para estabilizar aún más el pulso basal nocturno."
+        }
+        
+        return "\(statusMsg)\n\(telemetry)\n\(recommendations)"
     }
 }
 
