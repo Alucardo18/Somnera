@@ -24,76 +24,99 @@ struct VitalityCrucibleView: View {
     
     var body: some View {
         VStack(spacing: 25) {
-            // Biosfera de Homeostasis: Esfera de Partículas 3D (Ligera, Fluida y Nítida)
-            TimelineView(.animation) { timeline in
-                Canvas { context, size in
-                    let now = timeline.date.timeIntervalSinceReferenceDate
-                    let center = CGPoint(x: size.width / 2, y: size.height / 2)
-                    
-                    // Radio de la esfera con un pulso cardíaco sutil global (sin calcular trigonometría por partícula)
-                    let baseRadius = 65.0
-                    let pulse = sin(now * 3.0) * 2.0
-                    let sphereRadius = baseRadius + pulse
-                    
-                    // Rotaciones angulares constantes
-                    let rotY = now * 0.4
-                    let rotX = sin(now * 0.2) * 0.3
-                    
-                    let cosY = cos(rotY)
-                    let sinY = sin(rotY)
-                    let cosX = cos(rotX)
-                    let sinX = sin(rotX)
-                    
-                    // Proyección 3D de los 45 puntos (Ligero y de carga instantánea)
-                    var projected: [ProjectedParticle] = particles.map { p in
-                        // Rotación Y
-                        let x1 = p.x * cosY - p.z * sinY
-                        let z1 = p.x * sinY + p.z * cosY
+            // Biosfera de Homeostasis: Esfera de Partículas 3D Dinámica
+            VStack(spacing: 15) {
+                TimelineView(.animation) { timeline in
+                    Canvas { context, size in
+                        let now = timeline.date.timeIntervalSinceReferenceDate
+                        let center = CGPoint(x: size.width / 2, y: size.height / 2)
                         
-                        // Rotación X
-                        let y1 = p.y * cosX - z1 * sinX
-                        let z2 = p.y * sinX + z1 * cosX
+                        let baseRadius = 65.0
+                        let pulse = sin(now * 3.0) * 1.5
+                        let sphereRadius = baseRadius + pulse
                         
-                        // Perspectiva simple
-                        let d = 2.5
-                        let scaleFactor = d / (d + z2)
+                        // Rotación constante
+                        let rotY = now * 0.4
+                        let rotX = sin(now * 0.2) * 0.3
                         
-                        let screenX = center.x + CGFloat(x1 * sphereRadius * scaleFactor)
-                        let screenY = center.y + CGFloat(y1 * sphereRadius * scaleFactor)
+                        let cosY = cos(rotY)
+                        let sinY = sin(rotY)
+                        let cosX = cos(rotX)
+                        let sinX = sin(rotX)
                         
-                        return ProjectedParticle(
-                            x: screenX,
-                            y: screenY,
-                            z: z2,
-                            scale: scaleFactor,
-                            colorIndex: p.colorIndex
-                        )
-                    }
-                    
-                    // Ordenamiento Z para profundidad (Solo 45 elementos, instantáneo)
-                    projected.sort { $0.z > $1.z }
-                    
-                    // Renderizado de las partículas
-                    for p in projected {
-                        // Gradiente de color según la posición para simular una biosfera viva (Cian a SomAccent)
-                        let isFront = p.z < 0
-                        let opacity = max(0.15, min(0.9, (1.2 - p.z) / 2.0))
-                        let size = max(2.0, min(6.5, 4.0 * p.scale))
+                        var projected: [ProjectedParticle] = particles.map { p in
+                            let x1 = p.x * cosY - p.z * sinY
+                            let z1 = p.x * sinY + p.z * cosY
+                            
+                            let y1 = p.y * cosX - z1 * sinX
+                            let z2 = p.y * sinX + z1 * cosX
+                            
+                            let d = 2.5
+                            let scaleFactor = d / (d + z2)
+                            
+                            let screenX = center.x + CGFloat(x1 * sphereRadius * scaleFactor)
+                            let screenY = center.y + CGFloat(y1 * sphereRadius * scaleFactor)
+                            
+                            return ProjectedParticle(
+                                x: screenX,
+                                y: screenY,
+                                z: z2,
+                                scale: scaleFactor,
+                                colorIndex: p.colorIndex
+                            )
+                        }
                         
-                        let color: Color = p.colorIndex % 3 == 0 ? .cyan : (p.colorIndex % 3 == 1 ? .somAccent : .purple)
+                        projected.sort { $0.z > $1.z }
                         
-                        let rect = CGRect(x: p.x - size/2, y: p.y - size/2, width: size, height: size)
-                        context.fill(Path(ellipseIn: rect), with: .color(color.opacity(opacity)))
-                        
-                        // Efecto de resplandor para las partículas del frente
-                        if isFront && p.colorIndex % 5 == 0 {
-                            let glowRect = rect.insetBy(dx: -2.0, dy: -2.0)
-                            context.fill(Path(ellipseIn: glowRect), with: .color(color.opacity(opacity * 0.3)))
+                        for p in projected {
+                            let isFront = p.z < 0
+                            let opacity = max(0.15, min(0.9, (1.2 - p.z) / 2.0))
+                            let size = max(2.0, min(6.5, 4.0 * p.scale))
+                            
+                            // COLORES DINÁMICOS BASADOS EN VARIABLES BIOMÉTRICAS REALES:
+                            var color: Color = .cyan
+                            
+                            if p.colorIndex % 3 == 0 {
+                                // 1. Partículas de Oxigenación (Cian) -> Rojo si hay hipoxia
+                                if let spo2 = metrics?.spO2 {
+                                    let val = spo2 > 1.0 ? spo2 : spo2 * 100.0
+                                    color = val >= 92 ? .cyan : .red
+                                } else {
+                                    color = .cyan
+                                }
+                            } else if p.colorIndex % 3 == 1 {
+                                // 2. Partículas de Silencio (Naranja) -> Rojo si roncó mucho
+                                let snore = Double(session?.snoreScore ?? 100)
+                                color = snore >= 75 ? .somAccent : .red.opacity(0.8)
+                            } else {
+                                // 3. Partículas de Pulso (Púrpura) -> Rojo/Magenta si hay taquicardia o estrés
+                                if let hr = metrics?.heartRate {
+                                    color = hr <= 75 ? .purple : Color(red: 1.0, green: 0.2, blue: 0.6)
+                                } else {
+                                    color = .purple
+                                }
+                            }
+                            
+                            let rect = CGRect(x: p.x - size/2, y: p.y - size/2, width: size, height: size)
+                            context.fill(Path(ellipseIn: rect), with: .color(color.opacity(opacity)))
+                            
+                            if isFront && p.colorIndex % 5 == 0 {
+                                let glowRect = rect.insetBy(dx: -2.0, dy: -2.0)
+                                context.fill(Path(ellipseIn: glowRect), with: .color(color.opacity(opacity * 0.3)))
+                            }
                         }
                     }
                 }
+                .frame(height: 200)
+                
+                // Leyenda Biométrica: Indica qué variable controla cada color de la Biosfera
+                HStack(spacing: 20) {
+                    LegendItem(color: metrics?.spO2 != nil && (metrics?.spO2 ?? 1.0) * 100 < 92 ? .red : .cyan, label: "SpO2 (Oxígeno)")
+                    LegendItem(color: Double(session?.snoreScore ?? 100) >= 75 ? .somAccent : .red, label: "Silencio")
+                    LegendItem(color: metrics?.heartRate != nil && (metrics?.heartRate ?? 60) > 75 ? Color(red: 1.0, green: 0.2, blue: 0.6) : .purple, label: "Pulso")
+                }
+                .padding(.top, -10)
             }
-            .frame(height: 220)
             .onAppear {
                 generateParticles()
             }
@@ -118,8 +141,24 @@ struct VitalityCrucibleView: View {
                     .lineSpacing(6)
                     .fixedSize(horizontal: false, vertical: true)
                 
-                HStack {
-                    CrucibleBadge(label: "Homeostasis", value: "\(Int(calculateHomeostasis()))%", icon: "circle.hexagonpath.fill")
+                // Puntuación de Homeostasis con Clasificación Médica Clara y Semáforo de Estado
+                HStack(spacing: 10) {
+                    CrucibleBadge(
+                        label: "Homeostasis",
+                        value: "\(Int(calculateHomeostasis()))%",
+                        icon: "circle.hexagonpath.fill",
+                        statusColor: getHomeostasisStatus().color
+                    )
+                    
+                    // Etiqueta Médica de Diagnóstico
+                    Text(getHomeostasisStatus().text)
+                        .font(.system(size: 10, weight: .black))
+                        .tracking(2)
+                        .foregroundColor(.somBackground)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(getHomeostasisStatus().color)
+                        .cornerRadius(8)
                 }
             }
             .padding(25)
@@ -137,7 +176,7 @@ struct VitalityCrucibleView: View {
     
     private func generateParticles() {
         var temp: [Particle3D] = []
-        let N = 45 // Número óptimo para un rendimiento perfecto y apariencia esférica
+        let N = 45
         let goldenRatio = (1.0 + sqrt(5.0)) / 2.0
         
         for i in 0..<N {
@@ -214,6 +253,13 @@ struct VitalityCrucibleView: View {
         return totalWeight > 0 ? (scoreAcc / totalWeight) : snoreScore
     }
     
+    private func getHomeostasisStatus() -> (text: String, color: Color) {
+        let score = calculateHomeostasis()
+        if score >= 90 { return ("ÓPTIMA", .somSafe) }
+        if score >= 75 { return ("ADECUADA", .somAccent) }
+        return ("COMPROMETIDA", .red)
+    }
+    
     private func generateAISummary() -> String {
         guard let session = session else { return "Mapeando geometría cuántica..." }
         
@@ -235,16 +281,34 @@ struct VitalityCrucibleView: View {
     }
 }
 
+// Leyenda Biométrica Auxiliar
+struct LegendItem: View {
+    let color: Color
+    let label: String
+    
+    var body: some View {
+        HStack(spacing: 5) {
+            Circle()
+                .fill(color)
+                .frame(width: 6, height: 6)
+            Text(label)
+                .font(.system(size: 9, weight: .bold))
+                .foregroundColor(.white.opacity(0.5))
+        }
+    }
+}
+
 struct CrucibleBadge: View {
     let label: String
     let value: String
     let icon: String
+    var statusColor: Color = .somAccent
     
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: icon)
                 .font(.system(size: 10))
-                .foregroundColor(.somAccent)
+                .foregroundColor(statusColor)
             Text(label)
                 .font(.system(size: 10))
                 .foregroundColor(.white.opacity(0.4))
