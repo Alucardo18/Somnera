@@ -8,42 +8,94 @@ struct SynergyIntroView: View {
         ZStack {
             Color.somBackground.ignoresSafeArea()
             
-            // Fondo decorativo con luces
+            // Fondo decorativo con auroras holográficas de laboratorio
             ZStack {
                 Circle()
-                    .fill(Color.somAccent.opacity(0.15))
-                    .frame(width: 300, height: 300)
-                    .blur(radius: 60)
-                    .offset(x: -100, y: -200)
+                    .fill(Color.somAccent.opacity(0.12))
+                    .frame(width: 320, height: 320)
+                    .blur(radius: 70)
+                    .offset(x: -80, y: -220)
                 
                 Circle()
-                    .fill(Color.somMesh3.opacity(0.1))
-                    .frame(width: 400, height: 400)
-                    .blur(radius: 80)
-                    .offset(x: 150, y: 200)
+                    .fill(Color.cyan.opacity(0.08))
+                    .frame(width: 450, height: 450)
+                    .blur(radius: 90)
+                    .offset(x: 140, y: 180)
             }
             .ignoresSafeArea()
             
             ScrollView {
-                VStack(spacing: 35) {
-                    // Header
-                    VStack(spacing: 20) {
-                        Image(systemName: "sparkles")
-                            .font(.system(size: 60))
-                            .foregroundStyle(Color.somAccent.gradient)
-                            .shadow(color: Color.somAccent.opacity(0.5), radius: 20)
+                VStack(spacing: 30) {
+                    // Header Científico
+                    VStack(spacing: 16) {
+                        // Badge de Laboratorio
+                        HStack(spacing: 6) {
+                            Image(systemName: "flask.fill")
+                                .font(.system(size: 10))
+                                .foregroundColor(.cyan)
+                            Text("ENTORNO DE DIAGNÓSTICO CLÍNICO")
+                                .font(.system(size: 9, weight: .bold))
+                                .tracking(2)
+                                .foregroundColor(.cyan)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Capsule().fill(Color.cyan.opacity(0.08)))
                         
-                        Text("Sinergia")
+                        Text("Laboratorio de Sueño")
                             .font(.system(size: 34, weight: .black, design: .rounded))
                             .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
                         
-                        Text("Potencia tu análisis con datos biométricos.")
+                        Text("Sinergia: Telemetría y Monitoreo Cuántico Local")
                             .font(.headline)
                             .foregroundColor(.somTextSecondary)
                             .multilineTextAlignment(.center)
-                            .padding(.horizontal, 40)
+                            .padding(.horizontal, 30)
                     }
-                    .padding(.top, 40)
+                    .padding(.top, 30)
+                    
+                    // BANNER CRÍTICO: REQUERIMIENTO APPLE WATCH (Llamativo y elegante)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 10) {
+                            Image(systemName: "applewatch")
+                                .font(.title3)
+                                .foregroundColor(.cyan)
+                                .frame(width: 36, height: 36)
+                                .background(Color.cyan.opacity(0.1))
+                                .clipShape(Circle())
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("INTEGRACIÓN CON APPLE WATCH")
+                                    .font(.system(size: 11, weight: .black))
+                                    .tracking(1)
+                                    .foregroundColor(.white)
+                                Text("Métricas Indispensables")
+                                    .font(.caption)
+                                    .foregroundColor(.cyan)
+                            }
+                        }
+                        
+                        Text("Para que el laboratorio de Somnera despliegue su máximo potencial clínico y mapee con precisión milimétrica la Biosfera de Homeostasis 3D, **los datos de tu Apple Watch son vitales**.")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(.white.opacity(0.8))
+                            .lineSpacing(4)
+                        
+                        Text("El registro nocturno de oxígeno en sangre ($SpO2$) y frecuencia cardíaca actúa como la firma biológica indispensable para confirmar apneas y descartar falsos positivos.")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.5))
+                            .lineSpacing(3)
+                    }
+                    .padding(20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(Color.cyan.opacity(0.04))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24)
+                            .stroke(Color.cyan.opacity(0.2), lineWidth: 1)
+                    )
+                    .padding(.horizontal)
                     
                     // Main Message Card
                     VStack(alignment: .leading, spacing: 20) {
@@ -51,58 +103,73 @@ struct SynergyIntroView: View {
                             Image(systemName: "cpu")
                                 .font(.title2)
                                 .foregroundColor(.somAccent)
-                            Text("Poder Autónomo")
+                            Text("Laboratorio Acústico (iPhone)")
                                 .font(.headline)
                                 .foregroundColor(.white)
                         }
                         
-                        Text("Somnera es una herramienta avanzada capaz de detectar ronquidos y apneas con alta precisión usando únicamente IA y modelos matemáticos ejecutados localmente en tu iPhone.")
+                        Text("Tu iPhone actúa como un sensor acústico autónomo de alta resolución, procesando ronquidos y patrones respiratorios de forma 100% privada con inteligencia artificial local.")
                             .font(.subheadline)
                             .foregroundColor(.somTextSecondary)
                             .lineSpacing(4)
                         
                         Divider()
-                            .background(Color.white.opacity(0.1))
+                            .background(Color.white.opacity(0.06))
                         
                         HStack(spacing: 15) {
-                            Image(systemName: "applewatch")
+                            Image(systemName: "heart.text.square.fill")
                                 .font(.title2)
-                                .foregroundColor(.somSafe)
-                            Text("El Multiplicador")
+                                .foregroundColor(.purple)
+                            Text("Sinergia Cardiorrespiratoria")
                                 .font(.headline)
                                 .foregroundColor(.white)
                         }
                         
-                        Text("Al conectar tu Apple Watch, Somnera deja de 'estimar' y comienza a 'validar'. La frecuencia cardíaca y el oxígeno en sangre actúan como una firma biológica que confirma cada evento respiratorio.")
+                        Text("Al fusionar el audio del iPhone con la biometría del Watch, el algoritmo de Sinergia correlaciona tus niveles de oxígeno y pulso cardíaco para ofrecerte una precisión de grado clínico en tu hogar.")
                             .font(.subheadline)
                             .foregroundColor(.somTextSecondary)
                             .lineSpacing(4)
                     }
                     .padding(24)
-                    .background(Color.white.opacity(0.05))
+                    .background(Color.white.opacity(0.03))
                     .cornerRadius(24)
                     .overlay(
                         RoundedRectangle(cornerRadius: 24)
-                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                            .stroke(Color.white.opacity(0.05), lineWidth: 1)
                     )
                     .padding(.horizontal)
                     
                     // Features Grid
                     VStack(spacing: 16) {
-                        synergyFeature(icon: "heart.fill", title: "Estrés Cardíaco", desc: "Correlación de taquicardia post-apnea.")
-                        synergyFeature(icon: "lungs.fill", title: "Validación SpO2", desc: "Confirma pausas con caídas de oxígeno.")
-                        synergyFeature(icon: "waveform.path.ecg", title: "Higiene del Sueño", desc: "Analiza cómo tu actividad diaria afecta tu noche.")
+                        synergyFeature(
+                            icon: "lungs.fill",
+                            color: .cyan,
+                            title: "Saturación de Oxígeno (SpO2)",
+                            desc: "Indispensable para identificar caídas súbitas durante apneas."
+                        )
+                        synergyFeature(
+                            icon: "heart.fill",
+                            color: .red,
+                            title: "Frecuencia Cardíaca Activa",
+                            desc: "Monitorea la taquicardia refleja que ocurre post-ahogo respiratorio."
+                        )
+                        synergyFeature(
+                            icon: "waveform.path.ecg",
+                            color: .purple,
+                            title: "Carga Alostática y Sueño",
+                            desc: "Analiza el estrés total que sufre tu sistema cardiovascular nocturno."
+                        )
                     }
                     .padding(.horizontal)
                     
-                    Spacer(minLength: 30)
+                    Spacer(minLength: 20)
                     
                     // Button
                     Button {
                         onboarded = true
                         dismiss()
                     } label: {
-                        Text("Comenzar con Sinergia")
+                        Text("Activar Laboratorio de Sueño")
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -118,13 +185,13 @@ struct SynergyIntroView: View {
         }
     }
     
-    private func synergyFeature(icon: String, title: String, desc: String) -> some View {
+    private func synergyFeature(icon: String, color: Color, title: String, desc: String) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundColor(.somAccent)
+                .foregroundColor(color)
                 .frame(width: 40, height: 40)
-                .background(Color.somAccent.opacity(0.1))
+                .background(color.opacity(0.1))
                 .clipShape(Circle())
             
             VStack(alignment: .leading, spacing: 2) {
@@ -134,12 +201,17 @@ struct SynergyIntroView: View {
                 Text(desc)
                     .font(.caption)
                     .foregroundColor(.somTextSecondary)
+                    .lineSpacing(2)
             }
             Spacer()
         }
-        .padding(12)
-        .background(Color.white.opacity(0.03))
+        .padding(14)
+        .background(Color.white.opacity(0.02))
         .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.white.opacity(0.03), lineWidth: 1)
+        )
     }
 }
 
