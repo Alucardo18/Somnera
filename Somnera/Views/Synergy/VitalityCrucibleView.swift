@@ -1,100 +1,101 @@
 import SwiftUI
 import HealthKit
 
+// Estructuras de datos 3D compartidas y eficientes
+struct Particle3D {
+    let x: Double
+    let y: Double
+    let z: Double
+    let colorIndex: Int
+}
+
+struct ProjectedParticle {
+    let x: CGFloat
+    let y: CGFloat
+    let z: Double
+    let scale: CGFloat
+    let colorIndex: Int
+}
+
 struct VitalityCrucibleView: View {
     let session: SleepSession?
     @State private var metrics: SynergyMetrics?
-    @State private var isAnimating = false
+    @State private var particles: [Particle3D] = []
     
     var body: some View {
         VStack(spacing: 25) {
-            // Biosfera de Homeostasis: Globo Aramado 3D Vectorial (Nítido, Ultra-rápido y GPU-Acelerado)
-            ZStack {
-                // Resplandor atmosférico de fondo
-                Circle()
-                    .fill(Color.somAccent.opacity(0.04))
-                    .frame(width: 180, height: 180)
-                    .blur(radius: 25)
-                
-                // Estructura Esférica del Globo (Biosfera Holográfica)
-                ZStack {
-                    // 1. Meridianos (Líneas longitudinales verticales)
-                    ForEach(0..<4) { i in
-                        Circle()
-                            .stroke(
-                                LinearGradient(colors: [.cyan.opacity(0.4), .cyan.opacity(0.05)], startPoint: .top, endPoint: .bottom),
-                                lineWidth: 1.0
-                            )
-                            .frame(width: 150, height: 150)
-                            .rotation3DEffect(.degrees(Double(i) * 45), axis: (x: 0, y: 1, z: 0))
+            // Biosfera de Homeostasis: Esfera de Partículas 3D (Ligera, Fluida y Nítida)
+            TimelineView(.animation) { timeline in
+                Canvas { context, size in
+                    let now = timeline.date.timeIntervalSinceReferenceDate
+                    let center = CGPoint(x: size.width / 2, y: size.height / 2)
+                    
+                    // Radio de la esfera con un pulso cardíaco sutil global (sin calcular trigonometría por partícula)
+                    let baseRadius = 65.0
+                    let pulse = sin(now * 3.0) * 2.0
+                    let sphereRadius = baseRadius + pulse
+                    
+                    // Rotaciones angulares constantes
+                    let rotY = now * 0.4
+                    let rotX = sin(now * 0.2) * 0.3
+                    
+                    let cosY = cos(rotY)
+                    let sinY = sin(rotY)
+                    let cosX = cos(rotX)
+                    let sinX = sin(rotX)
+                    
+                    // Proyección 3D de los 45 puntos (Ligero y de carga instantánea)
+                    var projected: [ProjectedParticle] = particles.map { p in
+                        // Rotación Y
+                        let x1 = p.x * cosY - p.z * sinY
+                        let z1 = p.x * sinY + p.z * cosY
+                        
+                        // Rotación X
+                        let y1 = p.y * cosX - z1 * sinX
+                        let z2 = p.y * sinX + z1 * cosX
+                        
+                        // Perspectiva simple
+                        let d = 2.5
+                        let scaleFactor = d / (d + z2)
+                        
+                        let screenX = center.x + CGFloat(x1 * sphereRadius * scaleFactor)
+                        let screenY = center.y + CGFloat(y1 * sphereRadius * scaleFactor)
+                        
+                        return ProjectedParticle(
+                            x: screenX,
+                            y: screenY,
+                            z: z2,
+                            scale: scaleFactor,
+                            colorIndex: p.colorIndex
+                        )
                     }
                     
-                    // 2. Ecuador (Línea latitudinal central)
-                    Circle()
-                        .stroke(Color.cyan.opacity(0.35), lineWidth: 1.2)
-                        .frame(width: 150, height: 150)
-                        .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
+                    // Ordenamiento Z para profundidad (Solo 45 elementos, instantáneo)
+                    projected.sort { $0.z > $1.z }
                     
-                    // 3. Trópicos (Latitudes intermedias)
-                    Circle()
-                        .stroke(Color.cyan.opacity(0.2), lineWidth: 0.8)
-                        .frame(width: 130, height: 130)
-                        .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
-                        .offset(y: -38)
-                    
-                    Circle()
-                        .stroke(Color.cyan.opacity(0.2), lineWidth: 0.8)
-                        .frame(width: 130, height: 130)
-                        .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
-                        .offset(y: 38)
-                    
-                    // 4. Círculos Polares (Latitudes extremas)
-                    Circle()
-                        .stroke(Color.cyan.opacity(0.12), lineWidth: 0.8)
-                        .frame(width: 90, height: 90)
-                        .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
-                        .offset(y: -60)
-                    
-                    Circle()
-                        .stroke(Color.cyan.opacity(0.12), lineWidth: 0.8)
-                        .frame(width: 90, height: 90)
-                        .rotation3DEffect(.degrees(90), axis: (x: 1, y: 0, z: 0))
-                        .offset(y: 60)
+                    // Renderizado de las partículas
+                    for p in projected {
+                        // Gradiente de color según la posición para simular una biosfera viva (Cian a SomAccent)
+                        let isFront = p.z < 0
+                        let opacity = max(0.15, min(0.9, (1.2 - p.z) / 2.0))
+                        let size = max(2.0, min(6.5, 4.0 * p.scale))
+                        
+                        let color: Color = p.colorIndex % 3 == 0 ? .cyan : (p.colorIndex % 3 == 1 ? .somAccent : .purple)
+                        
+                        let rect = CGRect(x: p.x - size/2, y: p.y - size/2, width: size, height: size)
+                        context.fill(Path(ellipseIn: rect), with: .color(color.opacity(opacity)))
+                        
+                        // Efecto de resplandor para las partículas del frente
+                        if isFront && p.colorIndex % 5 == 0 {
+                            let glowRect = rect.insetBy(dx: -2.0, dy: -2.0)
+                            context.fill(Path(ellipseIn: glowRect), with: .color(color.opacity(opacity * 0.3)))
+                        }
+                    }
                 }
-                .rotation3DEffect(.degrees(isAnimating ? 360 : 0), axis: (x: 0.2, y: 1, z: 0.1))
-                .animation(.linear(duration: 16).repeatForever(autoreverses: false), value: isAnimating)
-                
-                // Nodos Biosféricos Satélite (Partículas de oxígeno flotando en órbita)
-                ZStack {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 5, height: 5)
-                        .shadow(color: .cyan, radius: 4)
-                        .offset(x: 75)
-                        .rotationEffect(.degrees(isAnimating ? 360 : 0))
-                        .animation(.linear(duration: 5).repeatForever(autoreverses: false), value: isAnimating)
-                    
-                    Circle()
-                        .fill(Color.somAccent)
-                        .frame(width: 4, height: 4)
-                        .shadow(color: .somAccent, radius: 4)
-                        .offset(x: -65)
-                        .rotationEffect(.degrees(isAnimating ? -360 : 0))
-                        .animation(.linear(duration: 7).repeatForever(autoreverses: false), value: isAnimating)
-                }
-                .rotation3DEffect(.degrees(30), axis: (x: 1, y: 0, z: 0))
-                
-                // Núcleo de Homeostasis Celular (Corazón del ecosistema)
-                Circle()
-                    .fill(Color.somAccent.gradient)
-                    .frame(width: 26, height: 26)
-                    .scaleEffect(isAnimating ? 1.15 : 0.85)
-                    .shadow(color: .somAccent.opacity(0.5), radius: 12)
-                    .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: isAnimating)
             }
             .frame(height: 220)
             .onAppear {
-                isAnimating = true
+                generateParticles()
             }
             .task {
                 await fetchMetrics()
@@ -132,6 +133,24 @@ struct VitalityCrucibleView: View {
             )
             .padding(.horizontal)
         }
+    }
+    
+    private func generateParticles() {
+        var temp: [Particle3D] = []
+        let N = 45 // Número óptimo para un rendimiento perfecto y apariencia esférica
+        let goldenRatio = (1.0 + sqrt(5.0)) / 2.0
+        
+        for i in 0..<N {
+            let y = 1.0 - (Double(i) / Double(N - 1)) * 2.0
+            let radius = sqrt(1.0 - y * y)
+            let theta = 2.0 * Double.pi * Double(i) / goldenRatio
+            
+            let x = cos(theta) * radius
+            let z = sin(theta) * radius
+            
+            temp.append(Particle3D(x: x, y: y, z: z, colorIndex: i))
+        }
+        self.particles = temp
     }
     
     private func fetchMetrics() async {
