@@ -124,41 +124,106 @@ struct VitalityCrucibleView: View {
                 await fetchMetrics()
             }
             
-            // IA Insight Card
-            VStack(alignment: .leading, spacing: 15) {
-                HStack {
-                    Image(systemName: "circle.hexagonpath")
+            // PANEL ORÁCULO DE DIAGNÓSTICO ESTRUCTURADO (Opción B Premium)
+            VStack(alignment: .leading, spacing: 20) {
+                // Header del Oráculo
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
                         .foregroundColor(.somAccent)
-                    Text("ANÁLISIS DE HOMEOSTASIS 3D")
+                        .font(.system(size: 14))
+                    Text("DIAGNÓSTICO HOMEOSFÉRICO")
                         .font(.system(size: 10, weight: .bold))
                         .tracking(2)
                         .foregroundColor(.white.opacity(0.6))
+                    Spacer()
+                    
+                    // Semáforo de Estado Médico
+                    Text(getHomeostasisStatus().text)
+                        .font(.system(size: 9, weight: .black))
+                        .tracking(1.5)
+                        .foregroundColor(.somBackground)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(getHomeostasisStatus().color)
+                        .cornerRadius(6)
                 }
                 
-                Text(generateAISummary())
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.white)
-                    .lineSpacing(6)
-                    .fixedSize(horizontal: false, vertical: true)
+                // 1. Diagnóstico del Ecosistema
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(getEcosystemStatusText())
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.white)
+                        .lineSpacing(5)
+                }
                 
-                // Puntuación de Homeostasis con Clasificación Médica Clara y Semáforo de Estado
-                HStack(spacing: 10) {
-                    CrucibleBadge(
-                        label: "Homeostasis",
-                        value: "\(Int(calculateHomeostasis()))%",
-                        icon: "circle.hexagonpath.fill",
-                        statusColor: getHomeostasisStatus().color
-                    )
-                    
-                    // Etiqueta Médica de Diagnóstico
-                    Text(getHomeostasisStatus().text)
-                        .font(.system(size: 10, weight: .black))
+                Divider()
+                    .background(Color.white.opacity(0.08))
+                
+                // 2. Bloque de Datos Duros (Grid Clínico)
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("TELEMETRÍA REGISTRADA")
+                        .font(.system(size: 9, weight: .bold))
                         .tracking(2)
-                        .foregroundColor(.somBackground)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(getHomeostasisStatus().color)
-                        .cornerRadius(8)
+                        .foregroundColor(.cyan)
+                    
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                        MetricCard(
+                            title: "Duración",
+                            value: String(format: "%.1f hrs", (session?.duration ?? 28800) / 3600.0),
+                            subtitle: "Meta ideal: 8.0h",
+                            icon: "clock.fill",
+                            color: .cyan
+                        )
+                        
+                        MetricCard(
+                            title: "Silencio",
+                            value: "\(Int(session?.snoreScore ?? 100))%",
+                            subtitle: "Ausencia ronquido",
+                            icon: "waveform.fill",
+                            color: .somAccent
+                        )
+                        
+                        MetricCard(
+                            title: "Ritmo Cardíaco",
+                            value: metrics?.heartRate != nil ? "\(Int(metrics!.heartRate!)) lpm" : "--",
+                            subtitle: "Promedio nocturno",
+                            icon: "heart.fill",
+                            color: .purple
+                        )
+                        
+                        MetricCard(
+                            title: "SpO2 (Oxígeno)",
+                            value: metrics?.spO2 != nil ? "\(Int((metrics?.spO2 ?? 1.0) * 100))%" : "--",
+                            subtitle: "Saturación",
+                            icon: "lungs.fill",
+                            color: .cyan
+                        )
+                    }
+                }
+                
+                Divider()
+                    .background(Color.white.opacity(0.08))
+                
+                // 3. Prescripción de Homeostasis
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("PRESCRIPCIÓN DE HOMEOSTASIS")
+                        .font(.system(size: 9, weight: .bold))
+                        .tracking(2)
+                        .foregroundColor(.somAccent)
+                    
+                    ForEach(getRecommendations(), id: \.self) { rec in
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(.somAccent)
+                                .padding(.top, 2)
+                            
+                            Text(rec)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.white.opacity(0.8))
+                                .lineSpacing(4)
+                        }
+                    }
                 }
             }
             .padding(25)
@@ -260,65 +325,56 @@ struct VitalityCrucibleView: View {
         return ("COMPROMETIDA", .red)
     }
     
-    private func generateAISummary() -> String {
-        guard let session = session else { return "Iniciando análisis biométrico..." }
-        
+    private func getEcosystemStatusText() -> String {
         let homeostasis = calculateHomeostasis()
-        let snore = Double(session.snoreScore)
-        let hours = session.duration / 3600.0
+        let hours = (session?.duration ?? 28800) / 3600.0
+        let valSpO2 = metrics?.spO2 != nil ? (metrics!.spO2! > 1.0 ? metrics!.spO2! : metrics!.spO2! * 100.0) : 100.0
         
-        // 1. Diagnóstico del Ecosistema (Homeostasis)
-        var statusMsg = ""
         if homeostasis >= 90 {
-            statusMsg = "Biosfera en equilibrio óptimo. Su arquitectura celular refleja una sinergia perfecta de recuperación profunda."
+            return "Biosfera en equilibrio óptimo. Su arquitectura celular refleja una sinergia perfecta de recuperación profunda."
+        } else if hours < 6.0 {
+            return "Contracción esférica detectada. La biosfera redujo su diámetro debido a una severa falta de horas de descanso (\(String(format: "%.1f", hours))h), generando deuda fisiológica activa."
+        } else if valSpO2 < 92 {
+            return "El polo respiratorio exhibe distorsión crítica. La reducción sostenida de oxígeno ha generado sobrecarga cardiovascular nocturna."
         } else if homeostasis >= 75 {
-            statusMsg = "Biosfera en estabilidad adecuada. Su estructura mantiene cohesión funcional, pero exhibe estrés alostático menor."
+            return "Biosfera en estabilidad adecuada. Su estructura mantiene cohesión funcional, pero exhibe estrés alostático menor por fatiga."
         } else {
-            statusMsg = "Biosfera en estado crítico de desequilibrio. Ruptura de la homeostasis sistémica detectada debido a anomalías críticas."
+            return "Biosfera en estado crítico de desequilibrio. Ruptura de la homeostasis sistémica detectada debido a múltiples anomalías."
         }
-        
-        // 2. Desglose Cuantitativo y Datos Duros
-        var telemetry = "\nDATOS DUROS REGISTRADOS:\n"
-        telemetry += String(format: "• Duración: %.1f horas (Meta ideal: 8.0h)\n", hours)
-        telemetry += String(format: "• Índice de Silencio: %d%% (Ausencia de ronquidos)\n", Int(snore))
-        
-        if let hr = metrics?.heartRate {
-            telemetry += String(format: "• Ritmo Cardíaco: %d lpm (Promedio profundo)\n", Int(hr))
-        } else {
-            telemetry += "• Ritmo Cardíaco: -- lpm (Sin sensor Apple Watch)\n"
-        }
-        
-        if let spo2 = metrics?.spO2 {
-            let val = spo2 > 1.0 ? spo2 : spo2 * 100.0
-            telemetry += String(format: "• Saturación SpO2: %d%% (Oxigenación)\n", Int(val))
-        } else {
-            telemetry += "• Saturación SpO2: --%% (Sin sensor Apple Watch)\n"
-        }
-        
-        // 3. Consejos accionables basados en el peor fallo
-        var recommendations = "\nPRESCRIPCIÓN DE HOMEOSTASIS:\n"
-        
+    }
+    
+    private func getRecommendations() -> [String] {
+        let hours = (session?.duration ?? 28800) / 3600.0
+        let snore = Double(session?.snoreScore ?? 100)
         let valSpO2 = metrics?.spO2 != nil ? (metrics!.spO2! > 1.0 ? metrics!.spO2! : metrics!.spO2! * 100.0) : 100.0
         let valHR = metrics?.heartRate ?? 60.0
         
         if valSpO2 < 92 {
-            recommendations += "1. SOPORTE DE VENTILACIÓN: Considere elevar la cabecera de su cama 15 grados o dormir en posición lateral para mitigar colapsos obstructivos leves.\n"
-            recommendations += "2. HIGIENE RESPIRATORIA: Evite sedantes y alcohol al menos 3 horas antes de acostarse para mantener el tono muscular faríngeo."
+            return [
+                "SOPORTE DE VENTILACIÓN: Considere elevar la cabecera de su cama 15 grados o dormir en posición lateral para mitigar colapsos obstructivos leves.",
+                "HIGIENE RESPIRATORIA: Evite sedantes y alcohol al menos 3 horas antes de acostarse para mantener el tono muscular faríngeo activo."
+            ]
         } else if snore < 75 {
-            recommendations += "1. TERAPIA POSICIONAL: Evite el decúbito supino (dormir boca arriba), ya que favorece la obstrucción de la vía aérea.\n"
-            recommendations += "2. CONTROL DE HUMEDAD: Utilice un humidificador nasal antes de dormir para reducir la fricción y congestión tisular."
+            return [
+                "TERAPIA POSICIONAL: Evite dormir boca arriba (decúbito supino), ya que la gravedad favorece la obstrucción natural de la vía aérea posterior.",
+                "CONTROL DE HUMEDAD: Utilice un humidificador nasal antes de dormir para reducir la fricción y congestión tisular de la garganta."
+            ]
         } else if hours < 6.0 {
-            recommendations += "1. REGULACIÓN CIRCADIANA: Establezca un horario estricto de acostarse y despertarse para pagar la deuda de sueño acumulada de \(String(format: "%.1f", 8.0 - hours)) horas.\n"
-            recommendations += "2. RITUAL DE APAGADO: Reduzca la exposición a pantallas 60 minutos antes de dormir para inducir el pico natural de melatonina."
+            return [
+                "REGULACIÓN CIRCADIANA: Establezca un horario estricto de sueño para saldar la deuda acumulada de \(String(format: "%.1f", 8.0 - hours)) horas.",
+                "RITUAL DE APAGADO: Reduzca la exposición a pantallas 60 minutos antes de dormir para inducir el pico biológico natural de melatonina."
+            ]
         } else if valHR > 75 {
-            recommendations += "1. DESCOMPRESIÓN ADRENÉRGICA: Realice 10 minutos de respiración box (inhalar 4s, retener 4s, exhalar 4s, retener 4s) antes de apagar las luces.\n"
-            recommendations += "2. METABOLISMO CERO: Evite comidas pesadas y ejercicio intenso en una ventana de 3 horas previas al descanso."
+            return [
+                "DESCOMPRESIÓN ADRENÉRGICA: Realice 10 minutos de respiración controlada 4-4-4 antes de apagar las luces para desacelerar el pulso.",
+                "METABOLISMO CERO: Evite alimentos densos y ejercicio intenso en una ventana de 3 horas previas al descanso nocturno."
+            ]
         } else {
-            recommendations += "1. CONSOLIDACIÓN DE RACHA: Mantenga su consistencia horaria actual. Su sistema biológico se encuentra en un estado óptimo de adaptación.\n"
-            recommendations += "2. VENTILACIÓN DE HABITACIÓN: Duerma con una temperatura ambiente templada (18-20°C) para estabilizar aún más el pulso basal nocturno."
+            return [
+                "CONSOLIDACIÓN DE RACHA: Mantenga su consistencia horaria actual. Su sistema biológico se encuentra en un estado óptimo de homeostasis.",
+                "VENTILACIÓN DE HABITACIÓN: Duerma con una temperatura ambiente templada (18-20°C) para estabilizar aún más el pulso basal."
+            ]
         }
-        
-        return "\(statusMsg)\n\(telemetry)\n\(recommendations)"
     }
 }
 
@@ -336,6 +392,47 @@ struct LegendItem: View {
                 .font(.system(size: 9, weight: .bold))
                 .foregroundColor(.white.opacity(0.5))
         }
+    }
+}
+
+// Subcomponente de Tarjeta de Métricas
+struct MetricCard: View {
+    let title: String
+    let value: String
+    let subtitle: String
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 10))
+                    .foregroundColor(color)
+                Text(title)
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundColor(.white.opacity(0.4))
+                    .tracking(0.5)
+            }
+            
+            Text(value)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(.white)
+            
+            Text(subtitle)
+                .font(.system(size: 8))
+                .foregroundColor(.white.opacity(0.3))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 15)
+                .fill(Color.white.opacity(0.02))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 15)
+                        .stroke(Color.white.opacity(0.03), lineWidth: 1)
+                )
+        )
     }
 }
 
