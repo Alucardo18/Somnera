@@ -179,7 +179,7 @@ struct VitalityCrucibleView: View {
                             title: "Silencio",
                             value: "\(Int(session?.snoreScore ?? 100))%",
                             subtitle: "Ausencia ronquido",
-                            icon: "waveform.fill",
+                            icon: "waveform",
                             color: .somAccent
                         )
                         
