@@ -2,7 +2,11 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var appState: AppState
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var dashboard = DashboardViewModel()
+    @AppStorage("somnera_is_mecenas") private var isMecenas = false
+    @AppStorage("somnera_last_sponsor_welcome_day") private var lastSponsorWelcomeDay = ""
+    @State private var showSponsorWelcome = false
 
     var body: some View {
         TabView(selection: $appState.currentTab) {
@@ -32,9 +36,33 @@ struct ContentView: View {
         }
         .tint(.somAccent)
         .onAppear { dashboard.load() }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            guard isMecenas else { return }
+            guard shouldShowDailySponsorWelcome() else { return }
+            
+            lastSponsorWelcomeDay = todayKey()
+            showSponsorWelcome = true
+        }
         .sheet(isPresented: $appState.showOnboarding) {
             OnboardingView()
                 .environmentObject(appState)
         }
+        .fullScreenCover(isPresented: $showSponsorWelcome) {
+            SponsorWelcomeView(isPresented: $showSponsorWelcome, autoDismissAfter: 3.0)
+        }
+    }
+    
+    private func shouldShowDailySponsorWelcome() -> Bool {
+        lastSponsorWelcomeDay != todayKey()
+    }
+    
+    private func todayKey() -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = .current
+        formatter.locale = .current
+        formatter.timeZone = .current
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
     }
 }
