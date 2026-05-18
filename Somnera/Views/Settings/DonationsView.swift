@@ -666,29 +666,114 @@ struct Totem3DView: View {
         context.fill(Circle().path(in: pulseRect), with: .color(color))
     }
     
-    // GYRO: Topographic Concentric Rings
+    // PORTAL LUNATE: Crescent Obsidian Moon with 3D Projected Expanding Audio Wave Arcs
+    // Formerly Gyro. Represents the snoring audio captured by Somnera, styled in direct resonance with the app icon.
     private func drawGyro(context: GraphicsContext, midX: CGFloat, midY: CGFloat, time: Double, color: Color) {
+        var context = context
+        
         let t = time
+        let floatY = CGFloat(sin(time * 0.8)) * 3.5 // Gentle levitation drift
+        let currentMidY = midY + floatY
         
-        // Outer ring (Horizontal rotation)
-        let w1 = 50 * CGFloat(abs(cos(t * 0.6)))
-        let h1: CGFloat = 50
-        context.stroke(Ellipse().path(in: CGRect(x: midX - w1, y: midY - h1, width: w1*2, height: h1*2)), with: .color(color.opacity(0.3)), lineWidth: 1.5)
+        let moonCenterX = midX - 12
+        let moonWidth: CGFloat = 18
+        let moonHeight: CGFloat = 42
         
-        // Middle ring (Vertical rotation)
-        let w2: CGFloat = 36
-        let h2 = 36 * CGFloat(abs(sin(t * 0.9)))
-        context.stroke(Ellipse().path(in: CGRect(x: midX - w2, y: midY - h2, width: w2*2, height: h2*2)), with: .color(color.opacity(0.6)), lineWidth: 1.5)
+        // 1. Soft Breathing Aura Glow behind the crescent moon
+        let pulseGlow = 0.7 + 0.15 * CGFloat(sin(time * 1.2))
+        let glowRect = CGRect(x: moonCenterX - 35, y: currentMidY - 50, width: 85, height: 100)
+        let glowShader = GraphicsContext.Shading.radialGradient(
+            Gradient(colors: [color.opacity(0.18 * Double(pulseGlow)), .clear]),
+            center: CGPoint(x: moonCenterX, y: currentMidY),
+            startRadius: 0,
+            endRadius: 45
+        )
+        context.fill(Path(ellipseIn: glowRect), with: glowShader)
         
-        // Inner ring (Diagonal rotation)
-        let twist = t * 1.2
-        let w3 = 20 * CGFloat(abs(sin(twist)))
-        let h3 = 20 * CGFloat(abs(cos(twist)))
-        context.stroke(Ellipse().path(in: CGRect(x: midX - w3, y: midY - h3, width: w3*2, height: h3*2)), with: .color(color), lineWidth: 2.0)
+        // 2. Draw 3D Concentric Expanding Audio Wavefronts
+        let focusX = moonCenterX + 4
+        let focusY = currentMidY
+        let waveCount = 3
         
-        // Glowing center core
-        let coreRadius: CGFloat = 6 + CGFloat(sin(time * 5.0)) * 1.5
-        context.fill(Circle().path(in: CGRect(x: midX - coreRadius, y: midY - coreRadius, width: coreRadius*2, height: coreRadius*2)), with: .color(.white))
+        for k in 0..<waveCount {
+            let progress = (t * 0.38 + Double(k) * 0.33).truncatingRemainder(dividingBy: 1.0)
+            let r = 8.0 + progress * 54.0
+            
+            // Fade in quickly, fade out as it reaches the maximum radius
+            let waveOpacity = (1.0 - progress) * (progress > 0.05 ? 1.0 : progress / 0.05) * 0.75
+            
+            var arcPath = Path()
+            let startAngle = -Double.pi / 2.3
+            let endAngle = Double.pi / 2.3
+            let segments = 24
+            
+            for s in 0...segments {
+                let angle = startAngle + Double(s) * (endAngle - startAngle) / Double(segments)
+                let px = focusX + cos(angle) * r
+                let py = focusY + sin(angle) * r * 0.45 // Tilted on Y to represent 3D perspective
+                if s == 0 {
+                    arcPath.move(to: CGPoint(x: px, y: py))
+                } else {
+                    arcPath.addLine(to: CGPoint(x: px, y: py))
+                }
+            }
+            
+            // Stroke the sonic wavefront with the brand accent color
+            context.stroke(arcPath, with: .color(color.opacity(waveOpacity)), lineWidth: 1.2)
+            
+            // Under-glow line for depth
+            context.stroke(arcPath, with: .color(color.opacity(waveOpacity * 0.3)), lineWidth: 2.5)
+            
+            // 3. Draw a glowing energy particle riding on each wave front (Frequency node)
+            let particleAngle = sin(time * 1.6 + Double(k) * 1.5) * 0.5
+            let pX = focusX + cos(particleAngle) * r
+            let pY = focusY + sin(particleAngle) * r * 0.45
+            
+            let sizeGlow = 6.0 * (1.0 - progress * 0.3)
+            let sizeCore = 2.0 * (1.0 - progress * 0.3)
+            
+            // Outer particle glow
+            let pGlowRect = CGRect(x: pX - sizeGlow/2, y: pY - sizeGlow/2, width: sizeGlow, height: sizeGlow)
+            context.fill(Circle().path(in: pGlowRect), with: .color(color.opacity(waveOpacity * 0.9)))
+            
+            // Core white light flare
+            let pCoreRect = CGRect(x: pX - sizeCore/2, y: pY - sizeCore/2, width: sizeCore, height: sizeCore)
+            context.fill(Circle().path(in: pCoreRect), with: .color(Color.white.opacity(waveOpacity)))
+        }
+        
+        // 4. Draw Crescent Moon Shape (Solid Obsidian)
+        var moonPath = Path()
+        moonPath.move(to: CGPoint(x: moonCenterX, y: currentMidY - moonHeight))
+        moonPath.addQuadCurve(
+            to: CGPoint(x: moonCenterX, y: currentMidY + moonHeight),
+            control: CGPoint(x: moonCenterX - moonWidth * 2.2, y: currentMidY)
+        )
+        moonPath.addQuadCurve(
+            to: CGPoint(x: moonCenterX, y: currentMidY - moonHeight),
+            control: CGPoint(x: moonCenterX - moonWidth * 0.6, y: currentMidY)
+        )
+        moonPath.closeSubpath()
+        
+        let obsidianBase = Color(hex: "#090B10")
+        let obsidianHighlight = Color(hex: "#161922")
+        let moonGradient = GraphicsContext.Shading.linearGradient(
+            Gradient(colors: [obsidianHighlight, obsidianBase]),
+            startPoint: CGPoint(x: moonCenterX - moonWidth, y: currentMidY),
+            endPoint: CGPoint(x: moonCenterX, y: currentMidY)
+        )
+        context.fill(moonPath, with: moonGradient)
+        
+        // Glowing Neon Outer stroke
+        context.stroke(moonPath, with: .color(color.opacity(0.85)), lineWidth: 1.4)
+        
+        // 5. Specular highlight line along the outer convex crest
+        var crestHighlight = Path()
+        crestHighlight.move(to: CGPoint(x: moonCenterX, y: currentMidY - moonHeight))
+        crestHighlight.addQuadCurve(
+            to: CGPoint(x: moonCenterX, y: currentMidY + moonHeight),
+            control: CGPoint(x: moonCenterX - moonWidth * 2.2, y: currentMidY)
+        )
+        context.stroke(crestHighlight, with: .color(Color.white.opacity(0.45)), lineWidth: 1.0)
     }
     
     // TESSERACT: 4D Isometric Wireframe Hypercube
