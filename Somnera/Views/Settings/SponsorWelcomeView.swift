@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SponsorWelcomeView: View {
     @Binding var isPresented: Bool
+    var autoDismissAfter: Double? = nil
     
     @AppStorage("somnera_sponsor_name") private var sponsorName = "Mecenas"
     @AppStorage("somnera_equipped_totem") private var equippedTotem = "cuarzo"
@@ -171,124 +172,12 @@ struct SponsorWelcomeView: View {
             withAnimation(.easeOut(duration: 1.0).delay(0.3)) {
                 animateText = true
             }
-        }
-    }
-}
 
-/// Timed, non-interactive sponsor overlay used for:
-/// - after-purchase celebration (short)
-/// - app-open mecenas greeting (longer)
-struct SponsorTimedWelcomeView: View {
-    @Binding var isPresented: Bool
-    let autoDismissAfter: Double
-    
-    @AppStorage("somnera_equipped_totem") private var equippedTotem = "cuarzo"
-    
-    @State private var animateTotem = false
-    @State private var animateText = false
-    @State private var currentQuote = ""
-    
-    let quotes = [
-        "La homeostasis no es un destino, es la danza silenciosa de tu cuerpo en la penumbra.",
-        "Que tu sueño sea tan profundo y ordenado como la geometría del cosmos.",
-        "En la calma de la noche, cada latido busca el equilibrio absoluto.",
-        "La noche cobija a los valientes que cuidan de su salud en el silencio.",
-        "Respira con calma, la inteligencia de Somnera vela por tu tranquilidad.",
-        "Tu descanso es el combustible sagrado de tu mente para el mañana."
-    ]
-    
-    let totems = [
-        TotemInfo(id: "cuarzo", name: "Cuarzo de la Homeostasis", color: .somSafe, description: "", mathType: .crystal),
-        TotemInfo(id: "piramide", name: "Pirámide Delta", color: .somAccent, description: "", mathType: .pyramid),
-        TotemInfo(id: "giroscopio", name: "Giroscopio Topográfico", color: .somWarning, description: "", mathType: .gyro),
-        TotemInfo(id: "tesseracto", name: "Tesseracto del Olvido", color: .somApnea, description: "", mathType: .tesseract),
-        TotemInfo(id: "helice", name: "Hélice de Sinergia", color: .somSafe, description: "", mathType: .helix),
-        TotemInfo(id: "astrolabio", name: "Astrolabio de Oro", color: .somWarning, description: "", mathType: .astrolabe),
-        TotemInfo(id: "singularidad", name: "Singularidad Áurea", color: .somWarning, description: "", mathType: .singularity)
-    ]
-    
-    var currentTotem: TotemInfo {
-        totems.first(where: { $0.id == equippedTotem }) ?? totems[0]
-    }
-    
-    var body: some View {
-        ZStack {
-            Color(hex: "#090B12").ignoresSafeArea()
-            
-            StarfieldBackground()
-                .ignoresSafeArea()
-                .opacity(0.6)
-            
-            VStack(spacing: 24) {
-                VStack(spacing: 12) {
-                    Text("MECENAS DETECTADO")
-                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundColor(currentTotem.color)
-                        .tracking(6)
-                        .scaleEffect(animateText ? 1.0 : 0.8)
-                        .opacity(animateText ? 1.0 : 0.0)
-                    
-                    Text("Bienvenido de nuevo")
-                        .font(.system(size: 30, weight: .black, design: .rounded))
-                        .foregroundColor(.somTextPrimary)
-                        .scaleEffect(animateText ? 1.0 : 0.9)
-                        .opacity(animateText ? 1.0 : 0.0)
-                }
-                .padding(.top, 40)
-                
-                Spacer()
-                
-                ZStack {
-                    Circle()
-                        .fill(currentTotem.color.opacity(0.12))
-                        .frame(width: 240, height: 240)
-                        .blur(radius: 40)
-                        .scaleEffect(animateTotem ? 1.15 : 0.85)
-                    
-                    Totem3DView(mathType: currentTotem.mathType, color: currentTotem.color, isUnlocked: true)
-                        .frame(width: 200, height: 200)
-                        .scaleEffect(animateTotem ? 1.0 : 0.1)
-                        .rotationEffect(.degrees(animateTotem ? 360 : 0))
-                }
-                .frame(height: 250)
-                
-                Text(currentTotem.name.uppercased())
-                    .font(.system(size: 14, weight: .bold, design: .monospaced))
-                    .foregroundColor(currentTotem.color)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(currentTotem.color.opacity(0.08))
-                    .cornerRadius(10)
-                    .opacity(animateText ? 1.0 : 0.0)
-                
-                Spacer()
-                
-                Text("“\(currentQuote)”")
-                    .font(.system(size: 15, weight: .medium, design: .serif))
-                    .foregroundColor(.somTextSecondary)
-                    .italic()
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(6)
-                    .padding(.horizontal, 40)
-                    .opacity(animateText ? 0.9 : 0.0)
-                
-                Spacer()
-            }
-        }
-        .onAppear {
-            currentQuote = quotes.randomElement() ?? quotes[0]
-            
-            withAnimation(.spring(response: 1.2, dampingFraction: 0.7, blendDuration: 0.5)) {
-                animateTotem = true
-            }
-            
-            withAnimation(.easeOut(duration: 1.0).delay(0.3)) {
-                animateText = true
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissAfter) {
-                withAnimation(.easeOut(duration: 0.3)) {
-                    isPresented = false
+            if let autoDismissAfter {
+                DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissAfter) {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        isPresented = false
+                    }
                 }
             }
         }
