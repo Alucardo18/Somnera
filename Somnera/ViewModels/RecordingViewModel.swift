@@ -498,10 +498,6 @@ final class RecordingViewModel: ObservableObject {
                     avgStability: avgStability
                 )
             }
-            
-            if let session = self.session {
-                sessionStorage.save(session)
-            }
         } else {
             print("[Somnera] 🗑️ Sesión descartada (cancelada durante el retardo/setup)")
             if let sessionToDiscard = self.session {
@@ -522,62 +518,67 @@ final class RecordingViewModel: ObservableObject {
     private func processBuffer(_ buffer: AVAudioPCMBuffer, time: AVAudioTime) {
         autoreleasepool {
             let now = Date()
-            // 1. Metrics
+            
+            // 1. Math & DSP (Background Thread Safe)
             let rms = DSPFilter.rms(of: buffer) ?? 0.0001
             let dB = (20 * log10(max(1e-5, rms))) + 80 // Normalized to 0-80 dB range
+            let spectral = SpectralAnalysisService.shared.analyze(buffer: buffer)
             
-            // Track peak on processing thread to ensure we don't lose it during UI throttling
-            sessionPeakDecibels = max(sessionPeakDecibels, dB)
+            let frameCount = Int(buffer.frameLength)
+            var peak: Float = 0
+            if let ptr = buffer.floatChannelData?[0] {
+                let samples = UnsafeBufferPointer(start: ptr, count: frameCount)
+                for s in samples { peak = max(peak, abs(s)) }
+            }
+            let crest = rms > 0 ? peak / rms : 0
+            
+            // 2. Write Amplified Copy (Background Thread Safe, avoids UI lag)
+            self.writeAmplifiedBuffer(buffer)
+            
+            // 3. IA Snore Analysis (Background Thread Safe)
+            snoreDetector.analyze(buffer, at: time)
+            
+            // 4. Safely dispatch all mutations and logic to MainActor
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                self.processBufferOnMainActor(rms: rms, dB: dB, spectral: (spectral.nasal, spectral.palatal, spectral.lingual), crest: crest, now: now, time: time)
+            }
+        }
+    }
+
+    @MainActor
+    private func processBufferOnMainActor(rms: Float, dB: Float, spectral: (nasal: Double, palatal: Double, lingual: Double), crest: Float, now: Date, time: AVAudioTime) {
+        // Track peak on MainActor
+        sessionPeakDecibels = max(sessionPeakDecibels, dB)
         
         // --- SNR CALCULATION ---
-        // Slowly track the lowest RMS to find the noise floor
         noiseFloorRMS = (rms < noiseFloorRMS) ? (rms * 0.05 + noiseFloorRMS * 0.95) : (noiseFloorRMS * 0.999 + rms * 0.001)
         let snr = 20 * log10(max(1.1, rms / max(0.0001, noiseFloorRMS)))
         
         // --- STABILITY (RHYTHM) CALCULATION ---
-        // Basic peak detection for breathing rhythm
         if rms > noiseFloorRMS * 1.5 && rms > 0.001 {
             let interval = now.timeIntervalSince(lastPeakTime)
-            if interval > 1.0 && interval < 6.0 { // Range for human breathing (10-60 bpm)
+            if interval > 1.0 && interval < 6.0 {
                 peakIntervals.append(interval)
                 if peakIntervals.count > 10 { peakIntervals.removeFirst() }
                 
-                // Stability = 1.0 - (StdDev / Mean)
                 if peakIntervals.count >= 3 {
                     let mean = peakIntervals.reduce(0, +) / Double(peakIntervals.count)
                     let variance = peakIntervals.map { pow($0 - mean, 2) }.reduce(0, +) / Double(peakIntervals.count)
                     let stdDev = sqrt(variance)
                     let stability = max(0.0, min(1.0, 1.0 - (stdDev / mean)))
                     
-                    Task { @MainActor in
-                        self.breathingStability = stability
-                        self.stabilitySum += stability
-                        self.stabilityCount += 1
-                    }
+                    self.breathingStability = stability
+                    self.stabilitySum += stability
+                    self.stabilityCount += 1
                 }
                 lastPeakTime = now
             }
         }
 
-        // Visual updates throttled to 20Hz (every 0.05s) to avoid MainActor saturation
         let shouldUpdateUI = now.timeIntervalSince(lastUIUpdateTime) >= 0.05
-        
-        // 4. Digital Twin Spectral Analysis
-        let spectral = SpectralAnalysisService.shared.analyze(buffer: buffer)
         self.lastSpectralAnalysis = (spectral.nasal, spectral.palatal, spectral.lingual)
         
-        // Calculate Crest Factor (Peak / RMS) once to determine if it's a textured sound (snore) 
-        // or flat noise (AC/Fan). Standard for clinical snore gating.
-        let frameCount = Int(buffer.frameLength)
-        var peak: Float = 0
-        if let ptr = buffer.floatChannelData?[0] {
-            let samples = UnsafeBufferPointer(start: ptr, count: frameCount)
-            for s in samples { peak = max(peak, abs(s)) }
-        }
-        let crest = rms > 0 ? peak / rms : 0
-        
-        // Always update internal intensities for clinical accuracy (independent of UI)
-        // Use thread-safe session snapshots.
         if dB > sessionDBThreshold && crest > sessionCrestThreshold {
             internalNasalIntensity = (internalNasalIntensity * 0.7) + (spectral.nasal * 0.3)
             internalPalatalIntensity = (internalPalatalIntensity * 0.7) + (spectral.palatal * 0.3)
@@ -590,24 +591,13 @@ final class RecordingViewModel: ObservableObject {
         }
         
         if shouldUpdateUI {
-            let capturedSNR = snr
-            let capturedRMS = rms
-            let capturedDB = dB
-            let capturedSpectral = spectral
-            let capturedIsSnoring = snoreDetector.isSnoring
-            
-            Task { @MainActor in
-                // UI THROTTLING: If screen is dimmed (Sleep Shield), skip all visual updates
-                // to save CPU, battery and prevent memory pressure from MainActor tasks.
-                guard !self.isDimmed else { return }
-                
-                self.currentRMS = capturedRMS
-                self.currentDecibels = capturedDB
-                self.currentSNR = Double(capturedSNR)
+            if !self.isDimmed {
+                self.currentRMS = rms
+                self.currentDecibels = dB
+                self.currentSNR = Double(snr)
                 self.peakDecibels = self.sessionPeakDecibels
-                self.updateWaveform(rms: capturedRMS)
+                self.updateWaveform(rms: rms)
                 
-                // Digital Twin Live UI Update (Sync with internal values)
                 self.currentNasalIntensity = self.internalNasalIntensity
                 self.currentPalatalIntensity = self.internalPalatalIntensity
                 self.currentLingualIntensity = self.internalLingualIntensity
@@ -615,8 +605,6 @@ final class RecordingViewModel: ObservableObject {
             lastUIUpdateTime = now
         }
         
-        // 5. Accumulation for final report (Independent of UI Throttling)
-        // Gated by IA & Crest Factor Stability using session snapshots.
         if snoreDetector.isSnoring && dB > sessionDBThreshold && crest > sessionCrestThreshold {
             nasalSum += spectral.nasal
             palatalSum += spectral.palatal
@@ -631,64 +619,46 @@ final class RecordingViewModel: ObservableObject {
                 let targetSeconds = Double(selectedDelayMinutes * 60)
                 
                 if elapsed >= targetSeconds {
-                    // El retardo ha expirado. Transición inmediata e infalible vía hardware
-                    Task { @MainActor [weak self] in
-                        self?.transitionToActiveRecording(at: now)
-                    }
+                    self.transitionToActiveRecording(at: now)
                 } else {
-                    // Mantener el contador sincronizado con el tiempo real de hardware
                     let remaining = max(0, Int(targetSeconds - elapsed))
                     if remaining != self.lastUpdatedRemainingSecond {
                         self.lastUpdatedRemainingSecond = remaining
-                        Task { @MainActor [weak self] in
-                            self?.countdownRemaining = remaining
-                        }
+                        self.countdownRemaining = remaining
                     }
                 }
             }
-            return // Detener procesamiento mientras esperamos
+            return
         }
 
-        // El flujo normal de grabación requiere estar grabando de verdad
         guard isRecording else { return }
 
         let motion = motionDetector.lastIntensity
         apneaDetector.update(rms: rms, motionIntensity: motion, at: Date())
             
-            // 2. Save amplified copy
-            self.writeAmplifiedBuffer(buffer)
-            
-            // 3. IA Analysis
-            snoreDetector.analyze(buffer, at: time)
-            
-            // Link snore events to apnea detector
-            if snoreDetector.isSnoring {
-                apneaDetector.reportSnore(at: now)
-            }
+        if snoreDetector.isSnoring {
+            apneaDetector.reportSnore(at: now)
+        }
 
-            // Timeline Sampling (1s resolution for smoother hypnogram)
-            sampleAccumulator.append(dB)
-            if now.timeIntervalSince(lastTimelineSampleTime) >= 1.0 {
-                // Use maximum (Peak) instead of Average to ensure snores are visible in the hypnogram.
-                let peakInWindow = sampleAccumulator.max() ?? dB
-                decibelTimeline.append(peakInWindow)
-                
-                // Collect Sentinel V2 Telemetry
-                snrTimeline.append(currentSNR)
-                stabilityTimeline.append(breathingStability)
-                tiltTimeline.append(currentTiltAngle)
-                motionTimeline.append(currentMotionG)
-                
-                sampleAccumulator = []
-                lastTimelineSampleTime = now
-                
-                // Auto-save metadata every 5 minutes
-                if now.timeIntervalSince(lastAutoSaveTime) >= 300 {
-                    saveCurrentSessionState(isFinal: false)
-                    lastAutoSaveTime = now
-                }
+        // Timeline Sampling (1s resolution for smoother hypnogram)
+        sampleAccumulator.append(dB)
+        if now.timeIntervalSince(lastTimelineSampleTime) >= 1.0 {
+            let peakInWindow = sampleAccumulator.max() ?? dB
+            decibelTimeline.append(peakInWindow)
+            
+            snrTimeline.append(currentSNR)
+            stabilityTimeline.append(breathingStability)
+            tiltTimeline.append(currentTiltAngle)
+            motionTimeline.append(currentMotionG)
+            
+            sampleAccumulator = []
+            lastTimelineSampleTime = now
+            
+            if now.timeIntervalSince(lastAutoSaveTime) >= 300 {
+                saveCurrentSessionState(isFinal: false)
+                lastAutoSaveTime = now
             }
-        } // End autoreleasepool
+        }
     }
 
     private func saveCurrentSessionState(isFinal: Bool) {
