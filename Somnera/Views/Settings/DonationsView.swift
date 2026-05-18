@@ -36,7 +36,7 @@ struct DonationsView: View {
         DonationTier(amount: "$264", subtitle: "Defensa Anti-Corporativa", name: "Tótem Tesseracto", desc: "Evita que las agencias de marketing invasivas compren la app y vendan tu historial de ronquidos a compañías de colchones de dudosa calidad.", totemId: "tesseracto"),
         DonationTier(amount: "$512", subtitle: "Hélice del Bienestar Clínico", name: "Tótem de Hélice", desc: "¡Doble hélice, doble compromiso! Financia el seguro de gastos médicos del programador antes de que sus muñecas colapsen por escribir tanto código premium.", totemId: "helice"),
         DonationTier(amount: "$1024", subtitle: "Resonancia Libre de Spam", name: "Tótem del Origen", desc: "Patrocinio nivel deidad. Mantén el proyecto 100% libre de molestos anuncios de casinos y gana el derecho absoluto de presumir un astrolabio digital en tu perfil.", totemId: "astrolabio"),
-        DonationTier(amount: "$2048", subtitle: "Horizonte del Mecenas Supremo", name: "Tótem Final", desc: "El apoyo definitivo: Emmanuel se tatuará el logotipo de Somnera en la espalda y te enviará una carta de agradecimiento en papel pergamino físico.", totemId: "singularidad")
+        DonationTier(amount: "$2048", subtitle: "Horizonte del Mecenas Supremo", name: "Tótem Final", desc: "El apoyo definitivo: Financia el café de Emmanuel de por vida. A cambio, el algoritmo te tratará como a la realeza, saludándote como 'Su Serena Majestad' y redactando tus reportes en español medieval.", totemId: "singularidad")
     ]
     
     var body: some View {
