@@ -86,7 +86,10 @@ final class SessionStorageService {
         if sessions.count > maxSessions {
             let toEvict = sessions.suffix(sessions.count - maxSessions)
             for session in toEvict {
-                delete(session)
+                if let path = session.audioFilePath {
+                    audioFileService.deleteAudio(at: path)
+                }
+                context?.delete(session)
             }
         }
     }

@@ -5,7 +5,7 @@ import SwiftUI
 struct SponsorRegistrationView: View {
     @Binding var isPresented: Bool
     
-    @AppStorage("somnera_sponsor_name") private var sponsorName = "Mecenas"
+    @AppStorage("somnera_sponsor_name") private var sponsorName = "Patrocinador"
     @AppStorage("somnera_equipped_totem") private var equippedTotem = "cuarzo"
     
     @State private var animateTotem = false
@@ -51,7 +51,7 @@ struct SponsorRegistrationView: View {
                         .scaleEffect(animateText ? 1.0 : 0.85)
                         .opacity(animateText ? 1.0 : 0.0)
                     
-                    Text("Registro de Mecenas")
+                    Text("Registro de Patrocinador")
                         .font(.system(size: 32, weight: .black, design: .rounded))
                         .foregroundColor(.somTextPrimary)
                         .scaleEffect(animateText ? 1.0 : 0.95)
@@ -95,7 +95,7 @@ struct SponsorRegistrationView: View {
                 Spacer()
                 
                 VStack(spacing: 12) {
-                    Text("REGISTRA TU NOMBRE EN EL COLEXIO DE MECENAS")
+                    Text("REGISTRA TU NOMBRE EN EL COLEGIO DE PATROCINADORES")
                         .font(.system(size: 9, weight: .bold, design: .monospaced))
                         .foregroundColor(.somTextSecondary)
                         .tracking(1.5)
@@ -166,7 +166,7 @@ struct SponsorWelcomeView: View {
     @Binding var isPresented: Bool
     var autoDismissAfter: Double? = nil
     
-    @AppStorage("somnera_sponsor_name") private var sponsorName = "Mecenas"
+    @AppStorage("somnera_sponsor_name") private var sponsorName = "Patrocinador"
     @AppStorage("somnera_equipped_totem") private var equippedTotem = "cuarzo"
     @AppStorage("somnera_unlocked_totems") private var unlockedTotems = ""
     
@@ -242,7 +242,7 @@ struct SponsorWelcomeView: View {
             VStack(spacing: 24) {
                 // Top header
                 VStack(spacing: 12) {
-                    Text("MECENAS DETECTADO")
+                    Text("PATROCINADOR DETECTADO")
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .foregroundColor(currentTotem.color)
                         .tracking(6)

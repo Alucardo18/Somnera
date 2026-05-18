@@ -666,8 +666,6 @@ final class RecordingViewModel: ObservableObject {
         print("[Somnera] 💾 Actualizando sesión: \(session.id.uuidString)")
         
         session.endDate = Date()
-        session.snoreEvents = currentSnoreEvents
-        session.apneaEvents = currentApneaEvents
         session.peakDecibels = sessionPeakDecibels
         session.decibelTimeline = decibelTimeline
         print("[Somnera] 📈 Guardando Hipnograma: \(decibelTimeline.count) muestras.")
@@ -776,6 +774,10 @@ final class RecordingViewModel: ObservableObject {
                     palatalIntensity: capturedPalatal,
                     lingualIntensity: capturedLingual
                 )
+                if let session = self.session, let context = self.sessionStorage.context {
+                    event.session = session
+                    context.insert(event)
+                }
                 self.currentSnoreEvents.append(event)
                 self.snoreEventCount = self.currentSnoreEvents.count
             }
@@ -804,6 +806,11 @@ final class RecordingViewModel: ObservableObject {
                     if confidence >= 0.4 {
                         // Sync specific event to HealthKit as an interruption (asleep -> awake)
                         try? await self.healthKitService.saveApneaEvent(at: Date(), duration: duration)
+                        
+                        if let session = self.session, let context = self.sessionStorage.context {
+                            lastEvent.session = session
+                            context.insert(lastEvent)
+                        }
                     } else {
                         self.currentApneaEvents.removeLast()
                     }

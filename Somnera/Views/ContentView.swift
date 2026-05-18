@@ -4,7 +4,7 @@ struct ContentView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var dashboard = DashboardViewModel()
-    @AppStorage("somnera_is_mecenas") private var isMecenas = false
+    @AppStorage("somnera_is_mecenas") private var isPatrocinador = false
     @State private var showSponsorWelcome = false
 
     var body: some View {
@@ -37,7 +37,7 @@ struct ContentView: View {
         .onAppear { dashboard.load() }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
-            guard isMecenas else { return }
+            guard isPatrocinador else { return }
             guard !showSponsorWelcome else { return }
             showSponsorWelcome = true
         }

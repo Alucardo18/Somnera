@@ -5,7 +5,7 @@ struct DashboardView: View {
     @State private var showRecording = false
     @State private var showCreatorMessage = false
     @EnvironmentObject var appState: AppState
-    @AppStorage("somnera_is_mecenas") private var isMecenas = false
+    @AppStorage("somnera_is_mecenas") private var isPatrocinador = false
     @AppStorage("somnera_equipped_totem") private var equippedTotem = "cuarzo"
 
     var body: some View {
@@ -99,7 +99,7 @@ struct DashboardView: View {
                             startPoint: .leading, endPoint: .trailing
                         ))
 
-                    if isMecenas {
+                    if isPatrocinador {
                         TotemBadgeView(totemId: equippedTotem)
                             .transition(.scale.combined(with: .opacity))
                     }
@@ -286,13 +286,13 @@ private struct TotemBadgeView: View {
             Circle()
                 .stroke(color.opacity(0.45), lineWidth: 1)
 
-            Totem3DView(mathType: mathType, color: color, isUnlocked: true)
+            Totem3DView(mathType: mathType, color: color, isUnlocked: true, isStatic: true)
                 // Keep the exact same animation as the equipped totem renderer; only scale it down.
                 .frame(width: 34, height: 34)
                 .scaleEffect(0.86)
         }
         .frame(width: 44, height: 44)
-        .accessibilityLabel("Insignia de mecenas")
+        .accessibilityLabel("Insignia de patrocinador")
     }
 }
 

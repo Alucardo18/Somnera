@@ -3,7 +3,7 @@ import SwiftUI
 struct DonationsView: View {
     @Environment(\.dismiss) var dismiss
     
-    @AppStorage("somnera_is_mecenas") private var isMecenas = false
+    @AppStorage("somnera_is_mecenas") private var isPatrocinador = false
     @AppStorage("somnera_unlocked_totems") private var unlockedTotems = ""
     @AppStorage("somnera_equipped_totem") private var equippedTotem = "cuarzo"
     
@@ -33,7 +33,7 @@ struct DonationsView: View {
         DonationTier(amount: "$32", subtitle: "Patrocinio de Cafeína Líquida", name: "Tótem de Cuarzo", desc: "Compra el café premium que Emmanuel necesita para no quedarse dormido sobre su propio algoritmo de detección a las 3:00 AM.", totemId: "cuarzo"),
         DonationTier(amount: "$56", subtitle: "Ritual Delta", name: "Tótem Piramidal", desc: "Sostén el desarrollo independiente mientras desbloqueas una insignia que vibra junto al logotipo.", totemId: "piramide"),
         DonationTier(amount: "$128", subtitle: "Anillo Topográfico", name: "Tótem Giroscópico", desc: "Potencia el laboratorio y desbloquea una geometría dorada con memoria persistente.", totemId: "giroscopio"),
-        DonationTier(amount: "$264", subtitle: "Hipercubo del Silencio", name: "Tótem Tesseracto", desc: "Apoya el motor clínico y desbloquea una reliquia que aparece en tu certificado de mecenas.", totemId: "tesseracto"),
+        DonationTier(amount: "$264", subtitle: "Hipercubo del Silencio", name: "Tótem Tesseracto", desc: "Apoya el motor clínico y desbloquea una reliquia que aparece en tu certificado de patrocinador.", totemId: "tesseracto"),
         DonationTier(amount: "$512", subtitle: "Sinergia Viva", name: "Tótem de Hélice", desc: "Desbloquea un emblema de sinergia que acompaña tu logo y celebra tu constancia.", totemId: "helice"),
         DonationTier(amount: "$1024", subtitle: "Astrolabio Áureo", name: "Tótem del Origen", desc: "Mantiene el proyecto libre de anuncios y activa un emblema de precisión estelar.", totemId: "astrolabio"),
         DonationTier(amount: "$2048", subtitle: "Singularidad Suprema", name: "Tótem Final", desc: "El apoyo definitivo: desbloquea la pieza de colección que trasciende el plano físico.", totemId: "singularidad")
@@ -154,7 +154,7 @@ struct DonationsView: View {
                                                     .frame(width: 76, height: 76)
 
                                                 if isTotemUnlocked(tier.totemId) {
-                                                    Totem3DView(mathType: totems[totemIdx].mathType, color: totems[totemIdx].color, isUnlocked: true)
+                                                    Totem3DView(mathType: totems[totemIdx].mathType, color: totems[totemIdx].color, isUnlocked: true, isStatic: true)
                                                         .frame(width: 44, height: 44)
                                                 } else {
                                                     Image(systemName: "lock.fill")
@@ -228,7 +228,7 @@ struct DonationsView: View {
                     }
                 }
             }
-            .navigationTitle("Mecenas")
+            .navigationTitle("Patrocinador")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -358,8 +358,8 @@ struct DonationsView: View {
                 paymentState = .success
             }
             
-            // Register mecenas status and unlock totem
-            isMecenas = true
+            // Register patrocinador status and unlock totem
+            isPatrocinador = true
             if !unlockedTotems.contains(newlyUnlockedTotemId) {
                 if unlockedTotems.isEmpty {
                     unlockedTotems = newlyUnlockedTotemId
@@ -409,12 +409,13 @@ struct Totem3DView: View {
     let mathType: TotemMathType
     let color: Color
     let isUnlocked: Bool
+    var isStatic: Bool = false
     @Environment(\.scenePhase) private var scenePhase
     @State private var isAnimating = true
     
     var body: some View {
         Group {
-            if isAnimating {
+            if isAnimating && !isStatic {
                 TimelineView(.periodic(from: .now, by: 1.0 / 24.0)) { timeline in
                     TotemCanvasView(time: timeline.date.timeIntervalSinceReferenceDate)
                 }
@@ -659,12 +660,59 @@ struct Totem3DView: View {
         }
     }
     
-    // HELIX: Synergy Double Helix (ADN)
+    // HELIX: Synergy Double Helix (ADN) with Winged Aura (Totem Alado)
     private func drawHelix(context: GraphicsContext, midX: CGFloat, midY: CGFloat, time: Double, color: Color) {
         let t = time * 2.0
         let steps = 11
         let amplitude: CGFloat = 24
         let totalHeight: CGFloat = 80
+        
+        // Draw majestic energy wings flanking the helix (Winged Totem "Totem Alado")
+        let wingPulse = CGFloat(sin(time * 2.2)) * 6.0
+        let ribCount = 3
+        
+        for j in 0..<ribCount {
+            let ratio = CGFloat(j) / CGFloat(ribCount - 1)
+            let yStart = midY - 15 + CGFloat(j) * 15
+            
+            // Left wing rib
+            var wingLeft = Path()
+            let startL = CGPoint(x: midX, y: yStart)
+            // Symmetrical sweep outwards and upwards
+            let endL = CGPoint(
+                x: midX - 22 - CGFloat(j) * 12 - wingPulse * 1.2,
+                y: midY - 45 + CGFloat(j) * 10 - wingPulse * 0.6
+            )
+            let controlL = CGPoint(
+                x: midX - 35 - CGFloat(j) * 5 - wingPulse * 0.8,
+                y: midY - 15 - wingPulse * 0.3
+            )
+            wingLeft.move(to: startL)
+            wingLeft.addQuadCurve(to: endL, control: controlL)
+            
+            context.stroke(wingLeft, with: .color(color.opacity(0.4 - Double(j) * 0.1)), lineWidth: 1.2 - CGFloat(j) * 0.2)
+            
+            // Right wing rib
+            var wingRight = Path()
+            let startR = CGPoint(x: midX, y: yStart)
+            let endR = CGPoint(
+                x: midX + 22 + CGFloat(j) * 12 + wingPulse * 1.2,
+                y: midY - 45 + CGFloat(j) * 10 - wingPulse * 0.6
+            )
+            let controlR = CGPoint(
+                x: midX + 35 + CGFloat(j) * 5 + wingPulse * 0.8,
+                y: midY - 15 - wingPulse * 0.3
+            )
+            wingRight.move(to: startR)
+            wingRight.addQuadCurve(to: endR, control: controlR)
+            
+            context.stroke(wingRight, with: .color(color.opacity(0.4 - Double(j) * 0.1)), lineWidth: 1.2 - CGFloat(j) * 0.2)
+            
+            // Glowing tips of the wings
+            let tipSize: CGFloat = 3.0 + CGFloat(sin(time * 3.0 + Double(j))) * 0.8
+            context.fill(Circle().path(in: CGRect(x: endL.x - tipSize/2, y: endL.y - tipSize/2, width: tipSize, height: tipSize)), with: .color(color))
+            context.fill(Circle().path(in: CGRect(x: endR.x - tipSize/2, y: endR.y - tipSize/2, width: tipSize, height: tipSize)), with: .color(color))
+        }
         
         var pointsA: [CGPoint] = []
         var pointsB: [CGPoint] = []
@@ -752,7 +800,7 @@ struct Totem3DView: View {
         context.fill(Circle().path(in: CGRect(x: midX - 4, y: midY - 4, width: 8, height: 8)), with: .color(color))
     }
     
-        // SINGULARITY: Einsteinian Accretion Lens Black Hole
+        // SINGULARITY: Einsteinian Accretion Lens Black Hole with realistic 3D Depth Orbiting Layers
         private func drawSingularity(context: GraphicsContext, midX: CGFloat, midY: CGFloat, time: Double, color: Color) {
             var context = context
             let coreRadius: CGFloat = 21
@@ -764,47 +812,11 @@ struct Totem3DView: View {
             let gold = Color(hex: "#F5D37A")
             let accentNebula = Color.somAccent
             
-            // Nebula (Somnera accent haze)
-            context.drawLayer { localContext in
-                localContext.addFilter(.blur(radius: 26))
-                
-                let drift = CGFloat(sin(time * 0.6)) * 6
-                let hazeRect = CGRect(x: midX - 58 + drift, y: midY - 46, width: 116, height: 92)
-                localContext.fill(
-                    Path(ellipseIn: hazeRect),
-                    with: .color(accentNebula.opacity(0.10))
-                )
-                
-                let hazeRect2 = CGRect(x: midX - 44, y: midY - 64 + drift * 0.6, width: 88, height: 128)
-                localContext.fill(
-                    Path(ellipseIn: hazeRect2),
-                    with: .color(accentNebula.opacity(0.06))
-                )
-            }
-            
-            // Subtle lens glow around the horizon
-            context.drawLayer { localContext in
-                localContext.addFilter(.blur(radius: 14))
-                let glow = coreRadius * 2.2 + CGFloat(sin(time * 1.6)) * 2
-                let rect = CGRect(x: midX - glow, y: midY - glow, width: glow * 2, height: glow * 2)
-                localContext.fill(Path(ellipseIn: rect), with: .color(accentNebula.opacity(0.18)))
-                localContext.fill(Path(ellipseIn: rect.insetBy(dx: 8, dy: 8)), with: .color(gold.opacity(0.08)))
-            }
-            
-            // Obsidian event horizon core (slight specular, faint rim)
-            let coreRect = CGRect(x: midX - coreRadius, y: midY - coreRadius, width: coreRadius * 2, height: coreRadius * 2)
-            context.fill(Path(ellipseIn: coreRect), with: .color(obsidian))
-            context.stroke(Path(ellipseIn: coreRect), with: .color(accentNebula.opacity(0.25)), lineWidth: 1)
-            
-            // Specular highlight to sell "obsidian"
-            context.drawLayer { localContext in
-                localContext.addFilter(.blur(radius: 8))
-                let highlightRect = CGRect(x: midX - coreRadius * 0.9, y: midY - coreRadius * 1.1, width: coreRadius * 1.4, height: coreRadius * 1.1)
-                localContext.fill(Path(ellipseIn: highlightRect), with: .color(Color.white.opacity(0.05)))
-            }
-            
-            // Gold particles orbiting (accretion swarm)
+            // Pre-calculate all particle properties for consistent depth sorting
             let particleCount = 16
+            var backgroundParticles: [(point: CGPoint, size: CGFloat, opacity: CGFloat)] = []
+            var foregroundParticles: [(point: CGPoint, size: CGFloat, opacity: CGFloat)] = []
+            
             for i in 0..<particleCount {
                 let phase = Double(i) * (2.0 * .pi / Double(particleCount))
                 let speed = 1.35 + Double(i % 3) * 0.18
@@ -820,20 +832,110 @@ struct Totem3DView: View {
                 let sparkle = 1.6 + CGFloat(sin(time * 2.2 + phase)) * 0.9
                 let alpha = 0.35 + (CGFloat(cos(angle + .pi / 2)) + 1) * 0.18
                 
-                let pRect = CGRect(x: x - sparkle * 0.5, y: y - sparkle * 0.5, width: sparkle, height: sparkle)
-                context.fill(Path(ellipseIn: pRect), with: .color(gold.opacity(alpha)))
+                let particleData = (point: CGPoint(x: x, y: y), size: sparkle, opacity: alpha)
+                
+                // If angle's sin is negative, it's behind the central sphere (background)
+                if sin(angle) < 0 {
+                    backgroundParticles.append(particleData)
+                } else {
+                    foregroundParticles.append(particleData)
+                }
             }
             
-            // Golden orbit ring hint (very faint)
-            var ring = Path()
+            // 1. Draw background particles (Behind the core)
+            for p in backgroundParticles {
+                let pRect = CGRect(x: p.point.x - p.size * 0.5, y: p.point.y - p.size * 0.5, width: p.size, height: p.size)
+                context.fill(Path(ellipseIn: pRect), with: .color(gold.opacity(p.opacity * 0.7)))
+            }
+            
+            // 2. Draw back half of the golden orbit ring
+            var ringBack = Path()
             let ringSteps = 54
+            var firstBack = true
             for s in 0...ringSteps {
                 let a = Double(s) * 2.0 * .pi / Double(ringSteps)
-                let x = midX + CGFloat(cos(a)) * orbitRadius
-                let y = midY - 5 + CGFloat(sin(a)) * orbitRadius * 0.34
-                if s == 0 { ring.move(to: .init(x: x, y: y)) } else { ring.addLine(to: .init(x: x, y: y)) }
+                if sin(a) < 0 {
+                    let x = midX + CGFloat(cos(a)) * orbitRadius
+                    let y = midY - 5 + CGFloat(sin(a)) * orbitRadius * 0.34
+                    if firstBack {
+                        ringBack.move(to: CGPoint(x: x, y: y))
+                        firstBack = false
+                    } else {
+                        ringBack.addLine(to: CGPoint(x: x, y: y))
+                    }
+                }
             }
-            context.stroke(ring, with: .color(gold.opacity(0.10)), lineWidth: 1)
+            context.stroke(ringBack, with: .color(gold.opacity(0.08)), lineWidth: 1)
+            
+            // 3. Draw Nebula (Somnera accent haze) using GPU-accelerated radial gradients
+            let drift = CGFloat(sin(time * 0.6)) * 6
+            let hazeRect = CGRect(x: midX - 58 + drift, y: midY - 46, width: 116, height: 92)
+            let nebulaShader1 = GraphicsContext.Shading.radialGradient(
+                Gradient(colors: [accentNebula.opacity(0.12), .clear]),
+                center: CGPoint(x: hazeRect.midX, y: hazeRect.midY),
+                startRadius: 0,
+                endRadius: hazeRect.width * 0.5
+            )
+            context.fill(Path(ellipseIn: hazeRect), with: nebulaShader1)
+            
+            let hazeRect2 = CGRect(x: midX - 44, y: midY - 64 + drift * 0.6, width: 88, height: 128)
+            let nebulaShader2 = GraphicsContext.Shading.radialGradient(
+                Gradient(colors: [accentNebula.opacity(0.07), .clear]),
+                center: CGPoint(x: hazeRect2.midX, y: hazeRect2.midY),
+                startRadius: 0,
+                endRadius: hazeRect2.height * 0.5
+            )
+            context.fill(Path(ellipseIn: hazeRect2), with: nebulaShader2)
+            
+            // 4. Draw Event Horizon Accretion Glow (soft lens glow) using GPU-accelerated radial gradient
+            let glow = coreRadius * 2.2 + CGFloat(sin(time * 1.6)) * 2
+            let glowRect = CGRect(x: midX - glow, y: midY - glow, width: glow * 2, height: glow * 2)
+            let horizonShader = GraphicsContext.Shading.radialGradient(
+                Gradient(colors: [accentNebula.opacity(0.22), gold.opacity(0.08), .clear]),
+                center: CGPoint(x: midX, y: midY),
+                startRadius: coreRadius * 0.8,
+                endRadius: glow
+            )
+            context.fill(Path(ellipseIn: glowRect), with: horizonShader)
+            
+            // 5. Draw Obsidian Core void
+            let coreRect = CGRect(x: midX - coreRadius, y: midY - coreRadius, width: coreRadius * 2, height: coreRadius * 2)
+            context.fill(Path(ellipseIn: coreRect), with: .color(obsidian))
+            context.stroke(Path(ellipseIn: coreRect), with: .color(accentNebula.opacity(0.25)), lineWidth: 1)
+            
+            // Specular highlight to sell obsidian material using GPU-accelerated radial gradient
+            let highlightRect = CGRect(x: midX - coreRadius * 0.9, y: midY - coreRadius * 1.1, width: coreRadius * 1.4, height: coreRadius * 1.1)
+            let specularShader = GraphicsContext.Shading.radialGradient(
+                Gradient(colors: [Color.white.opacity(0.07), .clear]),
+                center: CGPoint(x: highlightRect.midX, y: highlightRect.midY),
+                startRadius: 0,
+                endRadius: highlightRect.width * 0.5
+            )
+            context.fill(Path(ellipseIn: highlightRect), with: specularShader)
+            
+            // 6. Draw front half of the golden orbit ring
+            var ringFront = Path()
+            var firstFront = true
+            for s in 0...ringSteps {
+                let a = Double(s) * 2.0 * .pi / Double(ringSteps)
+                if sin(a) >= 0 {
+                    let x = midX + CGFloat(cos(a)) * orbitRadius
+                    let y = midY - 5 + CGFloat(sin(a)) * orbitRadius * 0.34
+                    if firstFront {
+                        ringFront.move(to: CGPoint(x: x, y: y))
+                        firstFront = false
+                    } else {
+                        ringFront.addLine(to: CGPoint(x: x, y: y))
+                    }
+                }
+            }
+            context.stroke(ringFront, with: .color(gold.opacity(0.12)), lineWidth: 1.2)
+            
+            // 7. Draw foreground particles (In front of the core)
+            for p in foregroundParticles {
+                let pRect = CGRect(x: p.point.x - p.size * 0.5, y: p.point.y - p.size * 0.5, width: p.size, height: p.size)
+                context.fill(Path(ellipseIn: pRect), with: .color(gold.opacity(p.opacity)))
+            }
         }
     }
 
