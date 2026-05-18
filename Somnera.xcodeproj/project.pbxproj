@@ -35,6 +35,7 @@
 		6F799ED0F368847C1177C3BC /* SynergyIntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDC3E71C37F4544E7DEA8371 /* SynergyIntroView.swift */; };
 		714A7667F387BCE0895FA03B /* SynergyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282DB09338C6AD9D1CB9EAB2 /* SynergyView.swift */; };
 		75B60EE4D6DA102CA711957E /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5394E29B5A0C2BAB2CE84C3D /* HealthKitService.swift */; };
+		7A5F9C7EFFC381CD2B3C0875 /* DonationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D768493E76295E795FCD3F4 /* DonationsView.swift */; };
 		7DB6162BE85B4D229CD1451E /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 560F26113D7731C71EA988F1 /* SessionListView.swift */; };
 		8EC0E3DFEC5EA1D981D309DD /* HighlightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E07F10F08F4F429A8839E280 /* HighlightsView.swift */; };
 		9B1EDD71F2E7830C3AA06398 /* RecordingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2CDFF3AAE5762CBD959BED /* RecordingViewModel.swift */; };
@@ -56,6 +57,7 @@
 		D421ECCADD274DE920B43A9A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C3E86F3D5316977DDE2DD56B /* Assets.xcassets */; };
 		E3A4D275F4A7697755B399F0 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44757D08C8733C3E1E37DE1E /* Constants.swift */; };
 		EDD99E37045ACDD3F35C6409 /* SynergyHelixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E626FE4C65AA7766A19BB3 /* SynergyHelixView.swift */; };
+		EEED746D11FDCA919889F13F /* SponsorWelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F2CD7552FD4AB0E1C3464F1 /* SponsorWelcomeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,6 +69,7 @@
 		18D276AE55AD993017F0F0BE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		18F8753C37E0A8EBA772DD30 /* SomneraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SomneraApp.swift; sourceTree = "<group>"; };
 		1D290828FE3AE170D4715CD5 /* SynergyDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynergyDetailView.swift; sourceTree = "<group>"; };
+		1D768493E76295E795FCD3F4 /* DonationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationsView.swift; sourceTree = "<group>"; };
 		1F6DCB5A701234D74777DD6F /* NightHeatmapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightHeatmapView.swift; sourceTree = "<group>"; };
 		1FE9B522D4105FC040519727 /* PSGTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSGTimelineView.swift; sourceTree = "<group>"; };
 		1FEDBB312C5EB7200C5F4171 /* DSPFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSPFilter.swift; sourceTree = "<group>"; };
@@ -79,6 +82,7 @@
 		3C00C4A3B082D2D56B13851C /* sparkle1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = sparkle1.mp3; sourceTree = "<group>"; };
 		44757D08C8733C3E1E37DE1E /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		4613D56AF3EA5A97B4F56D7F /* Somnera.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Somnera.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F2CD7552FD4AB0E1C3464F1 /* SponsorWelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorWelcomeView.swift; sourceTree = "<group>"; };
 		5394E29B5A0C2BAB2CE84C3D /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		560F26113D7731C71EA988F1 /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
 		57EE0EB93E7FFF684806E21B /* Somnera.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Somnera.entitlements; sourceTree = "<group>"; };
@@ -215,7 +219,9 @@
 			isa = PBXGroup;
 			children = (
 				ABCCF241CD3C994C70F32EAF /* CreatorMessageView.swift */,
+				1D768493E76295E795FCD3F4 /* DonationsView.swift */,
 				18D276AE55AD993017F0F0BE /* SettingsView.swift */,
+				4F2CD7552FD4AB0E1C3464F1 /* SponsorWelcomeView.swift */,
 				C73BD85843E37370605B41E3 /* TechInsightsView.swift */,
 			);
 			path = Settings;
@@ -438,6 +444,7 @@
 				9C3CFA597C1D9B344F71D606 /* DSPFilter.swift in Sources */,
 				5114794DA9C8CCD290FAA12B /* DashboardView.swift in Sources */,
 				587A4FE7723EA8BAB43BE9FA /* DashboardViewModel.swift in Sources */,
+				7A5F9C7EFFC381CD2B3C0875 /* DonationsView.swift in Sources */,
 				75B60EE4D6DA102CA711957E /* HealthKitService.swift in Sources */,
 				8EC0E3DFEC5EA1D981D309DD /* HighlightsView.swift in Sources */,
 				CB5CBD8EBA8EBAE2E2940F36 /* MotionDetectionService.swift in Sources */,
@@ -460,6 +467,7 @@
 				44F2265B0C725580928F10DA /* SomneraApp.swift in Sources */,
 				D29EF7E10DE9B2D727384D5B /* SomneraColors.swift in Sources */,
 				00773AC1AB4EB65BBD23B2A1 /* SpectralAnalysisService.swift in Sources */,
+				EEED746D11FDCA919889F13F /* SponsorWelcomeView.swift in Sources */,
 				2C3D1E78CCB6047DF0296A7C /* SynergyDetailView.swift in Sources */,
 				CF4D8DE331E0653A163C492F /* SynergyGuideView.swift in Sources */,
 				EDD99E37045ACDD3F35C6409 /* SynergyHelixView.swift in Sources */,
