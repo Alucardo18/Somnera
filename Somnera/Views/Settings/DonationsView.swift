@@ -472,28 +472,55 @@ struct Totem3DView: View {
         }
     }
     
-    // CRYSTAL: Double Pyramidal Octahedron
+    // CRYSTAL: Faceted Black Obsidian Quartz with Breathing Accent Glow & Ultra-slow Cinematic Rotation
     private func drawCrystal(context: GraphicsContext, midX: CGFloat, midY: CGFloat, time: Double, color: Color) {
-        let t = time * 0.8
-        let radiusX: CGFloat = 35
-        let radiusY: CGFloat = 16
-        let height: CGFloat = 55
+        var context = context
         
-        let top = CGPoint(x: midX, y: midY - height)
-        let bottom = CGPoint(x: midX, y: midY + height)
+        // 1. Slow, high-end movement parameters
+        let t = time * 0.18 // Very slow cinematic rotation
+        let driftY = CGFloat(sin(time * 0.7)) * 4.0 // Gentle levitation drift
+        let currentMidY = midY + driftY
         
+        let radiusX: CGFloat = 28
+        let radiusY: CGFloat = 10
+        let height: CGFloat = 62
+        
+        let top = CGPoint(x: midX, y: currentMidY - height)
+        let bottom = CGPoint(x: midX, y: currentMidY + height)
+        
+        // 2. Accent Breathing Glow (Draw soft radial aura behind the crystal)
+        let pulseGlow = 0.65 + 0.15 * CGFloat(sin(time * 1.2))
+        let glowRect = CGRect(x: midX - 60, y: currentMidY - 70, width: 120, height: 140)
+        let glowShader = GraphicsContext.Shading.radialGradient(
+            Gradient(colors: [color.opacity(0.18 * Double(pulseGlow)), .clear]),
+            center: CGPoint(x: midX, y: currentMidY),
+            startRadius: 0,
+            endRadius: 55
+        )
+        context.fill(Path(ellipseIn: glowRect), with: glowShader)
+        
+        // 3. Pre-calculate the 4 equatorial points of the crystal rotating slowly
         var points: [CGPoint] = []
         for i in 0..<4 {
             let angle = t + Double(i) * .pi / 2
             let x = midX + CGFloat(cos(angle)) * radiusX
-            let y = midY + CGFloat(sin(angle)) * radiusY
+            let y = currentMidY + CGFloat(sin(angle)) * radiusY
             points.append(CGPoint(x: x, y: y))
         }
         
-        // Draw sides
+        // 4. Draw Obsidian Facets (Depth sorted to look 3D and solid)
+        let obsidianBase = Color(hex: "#05060A")
+        let obsidianHighlight = Color(hex: "#10131A")
+        
         for i in 0..<4 {
             let p1 = points[i]
             let p2 = points[(i + 1) % 4]
+            
+            let angleCenter = t + Double(i) * .pi / 2 + .pi / 4
+            let cosFacing = cos(angleCenter)
+            
+            let topColor = cosFacing > 0 ? obsidianHighlight : obsidianBase
+            let botColor = cosFacing > 0 ? obsidianBase.opacity(0.9) : obsidianBase.opacity(0.7)
             
             // Top pyramid face
             var pathTop = Path()
@@ -501,8 +528,10 @@ struct Totem3DView: View {
             pathTop.addLine(to: p1)
             pathTop.addLine(to: p2)
             pathTop.closeSubpath()
-            context.stroke(pathTop, with: .color(color.opacity(0.6)), lineWidth: 1.0)
-            context.fill(pathTop, with: .color(color.opacity(0.08)))
+            
+            context.fill(pathTop, with: .color(topColor))
+            let borderOpacity = cosFacing > 0 ? 0.65 : 0.2
+            context.stroke(pathTop, with: .color(color.opacity(borderOpacity)), lineWidth: 0.8)
             
             // Bottom pyramid face
             var pathBot = Path()
@@ -510,18 +539,30 @@ struct Totem3DView: View {
             pathBot.addLine(to: p1)
             pathBot.addLine(to: p2)
             pathBot.closeSubpath()
-            context.stroke(pathBot, with: .color(color.opacity(0.6)), lineWidth: 1.0)
-            context.fill(pathBot, with: .color(color.opacity(0.08)))
+            
+            context.fill(pathBot, with: .color(botColor))
+            context.stroke(pathBot, with: .color(color.opacity(borderOpacity * 0.7)), lineWidth: 0.8)
         }
         
-        // Draw equator line
+        // 5. Draw Equator Ridge Line
         var equator = Path()
         equator.move(to: points[0])
         for p in points.dropFirst() {
             equator.addLine(to: p)
         }
         equator.closeSubpath()
-        context.stroke(equator, with: .color(color), lineWidth: 1.5)
+        context.stroke(equator, with: .color(color.opacity(0.55)), lineWidth: 1.0)
+        
+        // 6. Draw Glossy Specular Glass Flare on one of the front edges
+        if let frontVertex = points.max(by: { $0.y < $1.y }) {
+            var flarePath = Path()
+            flarePath.move(to: top)
+            flarePath.addLine(to: frontVertex)
+            flarePath.addLine(to: bottom)
+            
+            let glossColor = Color.white.opacity(0.55)
+            context.stroke(flarePath, with: .color(glossColor), lineWidth: 1.2)
+        }
     }
     
     // PYRAMID: Delta Wave Tetrahedron
