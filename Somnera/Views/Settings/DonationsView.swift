@@ -805,46 +805,109 @@ struct Totem3DView: View {
         context.stroke(railB, with: .color(color.opacity(0.5)), lineWidth: 1.2)
     }
     
-    // ASTROLABE: Astrological Celestial Mechanism
+    // RESONANCE KNOT: 3D Lissajous Harmonic Resonance Curve representing Snore Origin (Nasal, Palatal, Lingual)
+    // Formerly Astrolabe. Renders a continuous glass ribbon in 3D projection rotating slowly with flowing energy pearls.
     private func drawAstrolabe(context: GraphicsContext, midX: CGFloat, midY: CGFloat, time: Double, color: Color) {
-        let t = time * 0.4
-        let baseRadius: CGFloat = 45
+        var context = context
         
-        // 1. Outer celestial coordinate circle (Dotted ring)
-        let outerRect = CGRect(x: midX - baseRadius, y: midY - baseRadius, width: baseRadius*2, height: baseRadius*2)
-        context.stroke(Circle().path(in: outerRect), with: .color(color.opacity(0.2)), style: StrokeStyle(lineWidth: 1, dash: [4, 4]))
+        let t = time * 0.35 // Cinematic slow rotation
+        let floatY = CGFloat(sin(time * 0.75)) * 3.0 // Gentle breathing drift
+        let currentMidY = midY + floatY
         
-        // 2. Solid brass ring
-        let midRect = CGRect(x: midX - baseRadius * 0.85, y: midY - baseRadius * 0.85, width: baseRadius * 1.7, height: baseRadius * 1.7)
-        context.stroke(Circle().path(in: midRect), with: .color(color.opacity(0.5)), lineWidth: 1.5)
+        let radiusX: CGFloat = 38
+        let radiusY: CGFloat = 38
+        let radiusZ: CGFloat = 20
         
-        // 3. Rotating coordinate lines
-        let lineCount = 8
-        for i in 0..<lineCount {
-            let angle = t + Double(i) * .pi / Double(lineCount/2)
-            let length = baseRadius * 0.85
-            let endX = midX + CGFloat(cos(angle)) * length
-            let endY = midY + CGFloat(sin(angle)) * length
+        // 3D rotation angles
+        let rotY = t
+        let rotX = t * 0.45
+        
+        // Helper function to project a 3D Lissajous point to 2D screen coordinate with depth (z)
+        func project(theta: Double) -> (point: CGPoint, z: CGFloat) {
+            // Lissajous frequencies (a=2, b=3, c=1) producing a gorgeous infinite knot
+            let x0 = sin(2.0 * theta) * Double(radiusX)
+            let y0 = cos(3.0 * theta) * Double(radiusY)
+            let z0 = sin(1.0 * theta) * Double(radiusZ)
             
-            var coordLine = Path()
-            coordLine.move(to: CGPoint(x: midX, y: midY))
-            coordLine.addLine(to: CGPoint(x: endX, y: endY))
-            context.stroke(coordLine, with: .color(color.opacity(0.25)), lineWidth: 0.8)
+            // Rotate around Y-axis
+            let x1 = x0 * cos(rotY) - z0 * sin(rotY)
+            let z1 = x0 * sin(rotY) + z0 * cos(rotY)
+            
+            // Rotate around X-axis
+            let y2 = y0 * cos(rotX) - z1 * sin(rotX)
+            let z2 = y0 * sin(rotX) + z1 * cos(rotX)
+            
+            return (CGPoint(x: midX + CGFloat(x1), y: currentMidY + CGFloat(y2)), CGFloat(z2))
         }
         
-        // 4. Astrolabe Reti/Pointer (Thick needle)
-        let needleAngle = -t * 2.2
-        let needleLen = baseRadius * 0.75
-        let needleX = midX + CGFloat(cos(needleAngle)) * needleLen
-        let needleY = midY + CGFloat(sin(needleAngle)) * needleLen
+        // 1. Draw a soft ambient glow behind the resonance knot
+        let glowRect = CGRect(x: midX - 60, y: currentMidY - 60, width: 120, height: 120)
+        let glowShader = GraphicsContext.Shading.radialGradient(
+            Gradient(colors: [color.opacity(0.15), .clear]),
+            center: CGPoint(x: midX, y: currentMidY),
+            startRadius: 0,
+            endRadius: 55
+        )
+        context.fill(Path(ellipseIn: glowRect), with: glowShader)
         
-        var needle = Path()
-        needle.move(to: CGPoint(x: midX, y: midY))
-        needle.addLine(to: CGPoint(x: needleX, y: needleY))
-        context.stroke(needle, with: .color(color), lineWidth: 2.0)
+        // 2. Generate 3D projected points
+        let stepCount = 90
+        var projectedPoints: [(point: CGPoint, z: CGFloat)] = []
+        for i in 0...stepCount {
+            let theta = Double(i) * 2.0 * .pi / Double(stepCount)
+            projectedPoints.append(project(theta: theta))
+        }
         
-        // Core brass center node
-        context.fill(Circle().path(in: CGRect(x: midX - 4, y: midY - 4, width: 8, height: 8)), with: .color(color))
+        // 3. Render the continuous 3D glass ribbon
+        // We draw individual segments and map their opacity and thickness to their depth (z) to create a perfect 3D effect.
+        let maxZ: CGFloat = radiusZ * 1.5
+        
+        for i in 0..<stepCount {
+            let p1 = projectedPoints[i]
+            let p2 = projectedPoints[i+1]
+            
+            let avgZ = (p1.z + p2.z) / 2.0
+            // Normalize z to a 0.0 ... 1.0 range
+            let zNorm = (avgZ + maxZ) / (2.0 * maxZ)
+            let clampedZNorm = min(max(zNorm, 0.0), 1.0)
+            
+            let segmentOpacity = 0.18 + 0.62 * clampedZNorm
+            let segmentWidth = 1.0 + 2.2 * clampedZNorm
+            
+            var path = Path()
+            path.move(to: p1.point)
+            path.addLine(to: p2.point)
+            
+            // Draw a wider underlying glass shadow for depth
+            context.stroke(path, with: .color(color.opacity(segmentOpacity * 0.3)), lineWidth: segmentWidth * 2.0)
+            // Draw the core glowing neon line
+            context.stroke(path, with: .color(color.opacity(segmentOpacity)), lineWidth: segmentWidth)
+        }
+        
+        // 4. Draw Flowing Energy Pearls (3 nodes of light representing Nasal, Palatal, Lingual pathways)
+        let pearlCount = 3
+        for k in 0..<pearlCount {
+            let progress = time * 0.45 + Double(k) * (2.0 * .pi / Double(pearlCount))
+            let wrappedProgress = progress.truncatingRemainder(dividingBy: 2.0 * .pi)
+            
+            let pearlProj = project(theta: wrappedProgress)
+            let zNorm = (pearlProj.z + maxZ) / (2.0 * maxZ)
+            let clampedZNorm = min(max(zNorm, 0.0), 1.0)
+            
+            let sizeGlow = 8.0 * (0.8 + 0.6 * clampedZNorm)
+            let sizeCore = 3.0 * (0.8 + 0.6 * clampedZNorm)
+            let pearlOpacity = 0.3 + 0.7 * clampedZNorm
+            
+            let pearlCenter = pearlProj.point
+            
+            // Outer intense glow aura
+            let glowRect = CGRect(x: pearlCenter.x - sizeGlow/2, y: pearlCenter.y - sizeGlow/2, width: sizeGlow, height: sizeGlow)
+            context.fill(Circle().path(in: glowRect), with: .color(color.opacity(pearlOpacity * 0.8)))
+            
+            // Core white light flare
+            let coreRect = CGRect(x: pearlCenter.x - sizeCore/2, y: pearlCenter.y - sizeCore/2, width: sizeCore, height: sizeCore)
+            context.fill(Circle().path(in: coreRect), with: .color(Color.white.opacity(pearlOpacity)))
+        }
     }
     
         // SINGULARITY: 3D Flat Accretion Disk Black Hole using Somnera Brand Accent Gas and dynamic depth sorting
