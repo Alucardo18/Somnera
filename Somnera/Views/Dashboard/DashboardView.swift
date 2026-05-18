@@ -252,7 +252,6 @@ struct ScoreCardView: View {
 
 private struct TotemBadgeView: View {
     let totemId: String
-    @State private var spin = false
 
     private var color: Color {
         switch totemId {
@@ -288,14 +287,11 @@ private struct TotemBadgeView: View {
                 .stroke(color.opacity(0.45), lineWidth: 1)
 
             Totem3DView(mathType: mathType, color: color, isUnlocked: true)
-                .frame(width: 26, height: 26)
-                .scaleEffect(0.92)
-                .rotationEffect(.degrees(spin ? 360 : 0))
-                .animation(.linear(duration: 18.0).repeatForever(autoreverses: false), value: spin)
+                // Keep the exact same animation as the equipped totem renderer; only scale it down.
+                .frame(width: 34, height: 34)
+                .scaleEffect(0.86)
         }
-        .frame(width: 32, height: 32)
-        .clipShape(Circle())
-        .onAppear { spin = true }
+        .frame(width: 44, height: 44)
         .accessibilityLabel("Insignia de mecenas")
     }
 }
