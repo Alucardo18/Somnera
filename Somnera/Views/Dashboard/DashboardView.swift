@@ -5,6 +5,8 @@ struct DashboardView: View {
     @State private var showRecording = false
     @State private var showCreatorMessage = false
     @EnvironmentObject var appState: AppState
+    @AppStorage("somnera_is_mecenas") private var isMecenas = false
+    @AppStorage("somnera_equipped_totem") private var equippedTotem = "cuarzo"
 
     var body: some View {
         NavigationStack {
@@ -89,12 +91,19 @@ struct DashboardView: View {
     private var headerSection: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Somnera")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundStyle(LinearGradient(
-                        colors: [.somAccent, Color(hex: "#4A90D9")],
-                        startPoint: .leading, endPoint: .trailing
-                    ))
+                HStack(spacing: 10) {
+                    Text("Somnera")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundStyle(LinearGradient(
+                            colors: [.somAccent, Color(hex: "#4A90D9")],
+                            startPoint: .leading, endPoint: .trailing
+                        ))
+
+                    if isMecenas {
+                        TotemBadgeView(totemId: equippedTotem)
+                            .transition(.scale.combined(with: .opacity))
+                    }
+                }
                 Text(Date().formatted(.dateTime.weekday(.wide).day().month()))
                     .font(.subheadline)
                     .foregroundColor(.somTextSecondary)
@@ -238,6 +247,55 @@ struct ScoreCardView: View {
                 .font(.caption.bold())
                 .foregroundColor(color)
         }
+    }
+}
+
+private struct TotemBadgeView: View {
+    let totemId: String
+    @State private var spin = false
+
+    private var color: Color {
+        switch totemId {
+        case "cuarzo": return .somSafe
+        case "piramide": return .somAccent
+        case "giroscopio": return .somWarning
+        case "tesseracto": return .somApnea
+        case "helice": return .somSafe
+        case "astrolabio": return .somWarning
+        case "singularidad": return .somWarning
+        default: return .somAccent
+        }
+    }
+
+    private var symbol: String {
+        switch totemId {
+        case "cuarzo": return "sparkle"
+        case "piramide": return "triangle.fill"
+        case "giroscopio": return "gyroscope"
+        case "tesseracto": return "cube.transparent.fill"
+        case "helice": return "waveform.path.ecg"
+        case "astrolabio": return "sun.max.fill"
+        case "singularidad": return "circle.dotted.circle.fill"
+        default: return "seal.fill"
+        }
+    }
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(color.opacity(0.12))
+            Circle()
+                .stroke(color.opacity(0.45), lineWidth: 1)
+
+            Image(systemName: symbol)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(color)
+                .rotationEffect(.degrees(spin ? 360 : 0))
+                .animation(.linear(duration: 7.0).repeatForever(autoreverses: false), value: spin)
+        }
+        .frame(width: 22, height: 22)
+        .onAppear { spin = true }
+        .accessibilityLabel("Insignia de mecenas")
     }
 }
 

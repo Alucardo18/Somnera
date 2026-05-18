@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SponsorWelcomeView: View {
     @Binding var isPresented: Bool
+    var autoDismissAfter: Double? = nil
     
     @AppStorage("somnera_sponsor_name") private var sponsorName = "Mecenas"
     @AppStorage("somnera_equipped_totem") private var equippedTotem = "cuarzo"
@@ -170,6 +171,14 @@ struct SponsorWelcomeView: View {
             
             withAnimation(.easeOut(duration: 1.0).delay(0.3)) {
                 animateText = true
+            }
+
+            if let autoDismissAfter {
+                DispatchQueue.main.asyncAfter(deadline: .now() + autoDismissAfter) {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        isPresented = false
+                    }
+                }
             }
         }
     }

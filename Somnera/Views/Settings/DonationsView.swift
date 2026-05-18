@@ -30,13 +30,13 @@ struct DonationsView: View {
     ]
     
     let tiers = [
-        DonationTier(amount: "32 MXN", price: "$1.99 USD", name: "Café para el Hilo Principal", desc: "Evita que la IA sufra de lag mental y mantiene el procesador a temperatura ambiente.", totemId: "cuarzo"),
-        DonationTier(amount: "56 MXN", price: "$2.99 USD", name: "Antena de Salud", desc: "Alinea las estrellas para sincronizar tu HealthKit con telemetría de alta resolución.", totemId: "piramide"),
-        DonationTier(amount: "128 MXN", price: "$5.99 USD", name: "Núcleo Quantum", desc: "Alimenta las redes neuronales locales de clasificación en silencio absoluto.", totemId: "giroscopio"),
-        DonationTier(amount: "264 MXN", price: "$12.99 USD", name: "Homeostasis Armónica", desc: "Mantiene la coherencia cardiaca y el aislamiento del ruido de tu AC.", totemId: "tesseracto"),
-        DonationTier(amount: "512 MXN", price: "$24.99 USD", name: "Soberano del Sueño", desc: "Desbloquea frecuencias vibracionales altas e ilumina tu mini-tótem.", totemId: "helice"),
-        DonationTier(amount: "1024 MXN", price: "$49.99 USD", name: "Titán de la Privacidad", desc: "Permite procesar todo 100% localmente por el resto del milenio.", totemId: "astrolabio"),
-        DonationTier(amount: "2048 MXN", price: "$99.99 USD", name: "Singularidad Suprema", desc: "Soporte de ultra-lujo para el desarrollo independiente. Transciende el plano físico.", totemId: "singularidad")
+        DonationTier(amount: "$32", subtitle: "Patrocinio de Cafeína Líquida", name: "Tótem de Cuarzo", desc: "Compra el café premium que Emmanuel necesita para no quedarse dormido sobre su propio algoritmo de detección a las 3:00 AM.", totemId: "cuarzo"),
+        DonationTier(amount: "$56", subtitle: "Ritual Delta", name: "Tótem Piramidal", desc: "Sostén el desarrollo independiente mientras desbloqueas una insignia que vibra junto al logotipo.", totemId: "piramide"),
+        DonationTier(amount: "$128", subtitle: "Anillo Topográfico", name: "Tótem Giroscópico", desc: "Potencia el laboratorio y desbloquea una geometría dorada con memoria persistente.", totemId: "giroscopio"),
+        DonationTier(amount: "$264", subtitle: "Hipercubo del Silencio", name: "Tótem Tesseracto", desc: "Apoya el motor clínico y desbloquea una reliquia que aparece en tu certificado de mecenas.", totemId: "tesseracto"),
+        DonationTier(amount: "$512", subtitle: "Sinergia Viva", name: "Tótem de Hélice", desc: "Desbloquea un emblema de sinergia que acompaña tu logo y celebra tu constancia.", totemId: "helice"),
+        DonationTier(amount: "$1024", subtitle: "Astrolabio Áureo", name: "Tótem del Origen", desc: "Mantiene el proyecto libre de anuncios y activa un emblema de precisión estelar.", totemId: "astrolabio"),
+        DonationTier(amount: "$2048", subtitle: "Singularidad Suprema", name: "Tótem Final", desc: "El apoyo definitivo: desbloquea la pieza de colección que trasciende el plano físico.", totemId: "singularidad")
     ]
     
     var body: some View {
@@ -59,11 +59,11 @@ struct DonationsView: View {
                                 .foregroundColor(.somAccent)
                                 .tracking(4)
                             
-                            Text("Apoya a Somnera")
+                            Text("Sintoniza tu Sostenibilidad")
                                 .font(.system(size: 32, weight: .black, design: .rounded))
                                 .foregroundColor(.somTextPrimary)
                             
-                            Text("Mantén este laboratorio de sueño libre de anuncios, 100% privado y operado de manera independiente.")
+                            Text("Desbloquea e integra insignias místicas giroscópicas de mecenazgo junto a tu logotipo.")
                                 .font(.subheadline)
                                 .foregroundColor(.somTextSecondary)
                                 .multilineTextAlignment(.center)
@@ -71,18 +71,29 @@ struct DonationsView: View {
                         }
                         .padding(.top, 20)
                         
-                        // The Interactive Totem Preview
-                        VStack(spacing: 16) {
+                        // Totem preview + carousel selector + active tier card
+                        VStack(spacing: 18) {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 24)
                                     .fill(Color.somSurface.opacity(0.6))
-                                    .frame(height: 220)
+                                    .frame(height: 260)
                                     .somGlassStyle(cornerRadius: 24)
-                                
-                                Totem3DView(mathType: totems[selectedTotem].mathType, color: totems[selectedTotem].color, isUnlocked: isTotemUnlocked(totems[selectedTotem].id))
-                                    .frame(width: 160, height: 160)
-                                
-                                // Unlock Badge / Equip Button
+
+                                ZStack {
+                                    Totem3DView(
+                                        mathType: totems[selectedTotem].mathType,
+                                        color: totems[selectedTotem].color,
+                                        isUnlocked: isTotemUnlocked(totems[selectedTotem].id)
+                                    )
+                                    .frame(width: 170, height: 170)
+
+                                    if !isTotemUnlocked(totems[selectedTotem].id) {
+                                        Image(systemName: "lock.fill")
+                                            .font(.system(size: 28, weight: .bold))
+                                            .foregroundColor(.white.opacity(0.14))
+                                    }
+                                }
+
                                 VStack {
                                     Spacer()
                                     HStack {
@@ -112,100 +123,99 @@ struct DonationsView: View {
                                         } else {
                                             Text("BLOQUEADO")
                                                 .font(.system(size: 10, weight: .bold, design: .monospaced))
-                                                .foregroundColor(.somApnea)
+                                                .foregroundColor(.somTextSecondary)
                                                 .padding(.horizontal, 10)
                                                 .padding(.vertical, 6)
-                                                .background(Color.somApnea.opacity(0.1))
+                                                .background(Color.white.opacity(0.03))
                                                 .cornerRadius(8)
                                         }
                                     }
                                     .padding(16)
                                 }
                             }
-                            .frame(height: 220)
+                            .frame(height: 260)
                             .padding(.horizontal)
-                            
-                            // Segment selector
-                            HStack(spacing: 8) {
-                                ForEach(0..<totems.count, id: \.self) { idx in
-                                    Circle()
-                                        .fill(idx == selectedTotem ? totems[idx].color : Color.white.opacity(0.15))
-                                        .frame(width: idx == selectedTotem ? 12 : 8, height: idx == selectedTotem ? 12 : 8)
-                                        .onTapGesture {
-                                            withAnimation(.spring()) {
-                                                selectedTotem = idx
+
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 26) {
+                                    ForEach(Array(tiers.enumerated()), id: \.offset) { _, tier in
+                                        let totemIdx = totems.firstIndex(where: { $0.id == tier.totemId }) ?? 0
+                                        VStack(spacing: 10) {
+                                            ZStack {
+                                                Circle()
+                                                    .fill(Color.white.opacity(0.02))
+                                                    .overlay(
+                                                        Circle()
+                                                            .stroke(
+                                                                totemIdx == selectedTotem ? totems[totemIdx].color.opacity(0.85) : Color.white.opacity(0.10),
+                                                                lineWidth: 2
+                                                            )
+                                                    )
+                                                    .frame(width: 76, height: 76)
+
+                                                if isTotemUnlocked(tier.totemId) {
+                                                    Totem3DView(mathType: totems[totemIdx].mathType, color: totems[totemIdx].color, isUnlocked: true)
+                                                        .frame(width: 44, height: 44)
+                                                } else {
+                                                    Image(systemName: "lock.fill")
+                                                        .font(.system(size: 22, weight: .bold))
+                                                        .foregroundColor(.white.opacity(0.18))
+                                                }
                                             }
+                                            .contentShape(Circle())
+                                            .onTapGesture {
+                                                withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
+                                                    selectedTotem = totemIdx
+                                                }
+                                            }
+
+                                            Text(tier.amount)
+                                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                                .foregroundColor(totemIdx == selectedTotem ? totems[totemIdx].color : .somTextSecondary.opacity(0.6))
                                         }
+                                    }
                                 }
+                                .padding(.horizontal, 24)
+                                .padding(.bottom, 6)
                             }
-                            
-                            // Description
-                            VStack(spacing: 8) {
-                                Text(totems[selectedTotem].name.uppercased())
-                                    .font(.headline.bold())
+
+                            let activeTier = tiers.first(where: { $0.totemId == totems[selectedTotem].id }) ?? tiers[0]
+                            VStack(spacing: 10) {
+                                Text(activeTier.name.uppercased())
+                                    .font(.system(size: 28, weight: .black, design: .rounded))
                                     .foregroundColor(.white)
-                                
-                                Text(totems[selectedTotem].description)
-                                    .font(.caption)
+                                    .multilineTextAlignment(.center)
+
+                                Text(activeTier.subtitle)
+                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    .foregroundColor(totems[selectedTotem].color)
+
+                                Text(activeTier.desc)
+                                    .font(.system(size: 15, weight: .regular, design: .rounded))
                                     .foregroundColor(.somTextSecondary)
                                     .multilineTextAlignment(.center)
-                                    .lineSpacing(4)
+                                    .lineSpacing(5)
                                     .padding(.horizontal, 24)
-                            }
-                        }
-                        
-                        // Donation Tiers Section
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("CONTRIBUCIONES MECENAS")
-                                .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                .foregroundColor(.somTextSecondary)
-                                .padding(.horizontal)
-                                .tracking(2)
-                            
-                            VStack(spacing: 14) {
-                                ForEach(tiers) { tier in
-                                    Button {
-                                        triggerMockPurchase(tier)
-                                    } label: {
-                                        HStack(spacing: 16) {
-                                            // Mini Totem rendering in lists
-                                            let idx = totems.firstIndex(where: { $0.id == tier.totemId }) ?? 0
-                                            Totem3DView(mathType: totems[idx].mathType, color: totems[idx].color, isUnlocked: isTotemUnlocked(tier.totemId))
-                                                .frame(width: 44, height: 44)
-                                                .background(Circle().fill(Color.white.opacity(0.03)))
-                                            
-                                            VStack(alignment: .leading, spacing: 4) {
-                                                Text(tier.name)
-                                                    .font(.subheadline.bold())
-                                                    .foregroundColor(.white)
-                                                    .multilineTextAlignment(.leading)
-                                                
-                                                Text(tier.desc)
-                                                    .font(.system(size: 11))
-                                                    .foregroundColor(.somTextSecondary)
-                                                    .multilineTextAlignment(.leading)
-                                                    .lineLimit(2)
-                                            }
-                                            
-                                            Spacer()
-                                            
-                                            VStack(alignment: .trailing, spacing: 2) {
-                                                Text(tier.amount)
-                                                    .font(.system(.subheadline, design: .rounded).bold())
-                                                    .foregroundColor(totems[idx].color)
-                                                Text(tier.price)
-                                                    .font(.system(size: 10))
-                                                    .foregroundColor(.somTextSecondary)
-                                            }
-                                        }
-                                        .padding()
-                                        .background(Color.somSurface.opacity(0.4))
-                                        .somGlassStyle(cornerRadius: 16)
+
+                                Button {
+                                    triggerMockPurchase(activeTier)
+                                } label: {
+                                    HStack(spacing: 10) {
+                                        Image(systemName: "apple.logo")
+                                            .font(.system(size: 18, weight: .bold))
+                                        Text("Contribuir con \(activeTier.amount)")
+                                            .font(.system(.headline, design: .rounded).bold())
                                     }
-                                    .buttonStyle(.plain)
+                                    .foregroundColor(.black)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 18)
+                                    .background(Color.white)
+                                    .cornerRadius(18)
                                 }
+                                .padding(.horizontal, 24)
+                                .padding(.top, 8)
                             }
-                            .padding(.horizontal)
+                            .padding(.top, 8)
                         }
                         
                         // Disclaimer
@@ -233,7 +243,7 @@ struct DonationsView: View {
                     .presentationDetents([.fraction(0.35)])
             }
             .fullScreenCover(isPresented: $showSponsorWelcome) {
-                SponsorWelcomeView(isPresented: $showSponsorWelcome)
+                SponsorWelcomeView(isPresented: $showSponsorWelcome, autoDismissAfter: 7.0)
             }
         }
     }
@@ -383,7 +393,7 @@ struct TotemInfo: Identifiable {
 struct DonationTier: Identifiable {
     let id = UUID()
     let amount: String
-    let price: String
+    let subtitle: String
     let name: String
     let desc: String
     let totemId: String
