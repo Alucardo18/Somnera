@@ -94,7 +94,14 @@ struct RecordingView: View {
                     await vm.stopSession()
                     if let sessionID = finishedSessionID {
                         // Re-fetch freshly from the shared context to prevent detached backing data faults
-                        dashboardVM.sessionToNavigate = SessionStorageService.shared.fetchAll().first(where: { $0.id == sessionID })
+                        if let fetchedSession = SessionStorageService.shared.fetchAll().first(where: { $0.id == sessionID }) {
+                            let duration = fetchedSession.endDate.timeIntervalSince(fetchedSession.startDate)
+                            if duration >= 15.0 {
+                                dashboardVM.sessionToNavigate = fetchedSession
+                            } else {
+                                print("[Somnera] 🗑️ Sesión demasiado corta (\(Int(duration))s) para persistir. Omitiendo auto-navegación.")
+                            }
+                        }
                     }
                     dismiss()
                 }
