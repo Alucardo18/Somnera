@@ -281,7 +281,7 @@ private struct TotemBadgeView: View {
 
     var body: some View {
         Totem3DView(mathType: mathType, color: color, isUnlocked: true, isStatic: false)
-            .frame(width: 44, height: 44)
+            .frame(width: 88, height: 88)
             .accessibilityLabel("Insignia de patrocinador")
     }
 }
