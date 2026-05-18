@@ -731,75 +731,90 @@ struct Totem3DView: View {
         context.fill(Circle().path(in: CGRect(x: midX - 4, y: midY - 4, width: 8, height: 8)), with: .color(color))
     }
     
-    // SINGULARITY: Einsteinian Accretion Lens Black Hole
-    private func drawSingularity(context: GraphicsContext, midX: CGFloat, midY: CGFloat, time: Double, color: Color) {
-        var context = context
-        let radius: CGFloat = 20
-        
-        // CRITICAL FIX: Clip the entire drawing area strictly to a circle of radius 45 (inside the 120x120 container)
-        // to prevent ANY radial blur filters from leaking outside the canvas boundary and creating a hard square crop.
-        let clipPath = Path(ellipseIn: CGRect(x: midX - 52, y: midY - 52, width: 104, height: 104))
-        context.clip(to: clipPath)
-        
-        // 1. Accretion Disk back section (Drawn first to sit behind the core)
-        let t = time * 1.5
-        var diskBack = Path()
-        let steps = 40
-        for i in 0...steps {
-            let angle = .pi + Double(i) * .pi / Double(steps) // Half-circle (back)
-            let radiusVariation = radius * 1.6 + CGFloat(sin(t + Double(i) * 0.2)) * 3
-            let x = midX + CGFloat(cos(angle)) * radiusVariation
-            // Einstein gravity lensing distorting the back disk upwards
-            let y = midY - 6 + CGFloat(sin(angle)) * radiusVariation * 0.25 - 4.0 * (1.0 - CGFloat(abs(cos(angle))))
-            
-            if i == 0 {
-                diskBack.move(to: CGPoint(x: x, y: y))
-            } else {
-                diskBack.addLine(to: CGPoint(x: x, y: y))
-            }
-        }
-        context.stroke(diskBack, with: .color(color.opacity(0.4)), lineWidth: 3)
-        
-        // 2. Glowing Event Horizon Accretion Glow (Underneath Black Core)
-        context.addFilter(.blur(radius: 12))
-        let glowSize = radius * 1.8 + CGFloat(sin(time * 2.0)) * 2
-        let glowRect = CGRect(x: midX - glowSize, y: midY - glowSize, width: glowSize*2, height: glowSize*2)
-        context.fill(Circle().path(in: glowRect), with: .color(color.opacity(0.35)))
-        
-        // Remove filters for the crisp event horizon core
-        context.addFilter(.blur(radius: 0))
-        
-        // 3. The Event Horizon Core (Absolute Void)
-        let coreRect = CGRect(x: midX - radius, y: midY - radius, width: radius*2, height: radius*2)
-        context.fill(Circle().path(in: coreRect), with: .color(Color.somBackground))
-        context.stroke(Circle().path(in: coreRect), with: .color(.black), lineWidth: 1)
-        
-        // 4. Accretion Disk front section (Loops in front of the black hole)
-        var diskFront = Path()
-        for i in 0...steps {
-            let angle = Double(i) * .pi / Double(steps) // Half-circle (front)
-            let radiusVariation = radius * 1.6 + CGFloat(sin(t + Double(i) * 0.2)) * 3
-            let x = midX + CGFloat(cos(angle)) * radiusVariation
-            let y = midY - 4 + CGFloat(sin(angle)) * radiusVariation * 0.25
-            
-            if i == 0 {
-                diskFront.move(to: CGPoint(x: x, y: y))
-            } else {
-                diskFront.addLine(to: CGPoint(x: x, y: y))
-            }
-        }
-        context.stroke(diskFront, with: .color(color.opacity(0.85)), lineWidth: 2)
-        
-        // Einstein micro-lens points
-        for i in 0..<3 {
-            let pAngle = time * 0.5 + Double(i) * (2.0 * .pi / 3.0)
-            let pX = midX + CGFloat(cos(pAngle)) * (radius * 2.4)
-            let pY = midY + CGFloat(sin(pAngle)) * (radius * 2.4 * 0.4)
-            let nodeSize: CGFloat = 2.0 + CGFloat(sin(time * 3.0 + Double(i))) * 0.8
-            context.fill(Circle().path(in: CGRect(x: pX - nodeSize/2, y: pY - nodeSize/2, width: nodeSize, height: nodeSize)), with: .color(.white))
-        }
-    }
-}
+	    // SINGULARITY: Einsteinian Accretion Lens Black Hole
+	    private func drawSingularity(context: GraphicsContext, midX: CGFloat, midY: CGFloat, time: Double, color: Color) {
+	        var context = context
+	        let coreRadius: CGFloat = 21
+	        let orbitRadius: CGFloat = 42
+	        let clipPath = Path(ellipseIn: CGRect(x: midX - 52, y: midY - 52, width: 104, height: 104))
+	        context.clip(to: clipPath)
+	        
+	        let obsidian = Color(hex: "#050509")
+	        let gold = Color(hex: "#F5D37A")
+	        let accentNebula = Color.somAccent
+	        
+	        // Nebula (Somnera accent haze)
+	        context.drawLayer { localContext in
+	            localContext.addFilter(.blur(radius: 26))
+	            
+	            let drift = CGFloat(sin(time * 0.6)) * 6
+	            let hazeRect = CGRect(x: midX - 58 + drift, y: midY - 46, width: 116, height: 92)
+	            localContext.fill(
+	                Path(ellipseIn: hazeRect),
+	                with: .color(accentNebula.opacity(0.10))
+	            )
+	            
+	            let hazeRect2 = CGRect(x: midX - 44, y: midY - 64 + drift * 0.6, width: 88, height: 128)
+	            localContext.fill(
+	                Path(ellipseIn: hazeRect2),
+	                with: .color(accentNebula.opacity(0.06))
+	            )
+	        }
+	        
+	        // Subtle lens glow around the horizon
+	        context.drawLayer { localContext in
+	            localContext.addFilter(.blur(radius: 14))
+	            let glow = coreRadius * 2.2 + CGFloat(sin(time * 1.6)) * 2
+	            let rect = CGRect(x: midX - glow, y: midY - glow, width: glow * 2, height: glow * 2)
+	            localContext.fill(Path(ellipseIn: rect), with: .color(accentNebula.opacity(0.18)))
+	            localContext.fill(Path(ellipseIn: rect.insetBy(dx: 8, dy: 8)), with: .color(gold.opacity(0.08)))
+	        }
+	        
+	        // Obsidian event horizon core (slight specular, faint rim)
+	        let coreRect = CGRect(x: midX - coreRadius, y: midY - coreRadius, width: coreRadius * 2, height: coreRadius * 2)
+	        context.fill(Path(ellipseIn: coreRect), with: .color(obsidian))
+	        context.stroke(Path(ellipseIn: coreRect), with: .color(accentNebula.opacity(0.25)), lineWidth: 1)
+	        
+	        // Specular highlight to sell "obsidian"
+	        context.drawLayer { localContext in
+	            localContext.addFilter(.blur(radius: 8))
+	            let highlightRect = CGRect(x: midX - coreRadius * 0.9, y: midY - coreRadius * 1.1, width: coreRadius * 1.4, height: coreRadius * 1.1)
+	            localContext.fill(Path(ellipseIn: highlightRect), with: .color(Color.white.opacity(0.05)))
+	        }
+	        
+	        // Gold particles orbiting (accretion swarm)
+	        let particleCount = 16
+	        for i in 0..<particleCount {
+	            let phase = Double(i) * (2.0 * .pi / Double(particleCount))
+	            let speed = 1.35 + Double(i % 3) * 0.18
+	            let angle = time * speed + phase
+	            
+	            let radialWobble = CGFloat(sin(time * 0.9 + phase)) * 3
+	            let rx = orbitRadius + radialWobble
+	            let ry = (orbitRadius * 0.34) + radialWobble * 0.18
+	            
+	            let x = midX + CGFloat(cos(angle)) * rx
+	            let y = midY - 5 + CGFloat(sin(angle)) * ry
+	            
+	            let sparkle = 1.6 + CGFloat(sin(time * 2.2 + phase)) * 0.9
+	            let alpha = 0.35 + (CGFloat(cos(angle + .pi / 2)) + 1) * 0.18
+	            
+	            let pRect = CGRect(x: x - sparkle * 0.5, y: y - sparkle * 0.5, width: sparkle, height: sparkle)
+	            context.fill(Path(ellipseIn: pRect), with: .color(gold.opacity(alpha)))
+	        }
+	        
+	        // Golden orbit ring hint (very faint)
+	        var ring = Path()
+	        let ringSteps = 54
+	        for s in 0...ringSteps {
+	            let a = Double(s) * 2.0 * .pi / Double(ringSteps)
+	            let x = midX + CGFloat(cos(a)) * orbitRadius
+	            let y = midY - 5 + CGFloat(sin(a)) * orbitRadius * 0.34
+	            if s == 0 { ring.move(to: .init(x: x, y: y)) } else { ring.addLine(to: .init(x: x, y: y)) }
+	        }
+	        context.stroke(ring, with: .color(gold.opacity(0.10)), lineWidth: 1)
+	    }
+	}
 
 // Extension to allow easy CGPoint initializers
 extension CGPoint {
