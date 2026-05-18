@@ -29,6 +29,8 @@ final class AudioCaptureService {
     // MARK: - Lifecycle
 
     func start() throws {
+        guard !engine.isRunning else { return }
+        
         let inputNode   = engine.inputNode
         
         // 🚀 Activar el procesamiento de voz nativo de Apple (Denoising Profesional)
@@ -44,6 +46,9 @@ final class AudioCaptureService {
             )
         }
         converter = conv
+
+        // Safely remove tap first to avoid crash if there was any orphaned tap
+        inputNode.removeTap(onBus: 0)
 
         inputNode.installTap(
             onBus: 0,
