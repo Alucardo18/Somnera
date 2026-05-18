@@ -800,7 +800,7 @@ struct Totem3DView: View {
         context.fill(Circle().path(in: CGRect(x: midX - 4, y: midY - 4, width: 8, height: 8)), with: .color(color))
     }
     
-        // SINGULARITY: Einsteinian Accretion Lens Black Hole with realistic 3D Depth Orbiting Layers
+        // SINGULARITY: 3D Flat Accretion Disk Black Hole using Somnera Brand Accent Gas and dynamic depth sorting
         private func drawSingularity(context: GraphicsContext, midX: CGFloat, midY: CGFloat, time: Double, color: Color) {
             var context = context
             let coreRadius: CGFloat = 21
@@ -812,13 +812,13 @@ struct Totem3DView: View {
             let gold = Color(hex: "#F5D37A")
             let goldHot = Color(hex: "#FFECA1")
             let goldEdge = Color(hex: "#FF6E14")
-            let accentNebula = Color.somAccent
+            let accentNebula = Color.somAccent // Somnera Accent Brand Color
             
-            // 1. Draw Nebula (Somnera accent haze / warped space-time background)
+            // 1. Draw Nebula (Somnera accent haze / space-time background)
             let drift = CGFloat(sin(time * 0.5)) * 5
             let hazeRect1 = CGRect(x: midX - 58 + drift, y: midY - 46, width: 116, height: 92)
             let nebulaShader1 = GraphicsContext.Shading.radialGradient(
-                Gradient(colors: [accentNebula.opacity(0.14), .clear]),
+                Gradient(colors: [accentNebula.opacity(0.16), .clear]),
                 center: CGPoint(x: hazeRect1.midX, y: hazeRect1.midY),
                 startRadius: 0,
                 endRadius: hazeRect1.width * 0.5
@@ -827,42 +827,40 @@ struct Totem3DView: View {
             
             let hazeRect2 = CGRect(x: midX - 44, y: midY - 60 + drift * 0.6, width: 88, height: 120)
             let nebulaShader2 = GraphicsContext.Shading.radialGradient(
-                Gradient(colors: [Color.somApnea.opacity(0.08), .clear]),
+                Gradient(colors: [accentNebula.opacity(0.08), .clear]),
                 center: CGPoint(x: hazeRect2.midX, y: hazeRect2.midY),
                 startRadius: 0,
                 endRadius: hazeRect2.height * 0.5
             )
             context.fill(Path(ellipseIn: hazeRect2), with: nebulaShader2)
             
-            // 2. Pre-calculate Orbiting 3D Golden Spheres (varying tilt planes, speeds, depth sorting)
-            // We use 4 elegant spheres instead of a chaotic swarm of 16
+            // 2. Pre-calculate Orbiting 3D Golden Spheres (no wire rings, distinct planes/tilt, core-facing lighting)
             let sphereCount = 4
             var backgroundSpheres: [(point: CGPoint, size: CGFloat, dx: CGFloat, dy: CGFloat)] = []
             var foregroundSpheres: [(point: CGPoint, size: CGFloat, dx: CGFloat, dy: CGFloat)] = []
             
             for i in 0..<sphereCount {
-                let phase = Double(i) * (.pi * 0.5) // Perfectly balanced distribution
+                let phase = Double(i) * (.pi * 0.5)
                 let speed = 1.0 + Double(i) * 0.15
                 let angle = time * speed + phase
                 
                 let orbitRadius: CGFloat = 36 + CGFloat(i) * 4
-                let orbitTilt: Double = -0.4 + Double(i) * 0.3 // Unique tilt for gyroscopic look
+                let orbitTilt: Double = -0.4 + Double(i) * 0.3
                 
                 // Raw 3D coordinates on flat ellipse
                 let x0 = CGFloat(cos(angle)) * orbitRadius
                 let y0 = CGFloat(sin(angle)) * orbitRadius * 0.28
                 
-                // Rotate the point by the orbit's 3D tilt
+                // Rotate by orbit tilt
                 let cosT = CGFloat(cos(orbitTilt))
                 let sinT = CGFloat(sin(orbitTilt))
                 let x = midX + x0 * cosT - y0 * sinT
                 let y = midY - 3 + x0 * sinT + y0 * cosT
                 
-                let depth = CGFloat(sin(angle)) // -1.0 is behind, 1.0 is front
+                let depth = CGFloat(sin(angle))
                 let baseSize: CGFloat = 7.0
                 let finalSize = baseSize * (1.0 + 0.28 * depth)
                 
-                // Vector from sphere center back to Singularity core (for dynamic inner light highlight)
                 let dx = midX - x
                 let dy = midY - y
                 
@@ -875,7 +873,7 @@ struct Totem3DView: View {
                 }
             }
             
-            // 3. Draw background spheres (orbiting behind the black hole)
+            // 3. Draw background spheres (behind the core and accretion disk)
             for s in backgroundSpheres {
                 let sRect = CGRect(x: s.point.x - s.size * 0.5, y: s.point.y - s.size * 0.5, width: s.size, height: s.size)
                 let dist = sqrt(s.dx * s.dx + s.dy * s.dy)
@@ -892,75 +890,81 @@ struct Totem3DView: View {
                 context.fill(Path(ellipseIn: sRect), with: sphereShader)
             }
             
-            // 4. Draw Gravitational Lensing Accretion Disk (Back Halo Arc)
-            // Warped high above the black hole event horizon
-            var lensedCrescent = Path()
-            lensedCrescent.move(to: CGPoint(x: midX - coreRadius - 3, y: midY))
-            lensedCrescent.addCurve(
-                to: CGPoint(x: midX + coreRadius + 3, y: midY),
-                control1: CGPoint(x: midX - coreRadius - 3, y: midY - coreRadius * 1.9),
-                control2: CGPoint(x: midX + coreRadius + 3, y: midY - coreRadius * 1.9)
-            )
-            lensedCrescent.addCurve(
-                to: CGPoint(x: midX - coreRadius - 3, y: midY),
-                control1: CGPoint(x: midX + coreRadius + 3, y: midY - coreRadius * 1.15),
-                control2: CGPoint(x: midX - coreRadius - 3, y: midY - coreRadius * 1.15)
-            )
-            lensedCrescent.closeSubpath()
+            // 4. Geometry and Mathematics for the 3D Flat Accretion Disk (Gas Ring)
+            let gasRadius: CGFloat = 32
+            let gasAspect: CGFloat = 0.28
+            let gasTilt: Double = -0.16 // Beautiful, matching diagonal slant
+            let cosGT = CGFloat(cos(gasTilt))
+            let sinGT = CGFloat(sin(gasTilt))
             
-            let backDiskShader = GraphicsContext.Shading.radialGradient(
-                Gradient(colors: [goldHot.opacity(0.9), gold.opacity(0.85), goldEdge.opacity(0.3), .clear]),
-                center: CGPoint(x: midX, y: midY - coreRadius * 0.65),
-                startRadius: coreRadius * 0.8,
-                endRadius: coreRadius * 1.95
-            )
-            context.fill(lensedCrescent, with: backDiskShader)
+            func pointOnDisk(angle: Double) -> CGPoint {
+                let rx = CGFloat(cos(angle)) * gasRadius
+                let ry = CGFloat(sin(angle)) * gasRadius * gasAspect
+                let x = midX + rx * cosGT - ry * sinGT
+                let y = midY - 3 + rx * sinGT + ry * cosGT
+                return CGPoint(x: x, y: y)
+            }
             
-            // 5. Draw Event Horizon Accretion Glow (Lens glow around the core)
-            let glow = coreRadius * 2.3 + CGFloat(sin(time * 1.6)) * 1.5
-            let glowRect = CGRect(x: midX - glow, y: midY - glow, width: glow * 2, height: glow * 2)
-            let horizonShader = GraphicsContext.Shading.radialGradient(
-                Gradient(colors: [goldHot.opacity(0.18), goldEdge.opacity(0.08), .clear]),
-                center: CGPoint(x: midX, y: midY),
-                startRadius: coreRadius * 0.85,
-                endRadius: glow
-            )
-            context.fill(Path(ellipseIn: glowRect), with: horizonShader)
+            let steps = 64
             
-            // 6. Draw Obsidian Core (The absolute void event horizon)
+            // 5. Draw BACK HALF of the Accretion Disk (depth < 0, i.e., sin(angle) < 0)
+            var backDiskPath = Path()
+            var firstBack = true
+            for s in 0...steps {
+                let a = Double(s) * (2.0 * .pi) / Double(steps)
+                if sin(a) < 0 {
+                    let pt = pointOnDisk(angle: a)
+                    if firstBack {
+                        backDiskPath.move(to: pt)
+                        firstBack = false
+                    } else {
+                        backDiskPath.addLine(to: pt)
+                    }
+                }
+            }
+            
+            // Stroke Back Gas Ring in beautiful volumetric layers
+            context.stroke(backDiskPath, with: .color(accentNebula.opacity(0.12)), lineWidth: 12)
+            context.stroke(backDiskPath, with: .color(accentNebula.opacity(0.38)), lineWidth: 6)
+            context.stroke(backDiskPath, with: .color(Color(hex: "#E5E0FF").opacity(0.85)), lineWidth: 2)
+            
+            // 6. Draw Obsidian Core Event Horizon (The absolute black sphere void)
             let coreRect = CGRect(x: midX - coreRadius, y: midY - coreRadius, width: coreRadius * 2, height: coreRadius * 2)
             context.fill(Path(ellipseIn: coreRect), with: .color(obsidian))
-            context.stroke(Path(ellipseIn: coreRect), with: .color(goldEdge.opacity(0.35)), lineWidth: 0.8)
+            context.stroke(Path(ellipseIn: coreRect), with: .color(accentNebula.opacity(0.35)), lineWidth: 0.8)
             
-            // 7. Draw Gravitational Lensing Accretion Disk (Front Crossing Band)
-            // Slices horizontally in front of the black hole, tilted at a beautiful angle
-            // GraphicsContext is a value type, so we copy it to isolate our translations/rotations!
-            var frontBandContext = context
-            frontBandContext.translateBy(x: midX, y: midY)
-            frontBandContext.rotate(by: .radians(-0.16)) // Sleek diagonal tilt
-            
-            let diskWidth: CGFloat = coreRadius * 3.4
-            let diskHeight: CGFloat = 6.0
-            let frontBandPath = Path(ellipseIn: CGRect(x: -diskWidth * 0.5, y: 1.0, width: diskWidth, height: diskHeight))
-            
-            let frontGradient = GraphicsContext.Shading.linearGradient(
-                Gradient(colors: [.clear, goldEdge.opacity(0.3), gold.opacity(0.85), goldHot, gold.opacity(0.85), goldEdge.opacity(0.3), .clear]),
-                startPoint: CGPoint(x: -diskWidth * 0.5, y: 0),
-                endPoint: CGPoint(x: diskWidth * 0.5, y: 0)
-            )
-            frontBandContext.fill(frontBandPath, with: frontGradient)
-            
-            // 8. Draw Obsidian Glass Specular Highlight (High gloss crescent to give 3D spherical look)
+            // 7. Draw Glass Specular Highlight on Core (Gives it a high-gloss spherical look)
             let highlightRect = CGRect(x: midX - coreRadius * 0.85, y: midY - coreRadius * 1.05, width: coreRadius * 1.3, height: coreRadius * 1.0)
             let specularShader = GraphicsContext.Shading.radialGradient(
-                Gradient(colors: [Color.white.opacity(0.12), .clear]),
+                Gradient(colors: [Color.white.opacity(0.14), .clear]),
                 center: CGPoint(x: highlightRect.midX, y: highlightRect.midY),
                 startRadius: 0,
                 endRadius: highlightRect.width * 0.45
             )
             context.fill(Path(ellipseIn: highlightRect), with: specularShader)
             
-            // 9. Draw foreground spheres (orbiting in front of the black hole)
+            // 8. Draw FRONT HALF of the Accretion Disk (depth >= 0, i.e., sin(angle) >= 0)
+            var frontDiskPath = Path()
+            var firstFront = true
+            for s in 0...steps {
+                let a = Double(s) * (2.0 * .pi) / Double(steps)
+                if sin(a) >= 0 {
+                    let pt = pointOnDisk(angle: a)
+                    if firstFront {
+                        frontDiskPath.move(to: pt)
+                        firstFront = false
+                    } else {
+                        frontDiskPath.addLine(to: pt)
+                    }
+                }
+            }
+            
+            // Stroke Front Gas Ring in matching volumetric layers (seamlessly wrapping around the core!)
+            context.stroke(frontDiskPath, with: .color(accentNebula.opacity(0.12)), lineWidth: 12)
+            context.stroke(frontDiskPath, with: .color(accentNebula.opacity(0.38)), lineWidth: 6)
+            context.stroke(frontDiskPath, with: .color(Color(hex: "#E5E0FF").opacity(0.85)), lineWidth: 2)
+            
+            // 9. Draw foreground spheres (orbiting in front of the core and disk)
             for s in foregroundSpheres {
                 let sRect = CGRect(x: s.point.x - s.size * 0.5, y: s.point.y - s.size * 0.5, width: s.size, height: s.size)
                 let dist = sqrt(s.dx * s.dx + s.dy * s.dy)
