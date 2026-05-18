@@ -90,9 +90,11 @@ struct RecordingView: View {
             Button("Cancelar", role: .cancel) {}
             Button("Terminar", role: .destructive) {
                 Task {
+                    let finishedSessionID = vm.session?.id
                     await vm.stopSession()
-                    if let finishedSession = vm.session {
-                        dashboardVM.sessionToNavigate = finishedSession
+                    if let sessionID = finishedSessionID {
+                        // Re-fetch freshly from the shared context to prevent detached backing data faults
+                        dashboardVM.sessionToNavigate = SessionStorageService.shared.fetchAll().first(where: { $0.id == sessionID })
                     }
                     dismiss()
                 }
