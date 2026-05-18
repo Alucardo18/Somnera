@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CreatorMessageView: View {
     @Environment(\.dismiss) var dismiss
+    @State private var showDonationsSheet = false
     
     var body: some View {
         ZStack {
@@ -50,7 +51,7 @@ struct CreatorMessageView: View {
                     
                     // Botón de Donación (Placeholder)
                     Button {
-                        // Acción de donación futura
+                        showDonationsSheet = true
                     } label: {
                         HStack {
                             Image(systemName: "heart.fill")
@@ -77,6 +78,9 @@ struct CreatorMessageView: View {
                     .foregroundColor(.somTextSecondary)
                     .padding(.bottom, 40)
                 }
+            }
+            .sheet(isPresented: $showDonationsSheet) {
+                DonationsView()
             }
         }
     }

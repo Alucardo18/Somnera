@@ -2,7 +2,10 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var appState: AppState
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var dashboard = DashboardViewModel()
+    @AppStorage("somnera_is_mecenas") private var isPatrocinador = false
+    @State private var showSponsorWelcome = false
 
     var body: some View {
         TabView(selection: $appState.currentTab) {
@@ -32,9 +35,18 @@ struct ContentView: View {
         }
         .tint(.somAccent)
         .onAppear { dashboard.load() }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            guard isPatrocinador else { return }
+            guard !showSponsorWelcome else { return }
+            showSponsorWelcome = true
+        }
         .sheet(isPresented: $appState.showOnboarding) {
             OnboardingView()
                 .environmentObject(appState)
+        }
+        .fullScreenCover(isPresented: $showSponsorWelcome) {
+            SponsorWelcomeView(isPresented: $showSponsorWelcome, autoDismissAfter: 7.0)
         }
     }
 }

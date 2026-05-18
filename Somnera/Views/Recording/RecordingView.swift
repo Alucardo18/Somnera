@@ -90,9 +90,18 @@ struct RecordingView: View {
             Button("Cancelar", role: .cancel) {}
             Button("Terminar", role: .destructive) {
                 Task {
+                    let finishedSessionID = vm.session?.id
                     await vm.stopSession()
-                    if let finishedSession = vm.session {
-                        dashboardVM.sessionToNavigate = finishedSession
+                    if let sessionID = finishedSessionID {
+                        // Re-fetch freshly from the shared context to prevent detached backing data faults
+                        if let fetchedSession = SessionStorageService.shared.fetchAll().first(where: { $0.id == sessionID }) {
+                            let duration = fetchedSession.endDate.timeIntervalSince(fetchedSession.startDate)
+                            if duration >= 15.0 {
+                                dashboardVM.sessionToNavigate = fetchedSession
+                            } else {
+                                print("[Somnera] 🗑️ Sesión demasiado corta (\(Int(duration))s) para persistir. Omitiendo auto-navegación.")
+                            }
+                        }
                     }
                     dismiss()
                 }

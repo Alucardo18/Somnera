@@ -5,6 +5,8 @@ struct DashboardView: View {
     @State private var showRecording = false
     @State private var showCreatorMessage = false
     @EnvironmentObject var appState: AppState
+    @AppStorage("somnera_is_mecenas") private var isPatrocinador = false
+    @AppStorage("somnera_equipped_totem") private var equippedTotem = "cuarzo"
 
     var body: some View {
         NavigationStack {
@@ -89,12 +91,19 @@ struct DashboardView: View {
     private var headerSection: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Somnera")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundStyle(LinearGradient(
-                        colors: [.somAccent, Color(hex: "#4A90D9")],
-                        startPoint: .leading, endPoint: .trailing
-                    ))
+                HStack(alignment: .center, spacing: -18) {
+                    Text("Somnera")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundStyle(LinearGradient(
+                            colors: [.somAccent, Color(hex: "#4A90D9")],
+                            startPoint: .leading, endPoint: .trailing
+                        ))
+
+                    if isPatrocinador {
+                        TotemBadgeView(totemId: equippedTotem)
+                            .transition(.scale.combined(with: .opacity))
+                    }
+                }
                 Text(Date().formatted(.dateTime.weekday(.wide).day().month()))
                     .font(.subheadline)
                     .foregroundColor(.somTextSecondary)
@@ -238,6 +247,42 @@ struct ScoreCardView: View {
                 .font(.caption.bold())
                 .foregroundColor(color)
         }
+    }
+}
+
+private struct TotemBadgeView: View {
+    let totemId: String
+
+    private var color: Color {
+        switch totemId {
+        case "cuarzo": return .somAccent
+        case "piramide": return .somAccent
+        case "giroscopio": return .somWarning
+        case "tesseracto": return .somApnea
+        case "helice": return .somSafe
+        case "astrolabio": return .somWarning
+        case "singularidad": return .somWarning
+        default: return .somAccent
+        }
+    }
+
+    private var mathType: TotemMathType {
+        switch totemId {
+        case "cuarzo": return .crystal
+        case "piramide": return .pyramid
+        case "giroscopio": return .gyro
+        case "tesseracto": return .tesseract
+        case "helice": return .helix
+        case "astrolabio": return .astrolabe
+        case "singularidad": return .singularity
+        default: return .crystal
+        }
+    }
+
+    var body: some View {
+        Totem3DView(mathType: mathType, color: color, isUnlocked: true, isStatic: false)
+            .frame(width: 88, height: 88)
+            .accessibilityLabel("Insignia de patrocinador")
     }
 }
 
