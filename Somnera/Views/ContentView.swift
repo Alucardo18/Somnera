@@ -5,7 +5,6 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var dashboard = DashboardViewModel()
     @AppStorage("somnera_is_mecenas") private var isMecenas = false
-    @AppStorage("somnera_last_sponsor_welcome_day") private var lastSponsorWelcomeDay = ""
     @State private var showSponsorWelcome = false
 
     var body: some View {
@@ -39,9 +38,7 @@ struct ContentView: View {
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
             guard isMecenas else { return }
-            guard shouldShowDailySponsorWelcome() else { return }
-            
-            lastSponsorWelcomeDay = todayKey()
+            guard !showSponsorWelcome else { return }
             showSponsorWelcome = true
         }
         .sheet(isPresented: $appState.showOnboarding) {
@@ -49,20 +46,7 @@ struct ContentView: View {
                 .environmentObject(appState)
         }
         .fullScreenCover(isPresented: $showSponsorWelcome) {
-            SponsorWelcomeView(isPresented: $showSponsorWelcome, autoDismissAfter: 3.0)
+            SponsorWelcomeView(isPresented: $showSponsorWelcome, autoDismissAfter: 10.0)
         }
-    }
-    
-    private func shouldShowDailySponsorWelcome() -> Bool {
-        lastSponsorWelcomeDay != todayKey()
-    }
-    
-    private func todayKey() -> String {
-        let formatter = DateFormatter()
-        formatter.calendar = .current
-        formatter.locale = .current
-        formatter.timeZone = .current
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: Date())
     }
 }
