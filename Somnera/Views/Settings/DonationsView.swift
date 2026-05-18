@@ -31,12 +31,12 @@ struct DonationsView: View {
     
     let tiers = [
         DonationTier(amount: "$32", subtitle: "Patrocinio de Cafeína Líquida", name: "Tótem de Cuarzo", desc: "Compra el café premium que Emmanuel necesita para no quedarse dormido sobre su propio algoritmo de detección a las 3:00 AM.", totemId: "cuarzo"),
-        DonationTier(amount: "$56", subtitle: "Ritual Delta", name: "Tótem Piramidal", desc: "Sostén el desarrollo independiente mientras desbloqueas una insignia que vibra junto al logotipo.", totemId: "piramide"),
-        DonationTier(amount: "$128", subtitle: "Anillo Topográfico", name: "Tótem Giroscópico", desc: "Potencia el laboratorio y desbloquea una geometría dorada con memoria persistente.", totemId: "giroscopio"),
-        DonationTier(amount: "$264", subtitle: "Hipercubo del Silencio", name: "Tótem Tesseracto", desc: "Apoya el motor clínico y desbloquea una reliquia que aparece en tu certificado de patrocinador.", totemId: "tesseracto"),
-        DonationTier(amount: "$512", subtitle: "Sinergia Viva", name: "Tótem de Hélice", desc: "Desbloquea un emblema de sinergia que acompaña tu logo y celebra tu constancia.", totemId: "helice"),
-        DonationTier(amount: "$1024", subtitle: "Astrolabio Áureo", name: "Tótem del Origen", desc: "Mantiene el proyecto libre de anuncios y activa un emblema de precisión estelar.", totemId: "astrolabio"),
-        DonationTier(amount: "$2048", subtitle: "Singularidad Suprema", name: "Tótem Final", desc: "El apoyo definitivo: desbloquea la pieza de colección que trasciende el plano físico.", totemId: "singularidad")
+        DonationTier(amount: "$56", subtitle: "Combustión para Servidores", name: "Tótem Piramidal", desc: "Financia una semana de pizza fría y luz eléctrica para que los servidores locales sigan despiertos procesando datos mientras tú duermes profundamente.", totemId: "piramide"),
+        DonationTier(amount: "$128", subtitle: "Sello Anti-Desahucio", name: "Tótem Giroscópico", desc: "Garantiza que el programador pague el alquiler a tiempo este mes y no tenga que mudar las bases de datos de tus sueños al sótano de sus padres.", totemId: "giroscopio"),
+        DonationTier(amount: "$264", subtitle: "Defensa Anti-Corporativa", name: "Tótem Tesseracto", desc: "Evita que las agencias de marketing invasivas compren la app y vendan tu historial de ronquidos a compañías de colchones de dudosa calidad.", totemId: "tesseracto"),
+        DonationTier(amount: "$512", subtitle: "Hélice del Bienestar Clínico", name: "Tótem de Hélice", desc: "¡Doble hélice, doble compromiso! Financia el seguro de gastos médicos del programador antes de que sus muñecas colapsen por escribir tanto código premium.", totemId: "helice"),
+        DonationTier(amount: "$1024", subtitle: "Resonancia Libre de Spam", name: "Tótem del Origen", desc: "Patrocinio nivel deidad. Mantén el proyecto 100% libre de molestos anuncios de casinos y gana el derecho absoluto de presumir un astrolabio digital en tu perfil.", totemId: "astrolabio"),
+        DonationTier(amount: "$2048", subtitle: "Horizonte del Mecenas Supremo", name: "Tótem Final", desc: "El apoyo definitivo: Emmanuel se tatuará el logotipo de Somnera en la espalda y te enviará una carta de agradecimiento en papel pergamino físico.", totemId: "singularidad")
     ]
     
     var body: some View {
