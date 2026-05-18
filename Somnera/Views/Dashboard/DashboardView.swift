@@ -280,19 +280,9 @@ private struct TotemBadgeView: View {
     }
 
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(color.opacity(0.12))
-            Circle()
-                .stroke(color.opacity(0.45), lineWidth: 1)
-
-            Totem3DView(mathType: mathType, color: color, isUnlocked: true, isStatic: true)
-                // Keep the exact same animation as the equipped totem renderer; only scale it down.
-                .frame(width: 34, height: 34)
-                .scaleEffect(0.86)
-        }
-        .frame(width: 44, height: 44)
-        .accessibilityLabel("Insignia de patrocinador")
+        Totem3DView(mathType: mathType, color: color, isUnlocked: true, isStatic: false)
+            .frame(width: 44, height: 44)
+            .accessibilityLabel("Insignia de patrocinador")
     }
 }
 

@@ -437,10 +437,18 @@ struct Totem3DView: View {
     @ViewBuilder
     private func TotemCanvasView(time: Double) -> some View {
         Canvas { context, size in
-            let width = size.width
-            let height = size.height
-            let midX = width / 2
-            let midY = height / 2
+            let refSize: CGFloat = 200
+            let scale = min(size.width, size.height) / refSize
+            
+            var context = context
+            // Center the coordinate system at the actual canvas center
+            context.translateBy(x: size.width / 2, y: size.height / 2)
+            // Scale the context based on our reference size
+            context.scaleBy(x: scale, y: scale)
+            
+            // Draw relative to (0, 0) since we translated the center
+            let midX: CGFloat = 0
+            let midY: CGFloat = 0
 
             // Color configuration: Locked totems render in monotone gray
             let activeColor = isUnlocked ? color : Color.somTextSecondary.opacity(0.3)
