@@ -255,7 +255,7 @@ private struct TotemBadgeView: View {
 
     private var color: Color {
         switch totemId {
-        case "cuarzo": return .somSafe
+        case "cuarzo": return .somAccent
         case "piramide": return .somAccent
         case "giroscopio": return .somWarning
         case "tesseracto": return .somApnea

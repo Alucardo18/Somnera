@@ -20,7 +20,7 @@ struct DonationsView: View {
     }
     
     let totems = [
-        TotemInfo(id: "cuarzo", name: "Cuarzo de la Homeostasis", color: .somSafe, description: "Cristal bidireccional que estabiliza el ritmo circadiano y sintoniza los sensores locales. Representa el equilibrio perfecto entre CPU y batería.", mathType: .crystal),
+        TotemInfo(id: "cuarzo", name: "Cuarzo de la Homeostasis", color: .somAccent, description: "Cristal bidireccional que estabiliza el ritmo circadiano y sintoniza los sensores locales. Representa el equilibrio perfecto entre CPU y batería.", mathType: .crystal),
         TotemInfo(id: "piramide", name: "Pirámide Delta", color: .somAccent, description: "Geometría sagrada que amplifica las ondas de sueño profundo y estabiliza el pipeline de audio. Ideal para purgar ruidos percusivos.", mathType: .pyramid),
         TotemInfo(id: "giroscopio", name: "Giroscopio Topográfico", color: .somWarning, description: "Círculos concéntricos de oro líquido que rastrean los micro-movimientos de tu sueño en tiempo real con precisión milimétrica.", mathType: .gyro),
         TotemInfo(id: "tesseracto", name: "Tesseracto del Olvido", color: .somApnea, description: "Un hipercubo tetradimensional que deforma el espacio-tiempo para encapsular las apneas obstructivas antes de que irrumpan tu descanso.", mathType: .tesseract),
@@ -472,97 +472,95 @@ struct Totem3DView: View {
         }
     }
     
-    // CRYSTAL: Faceted Black Obsidian Quartz with Breathing Accent Glow & Ultra-slow Cinematic Rotation
+    // CRYSTAL: Minimalist Faceted Obsidian Quartz with Soft Brand Accent Glow & Gentle Floating Drift
     private func drawCrystal(context: GraphicsContext, midX: CGFloat, midY: CGFloat, time: Double, color: Color) {
         var context = context
         
-        // 1. Slow, high-end movement parameters
-        let t = time * 0.18 // Very slow cinematic rotation
-        let driftY = CGFloat(sin(time * 0.7)) * 4.0 // Gentle levitation drift
+        // 1. Slow, premium levitation drift (very little movement)
+        let driftY = CGFloat(sin(time * 0.8)) * 3.5
         let currentMidY = midY + driftY
         
-        let radiusX: CGFloat = 28
-        let radiusY: CGFloat = 10
-        let height: CGFloat = 62
+        let width: CGFloat = 18
+        let heightPoint: CGFloat = 45 // The straight column height
+        let heightCap: CGFloat = 16   // The top pyramid cap height
         
-        let top = CGPoint(x: midX, y: currentMidY - height)
-        let bottom = CGPoint(x: midX, y: currentMidY + height)
+        let capTip = CGPoint(x: midX, y: currentMidY - heightPoint - heightCap)
+        let topCenter = CGPoint(x: midX, y: currentMidY - heightPoint)
         
-        // 2. Accent Breathing Glow (Draw soft radial aura behind the crystal)
-        let pulseGlow = 0.65 + 0.15 * CGFloat(sin(time * 1.2))
-        let glowRect = CGRect(x: midX - 60, y: currentMidY - 70, width: 120, height: 140)
+        let topLeft = CGPoint(x: midX - width, y: currentMidY - heightPoint + 4)
+        let topRight = CGPoint(x: midX + width, y: currentMidY - heightPoint + 4)
+        
+        let botLeft = CGPoint(x: midX - width, y: currentMidY + heightPoint)
+        let botRight = CGPoint(x: midX + width, y: currentMidY + heightPoint)
+        let botCenter = CGPoint(x: midX, y: currentMidY + heightPoint - 4)
+        
+        // 2. Soft Breathing Glow (Somnera brand accent aura cast behind the crystal)
+        let pulseGlow = 0.7 + 0.18 * CGFloat(sin(time * 1.0))
+        let glowRect = CGRect(x: midX - 55, y: currentMidY - 65, width: 110, height: 130)
         let glowShader = GraphicsContext.Shading.radialGradient(
-            Gradient(colors: [color.opacity(0.18 * Double(pulseGlow)), .clear]),
+            Gradient(colors: [color.opacity(0.20 * Double(pulseGlow)), .clear]),
             center: CGPoint(x: midX, y: currentMidY),
             startRadius: 0,
-            endRadius: 55
+            endRadius: 50
         )
         context.fill(Path(ellipseIn: glowRect), with: glowShader)
         
-        // 3. Pre-calculate the 4 equatorial points of the crystal rotating slowly
-        var points: [CGPoint] = []
-        for i in 0..<4 {
-            let angle = t + Double(i) * .pi / 2
-            let x = midX + CGFloat(cos(angle)) * radiusX
-            let y = currentMidY + CGFloat(sin(angle)) * radiusY
-            points.append(CGPoint(x: x, y: y))
-        }
+        // 3. Facets styling (Rich matte obsidian black tones)
+        let leftBase = Color(hex: "#06070B")
+        let rightBase = Color(hex: "#0E1118")
         
-        // 4. Draw Obsidian Facets (Depth sorted to look 3D and solid)
-        let obsidianBase = Color(hex: "#05060A")
-        let obsidianHighlight = Color(hex: "#10131A")
+        // Draw Left Facet (solid fill)
+        var leftPath = Path()
+        leftPath.move(to: capTip)
+        leftPath.addLine(to: topCenter)
+        leftPath.addLine(to: botCenter)
+        leftPath.addLine(to: botLeft)
+        leftPath.addLine(to: topLeft)
+        leftPath.closeSubpath()
+        context.fill(leftPath, with: .color(leftBase))
         
-        for i in 0..<4 {
-            let p1 = points[i]
-            let p2 = points[(i + 1) % 4]
-            
-            let angleCenter = t + Double(i) * .pi / 2 + .pi / 4
-            let cosFacing = cos(angleCenter)
-            
-            let topColor = cosFacing > 0 ? obsidianHighlight : obsidianBase
-            let botColor = cosFacing > 0 ? obsidianBase.opacity(0.9) : obsidianBase.opacity(0.7)
-            
-            // Top pyramid face
-            var pathTop = Path()
-            pathTop.move(to: top)
-            pathTop.addLine(to: p1)
-            pathTop.addLine(to: p2)
-            pathTop.closeSubpath()
-            
-            context.fill(pathTop, with: .color(topColor))
-            let borderOpacity = cosFacing > 0 ? 0.65 : 0.2
-            context.stroke(pathTop, with: .color(color.opacity(borderOpacity)), lineWidth: 0.8)
-            
-            // Bottom pyramid face
-            var pathBot = Path()
-            pathBot.move(to: bottom)
-            pathBot.addLine(to: p1)
-            pathBot.addLine(to: p2)
-            pathBot.closeSubpath()
-            
-            context.fill(pathBot, with: .color(botColor))
-            context.stroke(pathBot, with: .color(color.opacity(borderOpacity * 0.7)), lineWidth: 0.8)
-        }
+        // Draw Right Facet (solid fill)
+        var rightPath = Path()
+        rightPath.move(to: capTip)
+        rightPath.addLine(to: topCenter)
+        rightPath.addLine(to: botCenter)
+        rightPath.addLine(to: botRight)
+        rightPath.addLine(to: topRight)
+        rightPath.closeSubpath()
+        context.fill(rightPath, with: .color(rightBase))
         
-        // 5. Draw Equator Ridge Line
-        var equator = Path()
-        equator.move(to: points[0])
-        for p in points.dropFirst() {
-            equator.addLine(to: p)
-        }
-        equator.closeSubpath()
-        context.stroke(equator, with: .color(color.opacity(0.55)), lineWidth: 1.0)
+        // 4. Vibrant Outer Outline & Center Ridge (Using Somnera brand accent color)
+        var outline = Path()
+        outline.move(to: capTip)
+        outline.addLine(to: topLeft)
+        outline.addLine(to: botLeft)
+        outline.addLine(to: botCenter)
+        outline.addLine(to: botRight)
+        outline.addLine(to: topRight)
+        outline.closeSubpath()
         
-        // 6. Draw Glossy Specular Glass Flare on one of the front edges
-        if let frontVertex = points.max(by: { $0.y < $1.y }) {
-            var flarePath = Path()
-            flarePath.move(to: top)
-            flarePath.addLine(to: frontVertex)
-            flarePath.addLine(to: bottom)
-            
-            let glossColor = Color.white.opacity(0.55)
-            context.stroke(flarePath, with: .color(glossColor), lineWidth: 1.2)
-        }
+        context.stroke(outline, with: .color(color.opacity(0.85)), lineWidth: 1.2)
+        
+        // Center dividing ridge line
+        var centerRidge = Path()
+        centerRidge.move(to: capTip)
+        centerRidge.addLine(to: topCenter)
+        centerRidge.addLine(to: botCenter)
+        context.stroke(centerRidge, with: .color(color.opacity(0.95)), lineWidth: 1.0)
+        
+        // Cap horizontal facets line
+        var capJoint = Path()
+        capJoint.move(to: topLeft)
+        capJoint.addLine(to: topCenter)
+        capJoint.addLine(to: topRight)
+        context.stroke(capJoint, with: .color(color.opacity(0.55)), lineWidth: 0.8)
+        
+        // 5. Specular highlight for premium glossy look
+        var glossPath = Path()
+        glossPath.move(to: capTip)
+        glossPath.addLine(to: topLeft)
+        glossPath.addLine(to: botLeft)
+        context.stroke(glossPath, with: .color(Color.white.opacity(0.45)), lineWidth: 0.8)
     }
     
     // PYRAMID: Delta Wave Tetrahedron
