@@ -91,7 +91,7 @@ struct DashboardView: View {
     private var headerSection: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 10) {
+                HStack(alignment: .center, spacing: -18) {
                     Text("Somnera")
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(LinearGradient(
