@@ -267,16 +267,16 @@ private struct TotemBadgeView: View {
         }
     }
 
-    private var symbol: String {
+    private var mathType: TotemMathType {
         switch totemId {
-        case "cuarzo": return "sparkle"
-        case "piramide": return "triangle.fill"
-        case "giroscopio": return "gyroscope"
-        case "tesseracto": return "cube.transparent.fill"
-        case "helice": return "waveform.path.ecg"
-        case "astrolabio": return "sun.max.fill"
-        case "singularidad": return "circle.dotted.circle.fill"
-        default: return "seal.fill"
+        case "cuarzo": return .crystal
+        case "piramide": return .pyramid
+        case "giroscopio": return .gyro
+        case "tesseracto": return .tesseract
+        case "helice": return .helix
+        case "astrolabio": return .astrolabe
+        case "singularidad": return .singularity
+        default: return .crystal
         }
     }
 
@@ -287,11 +287,10 @@ private struct TotemBadgeView: View {
             Circle()
                 .stroke(color.opacity(0.45), lineWidth: 1)
 
-            Image(systemName: symbol)
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(color)
+            Totem3DView(mathType: mathType, color: color, isUnlocked: true)
+                .frame(width: 18, height: 18)
                 .rotationEffect(.degrees(spin ? 360 : 0))
-                .animation(.linear(duration: 7.0).repeatForever(autoreverses: false), value: spin)
+                .animation(.linear(duration: 18.0).repeatForever(autoreverses: false), value: spin)
         }
         .frame(width: 22, height: 22)
         .onAppear { spin = true }
