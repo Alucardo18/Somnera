@@ -181,7 +181,32 @@ struct SponsorWelcomeView: View {
         "En la calma de la noche, cada latido busca el equilibrio absoluto.",
         "La noche cobija a los valientes que cuidan de su salud en el silencio.",
         "Respira con calma, la inteligencia de Somnera vela por tu tranquilidad.",
-        "Tu descanso es el combustible sagrado de tu mente para el mañana."
+        "Tu descanso es el combustible sagrado de tu mente para el mañana.",
+        "El día ha terminado. Deja que la gravedad haga su trabajo, relaja los hombros y permite que Somnera cuide de tus frecuencias estelares. Estás a salvo.",
+        "Cada latido de tu corazón es una sincronía perfecta con el universo. Apaga tus pensamientos de hoy; tu gemelo digital vigila el descanso.",
+        "La homeostasis perfecta no se busca con prisa, se permite en calma. Suelta el aire, apaga la mente y sintoniza con el silencio de la noche.",
+        "Dormir no es perder el tiempo, es la alquimia que consolida tus memorias y tu alma. Buenas noches, que tus ondas delta fluyan en perfecta armonía.",
+        "Tu Tótem está activo y la Biosfera en perfecto equilibrio. Has hecho suficiente por hoy; entrégate al infinito y descansa.",
+        "El descanso es la cuna de toda tu fuerza de mañana. Relaja la mandíbula, inhala paz y deja que la noche te cubra.",
+        "La noche limpia el ruido del mundo; permite que la quietud repare tus células y resetee tu conciencia.",
+        "El cerebro no duerme; esculpe tus recuerdos en el lienzo de la noche, creando la mejor versión de ti mismo.",
+        "Sintoniza la frecuencia de la respiración: una inhalación lenta de serenidad, una exhalación profunda de entrega.",
+        "En el laboratorio del sueño, la oscuridad es el reactivo más puro para restaurar tu homeostasis vital.",
+        "Deja que tus párpados pesen tanto como las galaxias lejanas. La gravedad te sostiene con amor y seguridad.",
+        "Tu respiración es el oleaje de un mar en calma. Déjate mecer por su ritmo constante, libre de tensiones.",
+        "El silencio no es la ausencia de sonido, es la presencia del descanso absoluto. Habita este instante.",
+        "Cada ciclo de sueño es un viaje de retorno a tu esencia biológica más pura. Viaja ligero, viaja en paz.",
+        "Las estrellas brillan afuera para recordarte que la luz siempre espera al final de la noche. Duerme tranquilo.",
+        "Tu mente ha corrido maratones hoy; es justo y necesario que ahora repose bajo el manto de la noche.",
+        "La temperatura desciende, el ritmo cardíaco se estabiliza. Tu cuerpo sabe exactamente cómo sanar en la penumbra.",
+        "Abandona el control del tiempo. En el espacio del sueño, no hay agendas ni tareas, solo reparación infinita.",
+        "Eres parte de la Biosfera; la naturaleza apaga sus luces y te invita a sincronizarte con el pulso de la Tierra.",
+        "La homeostasis es la sabiduría silenciosa de tu cuerpo. Confía en su capacidad para restaurar tu equilibrio nocturno.",
+        "Permite que las ondas delta acunen tus pensamientos, transformando la prisa diurna en paz nocturna.",
+        "Tu descanso es un santuario privado. Cierra las puertas al ruido y dale la bienvenida a la regeneración celular.",
+        "El latido nocturno es pausado, limpio y rítmico. Somnera acompaña cada vibración hacia tu homeostasis perfecta.",
+        "El mañana se construye esta noche. Regálate el descanso más profundo y reparador como un acto de amor propio.",
+        "Apaga la última luz del pensamiento. Duerme con la certeza de que todo está bien, y la mañana traerá nueva energía."
     ]
     
     let thanks = [
@@ -289,7 +314,7 @@ struct SponsorWelcomeView: View {
                         isPresented = false
                     }
                 } label: {
-                    Text("EMPEZAR TU VIAJE")
+                    Text("CONTINUAR")
                         .font(.system(.headline, design: .rounded).bold())
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
