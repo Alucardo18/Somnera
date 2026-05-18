@@ -46,7 +46,7 @@ struct ContentView: View {
                 .environmentObject(appState)
         }
         .fullScreenCover(isPresented: $showSponsorWelcome) {
-            SponsorWelcomeView(isPresented: $showSponsorWelcome, autoDismissAfter: 10.0)
+            SponsorTimedWelcomeView(isPresented: $showSponsorWelcome, autoDismissAfter: 10.0)
         }
     }
 }

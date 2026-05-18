@@ -243,7 +243,7 @@ struct DonationsView: View {
                     .presentationDetents([.fraction(0.35)])
             }
             .fullScreenCover(isPresented: $showSponsorWelcome) {
-                SponsorWelcomeView(isPresented: $showSponsorWelcome, autoDismissAfter: 7.0)
+                SponsorTimedWelcomeView(isPresented: $showSponsorWelcome, autoDismissAfter: 7.0)
             }
         }
     }
