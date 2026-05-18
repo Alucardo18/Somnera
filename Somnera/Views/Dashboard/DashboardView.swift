@@ -288,11 +288,13 @@ private struct TotemBadgeView: View {
                 .stroke(color.opacity(0.45), lineWidth: 1)
 
             Totem3DView(mathType: mathType, color: color, isUnlocked: true)
-                .frame(width: 18, height: 18)
+                .frame(width: 26, height: 26)
+                .scaleEffect(0.92)
                 .rotationEffect(.degrees(spin ? 360 : 0))
                 .animation(.linear(duration: 18.0).repeatForever(autoreverses: false), value: spin)
         }
-        .frame(width: 22, height: 22)
+        .frame(width: 32, height: 32)
+        .clipShape(Circle())
         .onAppear { spin = true }
         .accessibilityLabel("Insignia de mecenas")
     }
