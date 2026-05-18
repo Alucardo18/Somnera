@@ -564,45 +564,104 @@ struct Totem3DView: View {
     }
     
     // PYRAMID: Delta Wave Tetrahedron
+    // PYRAMID: Delta Wave Tetrahedron (Obsidian Glass with brand accent glowing borders)
     private func drawPyramid(context: GraphicsContext, midX: CGFloat, midY: CGFloat, time: Double, color: Color) {
-        let t = time * 0.7
-        let radius: CGFloat = 38
-        let height: CGFloat = 45
+        var context = context
         
-        let apex = CGPoint(x: midX, y: midY - height * 0.8)
+        let t = time * 0.55 // Slow, cinematic rotation
+        let driftY = CGFloat(sin(time * 0.8)) * 3.0 // Gentle levitation drift
+        let currentMidY = midY + driftY
         
+        let radius: CGFloat = 36
+        let height: CGFloat = 46
+        
+        let apex = CGPoint(x: midX, y: currentMidY - height * 0.85)
+        
+        // Soft aura glow cast behind the pyramid
+        let pulseGlow = 0.65 + 0.15 * CGFloat(sin(time * 1.1))
+        let glowRect = CGRect(x: midX - 50, y: currentMidY - 55, width: 100, height: 110)
+        let glowShader = GraphicsContext.Shading.radialGradient(
+            Gradient(colors: [color.opacity(0.16 * Double(pulseGlow)), .clear]),
+            center: CGPoint(x: midX, y: currentMidY),
+            startRadius: 0,
+            endRadius: 48
+        )
+        context.fill(Path(ellipseIn: glowRect), with: glowShader)
+        
+        // Calculate the 3 rotating base points
         var basePoints: [CGPoint] = []
         for i in 0..<3 {
             let angle = t + Double(i) * 2.0 * .pi / 3.0
             let x = midX + CGFloat(cos(angle)) * radius
-            let y = midY + height * 0.4 + CGFloat(sin(angle)) * (radius * 0.4)
+            let y = currentMidY + height * 0.45 + CGFloat(sin(angle)) * (radius * 0.35)
             basePoints.append(CGPoint(x: x, y: y))
         }
         
-        // Draw Base
+        // Calculate depth (z/cosFacing) for each face to fill with appropriate obsidian tones
+        let obsidianShadow = Color(hex: "#040507")
+        let obsidianBase = Color(hex: "#090B10")
+        let obsidianHighlight = Color(hex: "#121620")
+        
+        // Draw the bottom base first (deep shadow)
         var base = Path()
         base.move(to: basePoints[0])
         base.addLine(to: basePoints[1])
         base.addLine(to: basePoints[2])
         base.closeSubpath()
-        context.stroke(base, with: .color(color.opacity(0.8)), lineWidth: 1.2)
-        context.fill(base, with: .color(color.opacity(0.05)))
+        context.fill(base, with: .color(obsidianShadow))
+        context.stroke(base, with: .color(color.opacity(0.4)), lineWidth: 1.0)
         
-        // Draw Faces
+        // Draw the 3 Faces with dynamic obsidian coloring based on rotation angle
         for i in 0..<3 {
             let p1 = basePoints[i]
             let p2 = basePoints[(i+1)%3]
+            
+            // Angle of the face's center from the rotation center
+            let angleCenter = t + Double(i) * 2.0 * .pi / 3.0 + .pi / 3.0
+            let cosFacing = cos(angleCenter)
+            
+            // Map facing direction to obsidian tone
+            let faceColor: Color
+            if cosFacing > 0.3 {
+                faceColor = obsidianHighlight
+            } else if cosFacing > -0.3 {
+                faceColor = obsidianBase
+            } else {
+                faceColor = obsidianShadow
+            }
+            
             var face = Path()
             face.move(to: apex)
             face.addLine(to: p1)
             face.addLine(to: p2)
             face.closeSubpath()
-            context.stroke(face, with: .color(color), lineWidth: 1.5)
-            context.fill(face, with: .color(color.opacity(0.1)))
+            
+            // Fill with solid premium obsidian
+            context.fill(face, with: .color(faceColor))
+            
+            // Outline with the gorgeous vibrant brand accent color
+            let borderOpacity = cosFacing > -0.2 ? 0.9 : 0.4
+            context.stroke(face, with: .color(color.opacity(borderOpacity)), lineWidth: 1.4)
         }
         
+        // Draw Glossy Specular Glass Flare on the front-most edge
+        var frontIndex = 0
+        var maxVal: CGFloat = -9999
+        for i in 0..<3 {
+            if basePoints[i].y > maxVal {
+                maxVal = basePoints[i].y
+                frontIndex = i
+            }
+        }
+        let frontPoint = basePoints[frontIndex]
+        
+        var flarePath = Path()
+        flarePath.move(to: apex)
+        flarePath.addLine(to: frontPoint)
+        context.stroke(flarePath, with: .color(Color.white.opacity(0.45)), lineWidth: 1.0)
+        
         // Pulse glow node at apex
-        let pulseSize = 6 + CGFloat(sin(time * 3.0)) * 2
+        let pulseSize = 6 + CGFloat(sin(time * 3.0)) * 1.5
         let pulseRect = CGRect(x: apex.x - pulseSize/2, y: apex.y - pulseSize/2, width: pulseSize, height: pulseSize)
         context.fill(Circle().path(in: pulseRect), with: .color(color))
     }
