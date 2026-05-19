@@ -112,7 +112,7 @@ struct SessionDetailView: View {
                 .padding()
             }
         }
-        .navigationTitle(session.startDate.formatted(.dateTime.weekday(.abbreviated).day().month()))
+        .navigationTitle(session.endDate.formatted(.dateTime.weekday(.abbreviated).day().month()))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Color.somBackground, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)

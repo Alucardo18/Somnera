@@ -81,6 +81,12 @@ struct RecordingView: View {
                     vm.wakeUp()
                 }
             }
+            
+            // MARK: - Sleep Focus Deactivation Overlay
+            if vm.showSleepFocusPrompt {
+                sleepFocusPromptOverlay
+                    .transition(.opacity)
+            }
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -103,7 +109,9 @@ struct RecordingView: View {
                             }
                         }
                     }
-                    dismiss()
+                    if !vm.showSleepFocusPrompt {
+                        dismiss()
+                    }
                 }
             }
         } message: {
@@ -474,6 +482,82 @@ struct RecordingView: View {
                     .stroke(Color.somApnea.opacity(0.5), lineWidth: 1)
             )
             .shadow(color: .somApnea.opacity(0.3), radius: 15)
+        }
+    }
+    
+    private var sleepFocusPromptOverlay: some View {
+        ZStack {
+            // Darkened backdrop with blur
+            Color.black.opacity(0.8)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 25) {
+                // Moon/Bell Icon with animation ripple effect
+                ZStack {
+                    Circle()
+                        .fill(Color.somAccent.opacity(0.15))
+                        .frame(width: 80, height: 80)
+                    
+                    Image(systemName: "moon.slash.fill")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.somAccent)
+                }
+                
+                Text("Desactivar Modo Sueño")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                
+                Text("Tu análisis clínico de Somnera (iPhone + Apple Watch) ha concluido con éxito. Para asegurar que recibas todas tus notificaciones y alarmas correctamente, por favor desactiva el modo 'Sueño' o 'No Molestar'.")
+                    .font(.system(size: 14))
+                    .foregroundColor(.somTextSecondary)
+                    .lineSpacing(4)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 10)
+                
+                VStack(spacing: 12) {
+                    // Button to open settings
+                    Button {
+                        if let url = URL(string: "App-Prefs:root=DO_NOT_DISTURB") {
+                            if UIApplication.shared.canOpenURL(url) {
+                                UIApplication.shared.open(url)
+                            } else {
+                                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "slider.horizontal.3")
+                            Text("Desactivar en Ajustes")
+                                .fontWeight(.semibold)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(Color.somAccent)
+                        .foregroundColor(.white)
+                        .cornerRadius(14)
+                        .shadow(color: .somAccent.opacity(0.3), radius: 8)
+                    }
+                    
+                    // Button to close and dismiss view
+                    Button {
+                        vm.showSleepFocusPrompt = false
+                        dismiss()
+                    } label: {
+                        Text("Entendido, Cerrar")
+                            .fontWeight(.medium)
+                            .foregroundColor(.somTextSecondary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Color.white.opacity(0.06))
+                            .cornerRadius(14)
+                    }
+                }
+                .padding(.top, 10)
+            }
+            .padding(30)
+            .somGlassStyle(cornerRadius: 24)
+            .padding(24)
         }
     }
 }

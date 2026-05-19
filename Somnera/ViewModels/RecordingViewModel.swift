@@ -3,6 +3,8 @@ import AVFoundation
 import Combine
 import UIKit
 import SwiftUI
+import Intents
+import UserNotifications
 
 /// Central coordinator for a live sleep recording session.
 /// Connects AudioCapture → DSP → SnoreDetection + ApneaDetection → Storage.
@@ -43,6 +45,8 @@ final class RecordingViewModel: ObservableObject {
     // Sleep Shield (Screen Management)
     @Published var isDimmed: Bool = false
     @Published var isProximityCovered: Bool = false
+    @Published var showSleepFocusPrompt: Bool = false
+    @Published var wasFocusModeActiveOnStop: Bool = false
     private var lastInteractionDate = Date()
     private var originalBrightness: CGFloat = UIScreen.main.brightness
     private var screenDimmerTask: Task<Void, Never>?
@@ -498,12 +502,68 @@ final class RecordingViewModel: ObservableObject {
                     avgStability: avgStability
                 )
             }
+            
+            // Check Sleep Focus deactivation rule: session duration > 5 minutes (300 seconds)
+            let sessionDuration = sessionStart.map { Date().timeIntervalSince($0) } ?? 0.0
+            print("[Somnera] ⏱️ Duración de la sesión terminada: \(sessionDuration) segundos")
+            if sessionDuration > 300 {
+                let focusActive = checkSystemFocusStatus()
+                if focusActive {
+                    print("[Somnera] 🌙 Se detectó el modo Sueño activo. Activando flujo de desactivación.")
+                    self.wasFocusModeActiveOnStop = true
+                    self.showSleepFocusPrompt = true
+                    triggerFocusDeactivationNotification()
+                } else {
+                    print("[Somnera] ☀️ Modo Sueño no detectado como activo.")
+                }
+            }
         } else {
             print("[Somnera] 🗑️ Sesión descartada (cancelada durante el retardo/setup)")
             if let sessionToDiscard = self.session {
                 sessionStorage.delete(sessionToDiscard)
             }
             session = nil
+        }
+    }
+
+    private func checkSystemFocusStatus() -> Bool {
+        let statusCenter = INFocusStatusCenter.default
+        if statusCenter.authorizationStatus == .authorized {
+            return statusCenter.focusStatus.isFocused ?? true
+        }
+        
+        // Fallback: If focus status permission is not determined or restricted,
+        // we check if the current time is between 10 PM (22:00) and 10 AM (10:00)
+        // when Sleep Focus is normally scheduled and active.
+        let hour = Calendar.current.component(.hour, from: Date())
+        if hour >= 22 || hour <= 10 {
+            return true
+        }
+        return false
+    }
+
+    private func triggerFocusDeactivationNotification() {
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+            guard granted else { return }
+            
+            let content = UNMutableNotificationContent()
+            content.title = "🌙 Sesión de Somnera Completada"
+            content.body = "Tu análisis clínico ha terminado. Recuerda desactivar el modo Sueño en tu iPhone o Apple Watch."
+            content.sound = .default
+            
+            if #available(iOS 15.0, *) {
+                content.interruptionLevel = .timeSensitive
+            }
+            
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1.0, repeats: false)
+            let request = UNNotificationRequest(identifier: "SomneraSleepFocusDeactivation", content: content, trigger: trigger)
+            
+            center.add(request) { error in
+                if let error = error {
+                    print("[Somnera] Error scheduling deactivation notification: \(error)")
+                }
+            }
         }
     }
 

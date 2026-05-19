@@ -71,7 +71,7 @@ final class DashboardViewModel: ObservableObject {
             let day = calendarWithSundayStart.date(byAdding: .day, value: dayOffset, to: startOfWeek)!
             
             let sessionsOnDay = sessions.filter {
-                calendarWithSundayStart.isDate($0.startDate, inSameDayAs: day)
+                calendarWithSundayStart.isDate($0.endDate, inSameDayAs: day)
             }
             
             let score = sessionsOnDay.isEmpty ? nil :

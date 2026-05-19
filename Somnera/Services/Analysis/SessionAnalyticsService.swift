@@ -50,8 +50,8 @@ final class SessionAnalyticsService {
         let sevenDaysAgo = calendar.date(byAdding: .day, value: -7, to: now)!
         let fourteenDaysAgo = calendar.date(byAdding: .day, value: -14, to: now)!
         
-        let currentWeekSessions = sessions.filter { $0.startDate >= sevenDaysAgo }
-        let previousWeekSessions = sessions.filter { $0.startDate >= fourteenDaysAgo && $0.startDate < sevenDaysAgo }
+        let currentWeekSessions = sessions.filter { $0.endDate >= sevenDaysAgo }
+        let previousWeekSessions = sessions.filter { $0.endDate >= fourteenDaysAgo && $0.endDate < sevenDaysAgo }
         
         let currentAvg = currentWeekSessions.isEmpty ? 0 : 
             currentWeekSessions.map { $0.snoreScore }.reduce(0, +) / currentWeekSessions.count

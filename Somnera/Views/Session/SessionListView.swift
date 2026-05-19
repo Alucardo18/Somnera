@@ -9,7 +9,7 @@ struct SessionListView: View {
     
     private var filteredSessions: [SleepSession] {
         viewModel.sessions.filter { 
-            Calendar.current.isDate($0.startDate, inSameDayAs: selectedDate)
+            Calendar.current.isDate($0.endDate, inSameDayAs: selectedDate)
         }
     }
     
@@ -196,7 +196,7 @@ struct SessionBubbleView: View {
                         .font(.system(size: bubbleSize * 0.3, weight: .black, design: .rounded))
                         .foregroundColor(.white)
                     
-                    Text(session.startDate.formatted(.dateTime.day().month()))
+                    Text(session.endDate.formatted(.dateTime.day().month()))
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(.somTextSecondary)
                 }
@@ -226,7 +226,7 @@ struct SessionInsightCard: View {
         HStack(spacing: 0) {
             // Left: Score & Date
             VStack(alignment: .leading, spacing: 4) {
-                Text(session.startDate.formatted(.dateTime.weekday(.abbreviated).day().month()))
+                Text(session.endDate.formatted(.dateTime.weekday(.abbreviated).day().month()))
                     .font(.system(size: 10, weight: .black))
                     .foregroundColor(.somTextSecondary)
                     .textCase(.uppercase)
@@ -410,7 +410,7 @@ struct CalendarNavigatorView: View {
     }
     
     private func dayCell(for date: Date, compact: Bool = false) -> some View {
-        let sessionsOnDay = sessions.filter { calendar.isDate($0.startDate, inSameDayAs: date) }
+        let sessionsOnDay = sessions.filter { calendar.isDate($0.endDate, inSameDayAs: date) }
         let hasSession = !sessionsOnDay.isEmpty
         let isToday = calendar.isDateInToday(date)
         let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)

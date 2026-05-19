@@ -37,7 +37,7 @@ final class SessionStorageService {
     @MainActor
     func fetchAll() -> [SleepSession] {
         guard let context = context else { return [] }
-        let descriptor = FetchDescriptor<SleepSession>(sortBy: [SortDescriptor(\.startDate, order: .reverse)])
+        let descriptor = FetchDescriptor<SleepSession>(sortBy: [SortDescriptor(\.endDate, order: .reverse)])
         do {
             return try context.fetch(descriptor)
         } catch {
